@@ -1,0 +1,14 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"label": "Maven Clean Install (user)",
+			"command": "../../product/mvnw clean install -f ../../product/pom.xml",
+			"group": "build",
+			"problemMatcher": [
+				"$javac"
+			]
+		}
+	]
+}

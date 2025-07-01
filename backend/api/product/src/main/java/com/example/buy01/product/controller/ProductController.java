@@ -1,4 +1,4 @@
-package com.example.letsplay.controller;
+package com.example.buy01.controller;
 
 import com.example.letsplay.dto.ProductCreateDTO;
 import com.example.letsplay.dto.ProductDTO;

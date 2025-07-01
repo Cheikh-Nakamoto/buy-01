@@ -1,6 +1,12 @@
-package com.example.letsplay.dto;
+package com.example.buy01.user.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 // DTO pour la requête d'authentification
 // Cette classe contient les informations nécessaires pour authentifier un utilisateur
@@ -16,6 +22,15 @@ import lombok.Data;
 
 @Data
 public class AuthRequest {
+    @Email
+    @NotBlank(message = "Email is required")
+    @Size(max = 255)
+    @Schema(description = "User email", example = "papi@mail.to")
     private String email;
+
+    @NotBlank(message = "Password is required")
+    @Size(min = 8, max = 64)
+    @Schema(description = "User password", example = "password123")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) // Ne pas exposer le mot de passe dans les réponses JSON
     private String password;
 }

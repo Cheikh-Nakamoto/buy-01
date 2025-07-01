@@ -1,7 +1,8 @@
-package com.example.letsplay;
+package com.example.buy01.user;
 
-import com.example.letsplay.model.User;
-import com.example.letsplay.repository.UserRepository;
+import com.example.buy01.user.model.User;
+import com.example.buy01.user.model.UserRoleType.UserRole;
+import com.example.buy01.user.repository.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -25,7 +26,7 @@ public class AdminInitializer implements CommandLineRunner {
             admin.setName("adminroot");
             admin.setEmail("admin@root.com");
             admin.setPassword(passwordEncoder.encode("test123"));
-            admin.setRole("ADMIN");
+            admin.setRole(UserRole.ADMIN);
             userRepository.save(admin);
             System.out.println("✅ Admin user created");
         }

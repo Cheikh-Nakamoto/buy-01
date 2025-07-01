@@ -1,12 +1,4 @@
-package com.example.letsplay.service;
-
-import com.example.letsplay.dto.ProductCreateDTO;
-import com.example.letsplay.dto.ProductDTO;
-import com.example.letsplay.dto.ProductUpdateDTO;
-import com.example.letsplay.exception.ResourceNotFoundException;
-import com.example.letsplay.model.Product;
-import com.example.letsplay.repository.ProductRepository;
-import com.example.letsplay.security.UserDetailsImpl;
+package com.example.buy01.product.service;
 
 import lombok.RequiredArgsConstructor;
 

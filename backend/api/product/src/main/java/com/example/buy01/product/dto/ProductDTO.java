@@ -1,4 +1,4 @@
-package com.example.letsplay.dto;
+package com.example.buy01.dto;
 
 import lombok.Data;
 

@@ -1,4 +1,4 @@
-package com.example.letsplay.security;
+package com.example.buy01.user.security;
 
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;

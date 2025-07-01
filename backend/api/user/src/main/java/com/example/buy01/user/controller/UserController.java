@@ -1,23 +1,68 @@
+package com.example.buy01.user.controller;
+
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.example.buy01.user.dto.UserDTO;
+import com.example.buy01.user.dto.UserUpdateDTO;
+import com.example.buy01.user.service.UserService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/users")
-@PreAuthorize("hasAnyRole('CLIENT', 'SELLER'), 'ADMIN'") // Autorise l'accès aux utilisateurs ayant les rôles CLIENT, ADMIN ou SELLER
+@PreAuthorize("hasAnyRole('CLIENT', 'SELLER', 'ADMIN')") // Autorise l'accès aux utilisateurs ayant les rôles CLIENT,
+                                                         // ADMIN ou SELLER
 public class UserController {
 
     @Autowired
     private UserService userService;
 
     // Récupérer un utilisateur par son ID
-    @GetMapping("/{id}")
-    @PostAuthorize("returnObject?.getBody()?.id == authentication.principal.id or hasRole('ADMIN')") // Autorise l'accès si l'utilisateur est l'utilisateur demandé ou s'il a le rôle ADMIN
+    @GetMapping("/profile/{id}")
+    @PostAuthorize("returnObject?.getBody()?.id == authentication.principal.id or hasRole('ADMIN')") // Autorise l'accès
+                                                                                                     // si l'utilisateur
+                                                                                                     // est
+                                                                                                     // l'utilisateur
+                                                                                                     // demandé ou s'il
+                                                                                                     // a le rôle ADMIN
     public ResponseEntity<UserDTO> getUserById(@PathVariable String id) {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
     // Modifier un utilisateur
-    @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id") // Autorise l'accès si l'utilisateur est l'utilisateur demandé ou s'il a le rôle ADMIN
+    @PutMapping("/update/{id}")
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id") // Autorise l'accès si l'utilisateur est
+                                                                            // l'utilisateur demandé ou s'il a le rôle
+                                                                            // ADMIN
     public ResponseEntity<UserDTO> updateUser(@PathVariable String id, @Valid @RequestBody UserUpdateDTO dto) {
         return ResponseEntity.ok(userService.updateUser(id, dto));
+    }
+
+    @PutMapping("/avatar")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SELLER')") // Autorise l'accès aux utilisateurs
+                                                           // ayant les rôles CLIENT, SELLER ou
+                                                           // ADMIN
+    public ResponseEntity<?> uploadAvatar(@RequestParam("file") MultipartFile file, @PathVariable String id) {
+        try {
+            String url = userService.uploadAvatar(file, id);
+            return ResponseEntity.ok(Map.of("avatarUrl", url));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Échec de l’upload de l’avatar");
+        }
     }
 }

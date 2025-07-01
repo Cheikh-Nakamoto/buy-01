@@ -1,4 +1,4 @@
-package com.example.letsplay.security;
+package com.example.buy01.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

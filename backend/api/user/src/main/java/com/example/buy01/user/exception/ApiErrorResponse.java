@@ -1,4 +1,4 @@
-package com.example.letsplay.exception;
+package com.example.buy01.user.exception;
 
 
 import java.time.LocalDateTime;

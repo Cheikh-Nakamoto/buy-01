@@ -1,18 +1,25 @@
-package com.example.letsplay.service;
+package com.example.buy01.user.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.example.letsplay.dto.UserCreateDTO;
-import com.example.letsplay.dto.UserDTO;
-import com.example.letsplay.dto.UserUpdateDTO;
-import com.example.letsplay.exception.*;
-import com.example.letsplay.model.User;
-import com.example.letsplay.repository.UserRepository;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.example.buy01.user.dto.UserCreateDTO;
+import com.example.buy01.user.dto.UserDTO;
+import com.example.buy01.user.dto.UserUpdateDTO;
+import com.example.buy01.user.event.KafkaUserProducer;
+import com.example.buy01.user.exception.*;
+import com.example.buy01.user.model.User;
+import com.example.buy01.user.model.UserRoleType.UserRole;
+import com.example.buy01.user.repository.UserRepository;
+import com.example.buy01.user.utils.ValidateMethods;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -26,19 +33,22 @@ public class UserService {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
+    @Autowired
+    private KafkaUserProducer kafkaProducer;
+
     // Conversion User → DTO
     private UserDTO toDTO(User user) {
         UserDTO dto = new UserDTO();
-        dto.setId(user.getId());
         dto.setName(user.getName());
         dto.setEmail(user.getEmail());
         dto.setRole(user.getRole());
+        dto.setAvatar(user.getAvatar());
         return dto;
     }
 
     // Création d'un utilisateur
     // Vérification de l'unicité de l'email
-    public UserDTO createUser(UserCreateDTO dto) {
+    public UserDTO createUser(UserCreateDTO dto, MultipartFile avatar) throws IOException {
         if (userRepository.existsByEmail(dto.getEmail())) {
             throw new EmailAlreadyUsedException("Email already used");
         }
@@ -52,11 +62,22 @@ public class UserService {
         user.setName(dto.getName());
         user.setEmail(dto.getEmail());
         user.setRole(dto.getRole());
-
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
-
         ValidateMethods.validateUser(user);
-        return toDTO(userRepository.save(user));
+        // Enregistrement de l'utilisateur
+        user = userRepository.save(user);
+        kafkaProducer.sendUserCreatedEvent(user);
+
+        // Gestion de l'avatar
+        // Si l'avatar est fourni, on l'upload
+        // Si l'avatar n'est pas fourni, on le met à null
+        if (avatar != null && user.getRole() == UserRole.SELLER) {
+            user.setAvatar(uploadAvatar(avatar, user.getId()));
+        } else {
+            user.setAvatar(null); // Set avatar to null if not provided
+        }
+
+        return toDTO(user);
     }
 
     // Récupération de tous les utilisateurs
@@ -105,7 +126,7 @@ public class UserService {
         if (dto.getEmail() != null && !dto.getEmail().isBlank()) {
             user.setEmail(dto.getEmail());
         }
-        
+
         ValidateMethods.validateUser(user);
         return toDTO(userRepository.save(user));
     }
@@ -118,5 +139,41 @@ public class UserService {
             throw new ResourceNotFoundException("User not found");
         }
         userRepository.deleteById(id);
+        kafkaProducer.sendUserDeletedEvent(id); //Envoi de l'événement de suppression à Kafka
     }
+
+    public String uploadAvatar(MultipartFile file, String userId) throws IOException {
+        if (file.isEmpty() || !validateMethods.isImage(file)) {
+            throw new IllegalArgumentException("Fichier invalide. Format autorisé : JPEG, PNG, WEBP.");
+        }
+
+        if (file.getSize() > 2 * 1024 * 1024) {
+            throw new IllegalArgumentException("Taille maximale autorisée : 2 Mo.");
+        }
+
+        String originalFilename = file.getOriginalFilename();
+
+        if (originalFilename == null || !originalFilename.contains(".")) {
+            throw new IllegalArgumentException("Nom de fichier invalide.");
+        }
+
+        // Génération d'un nom de fichier unique
+        // Utilisation de UUID pour éviter les collisions de noms
+        // Extraction de l'extension du fichier
+        String ext = originalFilename.substring(originalFilename.lastIndexOf("."));
+        String filename = UUID.randomUUID() + ext;
+        String path = "uploads/avatars/" + filename;
+
+        File dir = new File("uploads/avatars");
+        dir.mkdirs();
+        file.transferTo(new File(path));
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Utilisateur non trouvé"));
+        user.setAvatar("/avatars/" + filename);
+        userRepository.save(user);
+
+        return user.getAvatar();
+    }
+
 }

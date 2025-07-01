@@ -1,12 +1,16 @@
-package com.example.letsplay.dto;
+package com.example.buy01.user.dto;
 
 import org.springframework.data.mongodb.core.index.Indexed;
+
+import com.example.buy01.user.model.UserRoleType.UserRole;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
 @Data
 public class UserCreateDTO {
+
+    // DTO pour la création d'un utilisateur
     @NotBlank(message = "Le nom est obligatoire")
     private String name;
 
@@ -17,26 +21,28 @@ public class UserCreateDTO {
     private String email;
 
     @NotBlank(message = "Le mot de passe est obligatoire")
-    @Size(min = 6, message = "Le mot de passe doit contenir au moins 6 caractères")
+    @Size(min = 8, message = "Le mot de passe doit contenir au moins 8 caractères")
     private String password;
 
     @NotNull(message = "Le rôle est obligatoire")
-    @Pattern(regexp = "USER|ADMIN", message = "Le rôle doit être USER ou ADMIN")
-    private String role;
+    @Pattern(regexp = "CLIENT|SELLER", message = "Le rôle doit être CLIENT ou SELLER")
+    private UserRole role;
 
+    // Getters and Setters
     public String getName() {
         return name;
     }
-
     public void setName(String name) {
         this.name = name;
     }
+
     public String getEmail() {
         return email;
     }
     public void setEmail(String email) {
         this.email = email;
     }
+
     public String getPassword() {
         return password;
     }
@@ -44,10 +50,10 @@ public class UserCreateDTO {
         this.password = password;
     }
 
-    public String getRole() {
+    public UserRole getRole() {
         return role;
     }
-    public void setRole(String role) {
+    public void setRole(UserRole role) {
         this.role = role;
     }
     

@@ -1,10 +1,11 @@
-package com.example.letsplay.dto;
+package com.example.buy01.user.dto;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
 @Data
 public class UserUpdateDTO {
+    
     private String name;
 
     @Email(message = "Email invalide")
@@ -12,7 +13,7 @@ public class UserUpdateDTO {
     private String email;
     
     @Size(min = 6, message = "Le mot de passe doit contenir au moins 6 caractères")
-    private String password; // facultatif
+    private String password;
 
     public String getName() {
         return name;

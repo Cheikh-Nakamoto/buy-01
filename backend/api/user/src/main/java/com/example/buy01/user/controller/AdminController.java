@@ -1,5 +1,20 @@
 package com.example.buy01.user.controller;
 // Contrôleur pour les opérations administratives
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.buy01.user.dto.UserDTO;
+import com.example.buy01.user.service.UserService;
+
 // Cette classe gère les requêtes d'administration des utilisateurs
 // Elle utilise le UserService pour interagir avec la base de données
 // Elle est annotée avec @RestController pour être détectée par Spring et injectée dans d'autres classes
@@ -8,39 +23,40 @@ package com.example.buy01.user.controller;
 // Elle utilise Lombok pour générer le constructeur et les méthodes d'accès
 
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("/api/admin/users")
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
 
     @Autowired
     private UserService userService;
-    @Autowired
-    private ProductService productService;
+    //@Autowired
+    //private ProductService productService;
     /*
      * 
      * 
-     public AdminController(UserService userService, ProductService productService) {
-         this.productService = productService;
-         this.userService = userService;
-     }
+     * public AdminController(UserService userService, ProductService
+     * productService) {
+     * this.productService = productService;
+     * this.userService = userService;
+     * }
      */
 
     // Liste de tous les utilisateurs
-    @GetMapping("/users")
+    @GetMapping("/all")
     public List<UserDTO> getAllUsers() {
         return userService.getAllUsers();
     }
 
     // Supprimer un utilisateur
-    @DeleteMapping("/users/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable String id) {
+    @DeleteMapping("/del/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable String id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
 
     // Supprimmer un produit
-    @DeleteMapping("/products/{id}")
+    /*@DeleteMapping("/products/{id}")
     public void delete(@PathVariable String id) {
         productService.deleteProduct(id);
-    }
+    }*/
 }

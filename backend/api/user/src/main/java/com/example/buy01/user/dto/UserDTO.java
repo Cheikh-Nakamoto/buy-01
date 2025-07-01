@@ -1,21 +1,15 @@
-package com.example.letsplay.dto;
+package com.example.buy01.user.dto;
+
+import com.example.buy01.user.model.UserRoleType.UserRole;
 
 import lombok.Data;
 
 @Data
 public class UserDTO {
-    private String id;
     private String name;
     private String email;
-    private String role;
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
+    private UserRole role;
+    private String avatar;
 
     public String getName() {
         return name;
@@ -33,11 +27,11 @@ public class UserDTO {
         this.email = email;
     }
 
-    public String getRole() {
+    public UserRole getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(UserRole role) {
         this.role = role;
     }
 }

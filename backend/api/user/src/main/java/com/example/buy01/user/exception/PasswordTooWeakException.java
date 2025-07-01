@@ -1,4 +1,4 @@
-package com.example.letsplay.exception;
+package com.example.buy01.user.exception;
 
 public class PasswordTooWeakException extends RuntimeException {
     public PasswordTooWeakException(String message) {

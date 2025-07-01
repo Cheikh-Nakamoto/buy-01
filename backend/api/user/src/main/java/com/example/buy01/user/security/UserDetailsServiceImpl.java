@@ -1,11 +1,11 @@
-package com.example.letsplay.security;
+package com.example.buy01.user.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
-import com.example.letsplay.repository.UserRepository;
+import com.example.buy01.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,7 +31,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws RuntimeException {
         var user = userRepository.findByEmail(email);
         if (user == null) {
-            return null; // ou vous pouvez lancer une exception personnalisée
+            return null;
         }
         return new UserDetailsImpl(user);
     }
