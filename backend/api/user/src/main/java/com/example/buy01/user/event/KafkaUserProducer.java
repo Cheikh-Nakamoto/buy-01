@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class KafkaUserProducer {
 
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(KafkaUserProducer.class);
+
     private final KafkaTemplate<String, UserRegisteredEvent> kafkaTemplateRegistered;
     private final KafkaTemplate<String, UserDeletedEvent> kafkaTemplateDeleted;
 
@@ -21,13 +23,17 @@ public class KafkaUserProducer {
         event.setRole(user.getRole());
 
         // Log the event for debugging purposes
-        System.out.println("Sending user registered event: " + event);
+        log.info("Sending user registered event: {}", event);
+        
         // Send the event to the Kafka topic
         kafkaTemplateRegistered.send("user-registered-topic", event);
     }
 
     public void sendUserDeletedEvent(String userId) {
         UserDeletedEvent event = new UserDeletedEvent(userId);
+        log.info("Sending user deleted event for userId: {}", userId);
+
+        // Send the event to the Kafka topic
         kafkaTemplateDeleted.send("user-deleted-topic", event);
     }
 
