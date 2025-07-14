@@ -24,8 +24,7 @@ public class UserCreateDTO {
     @Size(min = 8, message = "Le mot de passe doit contenir au moins 8 caractères")
     private String password;
 
-    @NotNull(message = "Le rôle est obligatoire")
-    @Pattern(regexp = "CLIENT|SELLER", message = "Le rôle doit être CLIENT ou SELLER")
+    @NotNull(message = "Le rôle doit être CLIENT ou SELLER")
     private UserRole role;
 
     // Getters and Setters

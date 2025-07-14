@@ -1,6 +1,7 @@
 package com.example.buy01.user.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,9 @@ public class UserService {
     @Autowired
     private KafkaUserProducer kafkaProducer;
 
+    @Value("${file.upload-dir}")
+    private String uploadDir;
+
     // Conversion User → DTO
     private UserDTO toDTO(User user) {
         UserDTO dto = new UserDTO();
@@ -54,8 +58,8 @@ public class UserService {
         }
 
         // Vérification de la force du mot de passe
-        if (dto.getPassword().length() < 6) {
-            throw new PasswordTooWeakException("Password must be at least 6 characters long");
+        if (dto.getPassword().length() < 8) {
+            throw new PasswordTooWeakException("Password must be at least 8 characters long");
         }
 
         User user = new User();
@@ -64,19 +68,19 @@ public class UserService {
         user.setRole(dto.getRole());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         ValidateMethods.validateUser(user);
-        // Enregistrement de l'utilisateur
-        user = userRepository.save(user);
-        kafkaProducer.sendUserCreatedEvent(user);
-
+        
         // Gestion de l'avatar
         // Si l'avatar est fourni, on l'upload
         // Si l'avatar n'est pas fourni, on le met à null
         if (avatar != null && user.getRole() == UserRole.SELLER) {
-            user.setAvatar(uploadAvatar(avatar, user.getId()));
+            user = uploadAvatar(avatar, user);
         } else {
-            user.setAvatar(null); // Set avatar to null if not provided
+            // Enregistrement de l'utilisateur
+            user = userRepository.save(user);
         }
 
+        // Envoi de l'événement de création à Kafka
+        kafkaProducer.sendUserCreatedEvent(user);
         return toDTO(user);
     }
 
@@ -139,10 +143,10 @@ public class UserService {
             throw new ResourceNotFoundException("User not found");
         }
         userRepository.deleteById(id);
-        kafkaProducer.sendUserDeletedEvent(id); //Envoi de l'événement de suppression à Kafka
+        kafkaProducer.sendUserDeletedEvent(id); // Envoi de l'événement de suppression à Kafka
     }
 
-    public String uploadAvatar(MultipartFile file, String userId) throws IOException {
+    public User uploadAvatar(MultipartFile file, User user) throws IOException {
         if (file.isEmpty() || !validateMethods.isImage(file)) {
             throw new IllegalArgumentException("Fichier invalide. Format autorisé : JPEG, PNG, WEBP.");
         }
@@ -162,18 +166,20 @@ public class UserService {
         // Extraction de l'extension du fichier
         String ext = originalFilename.substring(originalFilename.lastIndexOf("."));
         String filename = UUID.randomUUID() + ext;
-        String path = "uploads/avatars/" + filename;
 
-        File dir = new File("uploads/avatars");
-        dir.mkdirs();
-        file.transferTo(new File(path));
+        File dir = new File(uploadDir);
+        if (!dir.exists()) dir.mkdirs();
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Utilisateur non trouvé"));
+        // Créer le chemin absolu
+        File dest = new File(dir, filename);
+        file.transferTo(dest);
+
+        // Mettre à jour l'avatar de l'utilisateur
         user.setAvatar("/avatars/" + filename);
-        userRepository.save(user);
 
-        return user.getAvatar();
+        // Enregistrer l'utilisateur avec le nouvel avatar
+        user = userRepository.save(user);
+        return user;
     }
 
 }

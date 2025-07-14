@@ -8,7 +8,9 @@ import org.springframework.security.authentication.*;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.NoHandlerFoundException;
+
 
 import java.util.stream.Collectors;
 
@@ -68,6 +70,14 @@ public class GlobalExceptionHandler {
         public ResponseEntity<ApiErrorResponse> handleGeneric(Exception ex, HttpServletRequest request) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                                 .body(buildError(request, HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage()));
+        }
+
+        @ExceptionHandler(MaxUploadSizeExceededException.class)
+        public ResponseEntity<ApiErrorResponse> handleMaxSizeException(MaxUploadSizeExceededException ex,
+                        HttpServletRequest request) {
+                return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
+                                .body(buildError(request, HttpStatus.PAYLOAD_TOO_LARGE,
+                                                "Fichier trop volumineux. Taille maximale autorisée : 2 Mo."));
         }
 
         // Gère les exceptions spécifiques pour les mots de passe trop faibles

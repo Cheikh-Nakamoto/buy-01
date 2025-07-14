@@ -12,7 +12,7 @@ public class UserUpdateDTO {
     @Size(min = 5, max = 50, message = "L'email doit contenir entre 5 et 50 caractères")
     private String email;
     
-    @Size(min = 6, message = "Le mot de passe doit contenir au moins 6 caractères")
+    @Size(min = 8, message = "Le mot de passe doit contenir au moins 8 caractères")
     private String password;
 
     public String getName() {

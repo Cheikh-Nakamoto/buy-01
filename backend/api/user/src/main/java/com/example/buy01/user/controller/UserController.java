@@ -17,6 +17,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.buy01.user.dto.UserDTO;
 import com.example.buy01.user.dto.UserUpdateDTO;
+import com.example.buy01.user.exception.ResourceNotFoundException;
+import com.example.buy01.user.model.User;
+import com.example.buy01.user.repository.UserRepository;
 import com.example.buy01.user.service.UserService;
 
 import jakarta.validation.Valid;
@@ -29,6 +32,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     // Récupérer un utilisateur par son ID
     @GetMapping("/profile/{id}")
@@ -57,8 +63,10 @@ public class UserController {
                                                            // ADMIN
     public ResponseEntity<?> uploadAvatar(@RequestParam("file") MultipartFile file, @PathVariable String id) {
         try {
-            String url = userService.uploadAvatar(file, id);
-            return ResponseEntity.ok(Map.of("avatarUrl", url));
+            User user = userRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Utilisateur non trouvé"));
+            
+            return ResponseEntity.ok(Map.of("avatarUrl", userService.uploadAvatar(file, user).getAvatar()));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
