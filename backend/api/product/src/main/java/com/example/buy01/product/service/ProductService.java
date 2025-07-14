@@ -3,7 +3,16 @@ package com.example.buy01.product.service;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+
+import com.example.buy01.product.dto.ProductCreateDTO;
+import com.example.buy01.product.dto.ProductDTO;
+import com.example.buy01.product.dto.ProductUpdateDTO;
+import com.example.buy01.product.exception.ResourceNotFoundException;
+import com.example.buy01.product.model.Product;
+import com.example.buy01.product.repository.ProductRepository;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,8 +26,8 @@ public class ProductService {
     @Autowired
     private ProductRepository productRepository;
 
-    public ProductDTO createProduct(ProductCreateDTO product, UserDetailsImpl userDetails) {
-        String id = userDetails.getId(); // ID de l'utilisateur connecté.
+    public ProductDTO createProduct(ProductCreateDTO product, UserDetails userDetails) {
+        //String id = userDetails.getId(); // ID de l'utilisateur connecté.
         boolean hasRole = userDetails.getAuthorities().stream()
                 .anyMatch(auth -> auth.getAuthority().equals("ROLE_USER"));
 
@@ -29,7 +38,7 @@ public class ProductService {
         newProduct.setUserId(product.getUserId());
         
         if (hasRole) {
-            newProduct.setUserId(id); // Assigner l'ID de l'utilisateur connecté au produit
+            //newProduct.setUserId(id); // Assigner l'ID de l'utilisateur connecté au produit
         }
         
         if (newProduct.getUserId() == null) {

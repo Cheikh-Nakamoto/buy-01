@@ -1,4 +1,4 @@
-package com.example.media.utils;
+package com.example.buy01.media.utils;
 
 import org.springframework.web.multipart.MultipartFile;
 

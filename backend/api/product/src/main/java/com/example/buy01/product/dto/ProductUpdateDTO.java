@@ -1,4 +1,4 @@
-package com.example.buy01.dto;
+package com.example.buy01.product.dto;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;

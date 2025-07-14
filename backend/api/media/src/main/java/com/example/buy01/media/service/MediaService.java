@@ -1,10 +1,12 @@
-package com.example.media.service;
+package com.example.buy01.media.service;
 
-import com.example.media.model.Media;
-import com.example.media.utils.FileValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.example.buy01.media.model.Media;
+import com.example.buy01.media.repository.MediaRepository;
+import com.example.buy01.media.utils.FileValidator;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,6 +17,7 @@ import java.util.UUID;
 public class MediaService {
 
     private static final String UPLOAD_DIR = "uploads";
+    private final MediaRepository mediaRepository;
 
     public Media store(MultipartFile file, String productId) throws IOException {
         if (!FileValidator.isValidImage(file)) {

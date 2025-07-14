@@ -1,18 +1,18 @@
-package com.example.buy01.controller;
-
-import com.example.letsplay.dto.ProductCreateDTO;
-import com.example.letsplay.dto.ProductDTO;
-import com.example.letsplay.dto.ProductUpdateDTO;
-import com.example.letsplay.security.UserDetailsImpl;
-import com.example.letsplay.service.ProductService;
+package com.example.buy01.product.controller;
 
 import jakarta.annotation.security.PermitAll;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import com.example.buy01.product.dto.ProductCreateDTO;
+import com.example.buy01.product.dto.ProductDTO;
+import com.example.buy01.product.dto.ProductUpdateDTO;
+import com.example.buy01.product.service.ProductService;
 
 import java.util.List;
 
@@ -37,7 +37,7 @@ public class ProductController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    public ProductDTO create(@Validated @RequestBody ProductCreateDTO product, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ProductDTO create(@Validated @RequestBody ProductCreateDTO product, @AuthenticationPrincipal UserDetails userDetails) {
         return productService.createProduct(product, userDetails);
     }
 

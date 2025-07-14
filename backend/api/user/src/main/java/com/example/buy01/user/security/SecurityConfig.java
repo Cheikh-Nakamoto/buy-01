@@ -1,7 +1,5 @@
 package com.example.buy01.user.security;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,10 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import lombok.RequiredArgsConstructor;
@@ -35,26 +30,19 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
 
     @Autowired
-    private JwtAuthenticationFilter jwtAuthFilter;
-
-    @Autowired
     private UserDetailsService userDetailsService;
 
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> corsConfigurationSource())
                 .csrf(csrf -> csrf.disable()) // Disable CSRF for REST API
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/users/**").hasAnyRole("CLIENT", "SELLER", "ADMIN")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .anyRequest().authenticated())
-                .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-
+                        .anyRequest().authenticated());
         return http.build();
     }
 
@@ -71,39 +59,8 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
-
-    // 💡 Configuration CORS globale
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
-
-        config.setAllowedOrigins(List.of("http://localhost:4200")); // 🔁 Autoriser ton frontend
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE")); // 📦 Méthodes acceptées
-        config.setAllowedHeaders(List.of("Authorization", "Content-Type")); // 📩 Headers autorisés
-        config.setAllowCredentials(true); // 🔒 Pour envoyer des tokens/cookies
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config); // ✅ S'applique à toutes les routes
-
-        return source;
-    }
-
-    /*
-     * @Bean
-     * public FilterRegistrationBean<RateLimitingFilter> rateLimitingFilter() {
-     * FilterRegistrationBean<RateLimitingFilter> registrationBean = new
-     * FilterRegistrationBean<>();
-     * registrationBean.setFilter(new RateLimitingFilter());
-     * registrationBean.addUrlPatterns("/api/auth/login"); // Appliquer uniquement
-     * sur login
-     * return registrationBean;
-     * }// Filtre de rate limiting pour limiter les requêtes sur /auth/login,
-     * insértion
-     * // manuelle du filtre
-     */
 }

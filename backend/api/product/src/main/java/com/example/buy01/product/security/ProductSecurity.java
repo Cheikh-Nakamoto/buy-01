@@ -1,11 +1,12 @@
-package com.example.buy01.security;
+package com.example.buy01.product.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.example.letsplay.exception.ResourceNotFoundException;
-import com.example.letsplay.model.Product;
-import com.example.letsplay.repository.ProductRepository;
+import com.example.buy01.product.exception.ResourceNotFoundException;
+import com.example.buy01.product.model.Product;
+import com.example.buy01.product.repository.ProductRepository;
+
 
 //// Classe de sécurité pour les produits
 /// Cette classe est responsable de la vérification des droits d'accès aux produits

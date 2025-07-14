@@ -121,12 +121,221 @@ UserPasswordResetRequestedEvent → envoie du lien de réinitialisation
 | Suppression (`delete user`)    | ✅ Recommandé  | Nettoyer les données dans d’autres services |
 | Envoi d’e-mails                | ✅ Optionnel   | Découplé via `notification-service`         |
 
+Structure globale avec utilisation du service gateway et discovery
+
+buy-01/
+├── discovery-server/          ← ✅ Eureka (port 8761)
+├── gateway-service/           ← ✅ Spring Cloud Gateway + SSL (Let's Encrypt)
+├── user-service/
+├── product-service/
+├── media-service/
+└── docker-compose.yaml
+
+🔧 Étape 1 – Générer le projet Spring Boot Eureka
+Va sur https://start.spring.io et configure :
+
+Champ	Valeur
+Project	Maven
+Language	Java
+Spring Boot version	3.2.x ou 3.1.x
+Group	com.example
+Artifact	discovery-server
+Name	discovery-server
+Package name	com.example.discoveryserver
+Packaging	Jar
+Java	17
+✅ Dependencies	Spring Boot DevTools, Eureka Server
+
+Tu peux aussi ajouter Spring Web si tu veux personnaliser les réponses plus tard (optionnel).
+
+📁 Étape 2 – Activer Eureka Server dans l’application
+Dans DiscoveryServerApplication.java :
+
+java
+Copier
+Modifier
+package com.example.discoveryserver;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
+
+@SpringBootApplication
+@EnableEurekaServer
+public class DiscoveryServerApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DiscoveryServerApplication.class, args);
+    }
+}
+🧾 Étape 3 – Configurer application.yml (ou .properties)
+Dans src/main/resources/application.yml :
+
+yaml
+Copier
+Modifier
+server:
+  port: 8761
+
+spring:
+  application:
+    name: discovery-server
+
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+Ici, le serveur n’enregistre pas lui-même de services (il est le point central).
+
+🛠 Étape 4 – Lancer le projet
+Compile et lance :
+
+bash
+Copier
+Modifier
+./mvnw spring-boot:run
+Puis ouvre :
+
+http://localhost:8761
+Tu verras : ✅ Eureka Dashboard avec 0 service disponible.
+
+✅ Étape 1 – Générer le projet gateway-service
+Utilise https://start.spring.io :
+
+Champ	Valeur
+Group	com.example
+Artifact	gateway-service
+Java	17
+Spring Boot	3.2.x
+✅ Dépendances	✅ Spring Cloud Gateway
+✅ Eureka Discovery Client
+✅ Spring Boot DevTools
+
+✅ Étape 2 – Configuration de base application.yml
+Dans src/main/resources/application.yml :
+
+yaml
+Copier
+Modifier
+server:
+  port: 8080
+
+spring:
+  application:
+    name: gateway-service
+
+  cloud:
+    gateway:
+      routes:
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/api/users/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://discovery-server:8761/eureka
+📌 Ici :
+
+lb://user-service : Spring utilise Eureka pour faire du load balancing
+
+Path=/api/users/** : tout ce qui commence par /api/users est redirigé vers user-service
+
+✅ Étape 3 – Activer Eureka dans GatewayApplication.java
+java
+Copier
+Modifier
+@SpringBootApplication
+@EnableDiscoveryClient
+public class GatewayServiceApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(GatewayServiceApplication.class, args);
+    }
+}
+✅ Étape 4 – Dockeriser le Gateway
+📄 Dockerfile :
+dockerfile
+Copier
+Modifier
+FROM eclipse-temurin:17-jdk
+WORKDIR /app
+COPY target/gateway-service-0.0.1-SNAPSHOT.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]
+✅ Étape 5 – Ajouter au docker-compose.yaml
+yaml
+Copier
+Modifier
+  gateway-service:
+    build: ./gateway-service
+    container_name: gateway-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      - discovery-server
+      - user-service
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka
+✅ Étape 6 – Test avec Postman ou navigateur
+Accède à :
+
+bash
+Copier
+Modifier
+http://localhost:8080/api/users/me
+📌 Cela va :
+
+Passer par le Gateway
+
+Aller vers Eureka
+
+Rediriger vers user-service en interne
+
+🛡️ Est-ce que la sécurité doit être implémentée au niveau du Gateway ?
+✅ Oui, en grande partie. Le Gateway est le meilleur endroit pour centraliser la sécurité externe, mais pas le seul.
+
+🎯 Voici comment répartir la sécurité dans une architecture microservices avec Spring Cloud Gateway + Eureka
+1. 🔐 Au niveau du Gateway (gateway-service) — Filtrage global
+À mettre ici :
+Sécurité	Pourquoi ?
+✅ Vérification du JWT	Toutes les requêtes passent ici : 1 seul point de contrôle
+✅ CORS	Pour autoriser ou bloquer des appels depuis le frontend
+✅ Redirection HTTP → HTTPS	SSL = obligatoire ici uniquement
+✅ Rate limiting / Throttling	Empêcher les abus ou attaques DoS côté public
+✅ IP whitelisting / Firewall	Protection de base avant d’entrer dans les services
+
+💡 Tu peux utiliser un GlobalFilter dans Spring Cloud Gateway pour tout ça.
+
+2. 🔐 Au niveau des services (user, product, media) — Sécurité métier
+À maintenir ici :
+Sécurité / Authz	Pourquoi ?
+✅ @PreAuthorize("hasRole('SELLER')")	Seul un vendeur peut créer un produit
+✅ Protection des endpoints sensibles	Même si le JWT a été validé au Gateway, on revérifie
+✅ Isolation des rôles par service	user-service ne connaît pas product-service
+
+✅ Ces services doivent faire confiance au JWT vérifié en amont, mais garder une logique métier propre à eux.
+
+📊 Exemple concret de répartition
+Élément	Implémenté dans…	Exemple
+Vérification du token JWT	🔐 Gateway	GlobalFilter qui rejette un token invalide
+Empêcher un CLIENT d’ajouter produit	🧠 product-service	@PreAuthorize("hasRole('SELLER')")
+Bloquer des IP anonymes	🔐 Gateway	Config dans application.yml ou plugin de sécurité
+Expiration de session utilisateur	🔐 Gateway	Décodage du JWT (exp claim)
+Cacher les endpoints admin	🧠 user-service (ou Gateway)	Route avec roles ou route privée
+
+🧠 Règle d’or
+🧰 Le Gateway sécurise l’entrée du système (contrôle d’accès global)
+
+🧱 Les microservices sécurisent leur logique métier spécifique
+
+
+
 ------ TAF
 
 Traitement de chaque services pour un bon fonctionnement :
 
 User service In progress...
 
-Dossier gateway à mettre en place pour permettre la communication entre les micros-services ...
+passerelle gateway à mettre en place pour permettre la communication entre les micros-services ...
 
 Eureka à étudier pour comprendre l'utilité et l'implémentation

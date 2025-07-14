@@ -1,8 +1,9 @@
-package com.example.media.repository;
+package com.example.buy01.media.repository;
 
-import com.example.media.model.Media;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
+
+import com.example.buy01.media.model.Media;
 
 import java.util.List;
 

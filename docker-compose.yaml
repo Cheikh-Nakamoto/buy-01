@@ -27,7 +27,7 @@ services:
 
   ### 🟧 Kafka Broker
   kafka:
-    image: confluentinc/cp-kafka:latest
+    image: confluentinc/cp-kafka:7.5.3
     container_name: kafka
     ports:
       - "9092:9092"
@@ -39,6 +39,31 @@ services:
     depends_on:
       - zookeeper
 
+  ### 🟥 API Gateway (Spring Boot)
+  gateway-service:
+    build: ./backend/api/gateway-service
+    container_name: gateway-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      - discovery-server
+      - user-service
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka
+      SPRING_CLOUD_GATEWAY_ROUTES_USER_SERVICE_URI: lb://user-service
+      SPRING_CLOUD_GATEWAY_ROUTES_USER_SERVICE_ID: user-service
+      SPRING_CLOUD_GATEWAY_ROUTES_USER_SERVICE_PREDICATE: Path=/users/**, Path=/auth/**, Path=/admin/**
+      JWT_SECRET: mySuperSecretKey1234567890
+
+  
+  ### Eureka Server
+  discovery-server:
+    build: ./backend/api/discovery-server
+    container_name: discovery-server
+    ports:
+      - "8761:8761"
+
+
   ### 🟦 User Service (Spring Boot)
   user-service:
     build: ./backend/api/user
@@ -48,10 +73,13 @@ services:
     depends_on:
       - mongodb
       - kafka
+      - discovery-server
     environment:
       SPRING_DATA_MONGODB_URI: mongodb://root:secret@mongodb:27017/user_db?authSource=admin
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       JWT_SECRET: mySuperSecretKey1234567890
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka
+
     restart: always
 
 volumes:

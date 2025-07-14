@@ -5,6 +5,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.buy01.media.model.Media;
+import com.example.buy01.media.service.MediaService;
+
 @RestController
 @RequestMapping("/api/media")
 @RequiredArgsConstructor
