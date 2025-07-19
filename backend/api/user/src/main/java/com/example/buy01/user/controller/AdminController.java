@@ -23,7 +23,7 @@ import com.example.buy01.user.service.UserService;
 // Elle utilise Lombok pour générer le constructeur et les méthodes d'accès
 
 @RestController
-@RequestMapping("/api/admin/users")
+@RequestMapping("/api/admin")
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
 
@@ -42,13 +42,13 @@ public class AdminController {
      */
 
     // Liste de tous les utilisateurs
-    @GetMapping("/all")
+    @GetMapping("/users/all")
     public List<UserDTO> getAllUsers() {
         return userService.getAllUsers();
     }
 
     // Supprimer un utilisateur
-    @DeleteMapping("/del/{id}")
+    @DeleteMapping("/users/del/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable String id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,9 +37,18 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUser(@RequestHeader("X-USER-EMAIL") String email) {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new ResourceNotFoundException("Utilisateur non trouvé avec l'email : " + email);
+        }
+        return ResponseEntity.ok(user);
+    }
+
     // Récupérer un utilisateur par son ID
     @GetMapping("/profile/{id}")
-    @PostAuthorize("returnObject?.getBody()?.id == authentication.principal.id or hasRole('ADMIN')") // Autorise l'accès
+    @PostAuthorize("hasRole('ADMIN')") // Autorise l'accès
                                                                                                      // si l'utilisateur
                                                                                                      // est
                                                                                                      // l'utilisateur
@@ -61,11 +71,13 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN') or hasRole('SELLER')") // Autorise l'accès aux utilisateurs
                                                            // ayant les rôles CLIENT, SELLER ou
                                                            // ADMIN
-    public ResponseEntity<?> uploadAvatar(@RequestParam("file") MultipartFile file, @PathVariable String id) {
+    public ResponseEntity<?> uploadAvatar(@RequestParam("file") MultipartFile file, @RequestHeader("X-USER-EMAIL") String email) {
         try {
-            User user = userRepository.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("Utilisateur non trouvé"));
-            
+            User user = userRepository.findByEmail(email);
+            if (user == null) {
+                throw new ResourceNotFoundException("Utilisateur non trouvé");
+            }
+
             return ResponseEntity.ok(Map.of("avatarUrl", userService.uploadAvatar(file, user).getAvatar()));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

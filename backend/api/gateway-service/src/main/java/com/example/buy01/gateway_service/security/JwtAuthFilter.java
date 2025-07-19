@@ -11,8 +11,6 @@ import org.springframework.web.server.ServerWebExchange;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import lombok.RequiredArgsConstructor;
-
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import reactor.core.publisher.Mono;
@@ -20,9 +18,13 @@ import reactor.core.publisher.Mono;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Component
-@RequiredArgsConstructor
 public class JwtAuthFilter implements GlobalFilter, Ordered {
+
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthFilter.class);
 
     @Value("${jwt.secret}")
     private String jwtSecret;
@@ -44,6 +46,7 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
         }
 
         String token = authHeader.substring(7);
+        logger.info("token: {}", token);
         Claims claims;
 
         try {
@@ -61,6 +64,7 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
         // Injecter les claims dans les headers vers les microservices
         String username = claims.getSubject();
         String role = (String) claims.get("role");
+        logger.info("Username: {}, Role: {}", username, role);
 
         ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
                 .header("X-USER-EMAIL", username)

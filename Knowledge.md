@@ -328,6 +328,26 @@ Cacher les endpoints admin	🧠 user-service (ou Gateway)	Route avec roles ou ro
 
 🧱 Les microservices sécurisent leur logique métier spécifique
 
+Résumé de la configuration nécessaire
+Élément	Fichier	Ajout requis
+JWT	application.yml	jwt.secret
+CORS	Spring config Java	OK ✅
+RateLimiter	Java avec Bucket4j	OK ✅ (name() = RateLimiter)
+Routes Gateway	application.yml	spring.cloud.gateway.routes[...]
+Eureka client	application.yml	spring.application.name + eureka.client
+Dépendances Maven	pom.xml	✅ Doit inclure spring-cloud-starter-gateway, eureka-client, jjwt-api, bucket4j-core, etc.
+
+💡 À vérifier :
+✅ Ton filtre JwtAuthFilter est un GlobalFilter, donc tu n'as pas besoin de le référencer dans le YAML : il s'applique automatiquement à toutes les routes non publiques (via ton isPublicEndpoint).
+
+✅ RateLimiter est bien un GatewayFilterFactory, donc tu dois l’appeler par name: dans chaque route que tu veux limiter (comme ci-dessus sur /api/auth/**).
+
+❗ Important
+Ta jwt.secret doit faire au moins 32 caractères pour être compatible avec hmacShaKeyFor.
+
+Si tu veux que RateLimiter s'applique uniquement sur /api/auth/login, garde cette logique dans ta classe, tu n’as pas besoin de définir plus dans le YAML.
+
+
 
 
 ------ TAF

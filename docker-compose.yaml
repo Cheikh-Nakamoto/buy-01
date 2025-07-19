@@ -1,5 +1,9 @@
 version: '3.8'
 
+networks:
+  buy-network:
+    driver: bridge
+
 services:
 
   ### 🟩 MongoDB
@@ -14,55 +18,17 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
+    networks:
+      - buy-network
 
-  ### 🟨 Zookeeper (nécessaire pour Kafka)
-  zookeeper:
-    image: confluentinc/cp-zookeeper:latest
-    container_name: zookeeper
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-    ports:
-      - "2181:2181"
-
-  ### 🟧 Kafka Broker
-  kafka:
-    image: confluentinc/cp-kafka:7.5.3
-    container_name: kafka
-    ports:
-      - "9092:9092"
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-    depends_on:
-      - zookeeper
-
-  ### 🟥 API Gateway (Spring Boot)
-  gateway-service:
-    build: ./backend/api/gateway-service
-    container_name: gateway-service
-    ports:
-      - "8080:8080"
-    depends_on:
-      - discovery-server
-      - user-service
-    environment:
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka
-      SPRING_CLOUD_GATEWAY_ROUTES_USER_SERVICE_URI: lb://user-service
-      SPRING_CLOUD_GATEWAY_ROUTES_USER_SERVICE_ID: user-service
-      SPRING_CLOUD_GATEWAY_ROUTES_USER_SERVICE_PREDICATE: Path=/users/**, Path=/auth/**, Path=/admin/**
-      JWT_SECRET: mySuperSecretKey1234567890
-
-  
   ### Eureka Server
   discovery-server:
     build: ./backend/api/discovery-server
     container_name: discovery-server
     ports:
       - "8761:8761"
-
+    networks:
+      - buy-network
 
   ### 🟦 User Service (Spring Boot)
   user-service:
@@ -77,10 +43,60 @@ services:
     environment:
       SPRING_DATA_MONGODB_URI: mongodb://root:secret@mongodb:27017/user_db?authSource=admin
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      JWT_SECRET: mySuperSecretKey1234567890
+      JWT_SECRET: N5Dztk+QsQEOFEhZ9WZ7ZzRp7uuOoT/knKWvYVZLNS7vt8BjnfHxLjzjGdBfEBu3
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka
-
+    volumes:
+      - ./uploads:/app/uploads
+    networks:
+      - buy-network
+      
     restart: always
 
+  ### 🟨 Zookeeper (nécessaire pour Kafka)
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - buy-network
+
+  ### 🟧 Kafka Broker
+  kafka:
+    image: confluentinc/cp-kafka:7.5.3
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    depends_on:
+      - zookeeper
+    networks:
+      - buy-network
+
+  ### 🟥 API Gateway (Spring Boot)
+  gateway-service:
+    build: ./backend/api/gateway-service
+    container_name: gateway-service
+    ports:
+      - "8090:8090"
+    depends_on:
+      - discovery-server
+      - user-service
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka
+      SPRING_CLOUD_GATEWAY_ROUTES_USER_SERVICE_URI: lb://user-service
+      SPRING_CLOUD_GATEWAY_ROUTES_USER_SERVICE_ID: user-service
+      SPRING_CLOUD_GATEWAY_ROUTES_USER_SERVICE_PREDICATE: Path=/users/**, Path=/auth/**, Path=/admin/**
+      JWT_SECRET: N5Dztk+QsQEOFEhZ9WZ7ZzRp7uuOoT/knKWvYVZLNS7vt8BjnfHxLjzjGdBfEBu3
+    networks:
+      - buy-network
+      
 volumes:
   mongo_data:
