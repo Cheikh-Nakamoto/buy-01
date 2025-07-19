@@ -1,0 +1,220 @@
+<!-- product-list.component.html -->
+<div class="product-list-container">
+  <!-- Header -->
+  <div class="header">
+    <h1>✨ Catalogue Produits</h1>
+    <p>Découvrez {{ totalProducts }} produits dans {{ totalCategories }} catégories</p>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <!-- Search Box -->
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input 
+        type="text" 
+        placeholder="Rechercher un produit..." 
+        [(ngModel)]="searchTerm"
+        (input)="onSearchChange()"
+      >
+    </div>
+    
+    <!-- Category Filters -->
+    <div class="filter-buttons">
+      <button 
+        *ngFor="let category of categories"
+        class="filter-btn"
+        [class.active]="selectedCategory === category"
+        (click)="onCategoryChange(category)"
+      >
+        {{ category === 'all' ? 'Tous' : category }}
+      </button>
+    </div>
+    
+    <!-- Sort Options -->
+    <div class="sort-options">
+      <select class="sort-select" aria-label="Trier les produits par">
+        <option value="name">Trier par nom</option>
+        <option value="price">Trier par prix</option>
+        <option value="date">Trier par date</option>
+      </select>
+    </div>
+    
+    <!-- View Toggle -->
+    <div class="view-toggle">
+      <button 
+        class="view-btn"
+        [class.active]="viewMode === 'grid'"
+        (click)="onViewModeChange('grid')"
+      >
+        🔳
+      </button>
+      <button 
+        class="view-btn"
+        [class.active]="viewMode === 'list'"
+        (click)="onViewModeChange('list')"
+      >
+        📋
+      </button>
+    </div>
+  </div>
+
+  <!-- Results Info -->
+  <div class="results-info" *ngIf="searchTerm || selectedCategory !== 'all'">
+    <p>{{ filteredProductsCount }} produit(s) trouvé(s)</p>
+  </div>
+
+  <!-- Products Grid View -->
+  <div class="products-grid" *ngIf="viewMode === 'grid'">
+    <div 
+      class="product-card"
+      *ngFor="let product of filteredProducts; trackBy: trackByProductId"
+      (click)="viewProductDetails(product.id)"
+    >
+      <!-- Product Image -->
+      <div class="product-image">
+        <img 
+          [src]="product.images[0]" 
+          [alt]="product.name"
+          loading="lazy"
+        >
+        <div 
+          class="product-badge"
+          [ngClass]="getBadgeClass(getProductBadge(product))"
+          *ngIf="getProductBadge(product)"
+        >
+          {{ getProductBadge(product) }}
+        </div>
+      </div>
+      
+      <!-- Product Info -->
+      <div class="product-info">
+        <div class="product-category">{{ product.category }}</div>
+        <h3 class="product-title">{{ product.name }}</h3>
+        <p class="product-description">{{ product.description }}</p>
+        
+        <!-- Seller Info -->
+        <div class="seller-info">
+          <img 
+            [src]="product.sellerAvatar" 
+            [alt]="product.sellerName"
+            class="seller-avatar"
+            *ngIf="product.sellerAvatar"
+          >
+          <span class="seller-name">{{ product.sellerName }}</span>
+        </div>
+        
+        <!-- Stock Status -->
+        <div class="stock-status" [ngClass]="getStockClass(product.stock)">
+          {{ getStockStatus(product.stock) }}
+        </div>
+        
+        <!-- Product Footer -->
+        <div class="product-footer">
+          <div class="product-price">{{ formatPrice(product.price) }}</div>
+          <button 
+            class="add-to-cart"
+            [disabled]="product.stock === 0"
+            (click)="addToCart(product); $event.stopPropagation()"
+          >
+            <span *ngIf="product.stock > 0">Ajouter</span>
+            <span *ngIf="product.stock === 0">Indisponible</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Products List View -->
+  <div class="products-list" *ngIf="viewMode === 'list'">
+    <div 
+      class="product-list-item"
+      *ngFor="let product of filteredProducts; trackBy: trackByProductId"
+      (click)="viewProductDetails(product.id)"
+    >
+      <img 
+        [src]="product.images[0]" 
+        [alt]="product.name"
+        class="list-image"
+        loading="lazy"
+      >
+      
+      <div class="list-info">
+        <div class="list-header">
+          <h3 class="list-title">{{ product.name }}</h3>
+          <div 
+            class="product-badge"
+            [ngClass]="getBadgeClass(getProductBadge(product))"
+            *ngIf="getProductBadge(product)"
+          >
+            {{ getProductBadge(product) }}
+          </div>
+        </div>
+        
+        <div class="list-meta">
+          <span class="list-category">{{ product.category }}</span>
+          <span class="list-seller">par {{ product.sellerName }}</span>
+        </div>
+        
+        <p class="list-description">{{ product.description }}</p>
+        
+        <div class="list-details">
+          <div class="stock-status" [ngClass]="getStockClass(product.stock)">
+            {{ getStockStatus(product.stock) }}
+          </div>
+          <div class="list-date">Ajouté le {{ formatDate(product.createdAt) }}</div>
+        </div>
+      </div>
+      
+      <div class="list-actions">
+        <div class="list-price">{{ formatPrice(product.price) }}</div>
+        <button 
+          class="add-to-cart"
+          [disabled]="product.stock === 0"
+          (click)="addToCart(product); $event.stopPropagation()"
+        >
+          <span *ngIf="product.stock > 0">Ajouter</span>
+          <span *ngIf="product.stock === 0">Indisponible</span>
+        </button>
+        <button 
+          class="contact-seller"
+          (click)="contactSeller(product.sellerId); $event.stopPropagation()"
+        >
+          Contacter
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="filteredProducts.length === 0">
+    <div class="empty-icon">🔍</div>
+    <h3>Aucun produit trouvé</h3>
+    <p>Essayez de modifier vos critères de recherche ou de filtrage.</p>
+    <button class="reset-filters" (click)="resetFilters()">
+      Réinitialiser les filtres
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="loading-spinner"></div>
+    <p>Chargement des produits...</p>
+  </div>
+
+  <!-- Statistics -->
+  <div class="stats" *ngIf="filteredProducts.length > 0">
+    <div class="stat-item">
+      <span class="stat-number">{{ totalProducts }}</span>
+      <span class="stat-label">Produits</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-number">{{ totalCategories }}</span>
+      <span class="stat-label">Catégories</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-number">{{ formatPrice(averagePrice) }}</span>
+      <span class="stat-label">Prix Moyen</span>
+    </div>
+  </div>
+</div>

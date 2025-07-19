@@ -1,0 +1,66 @@
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  role: 'buyer' | 'seller';
+  avatar?: string;
+  createdAt: Date;
+}
+
+export interface MediaItem {
+  id: string;
+  name: string;
+  url: string;
+  type: 'image' | 'video';
+  size: number;
+  uploadedAt: Date;
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  category: string;
+  stock: number;
+  images: string[];
+  sellerId: string;
+  sellerName: string;
+  sellerAvatar?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface MediaFile {
+  id: string;
+  name: string;
+  url: string;
+  size: number;
+  type: string;
+  uploadedAt: Date;
+  userId: string;
+}
+
+export interface AuthFormData {
+  email: string;
+  password: string;
+  confirmPassword?: string;
+  name?: string;
+  role?: 'buyer' | 'seller';
+}
+
+export interface ProductFormData {
+  name: string;
+  description: string;
+  price: number;
+  category: string;
+  stock: number;
+  images: string[];
+}
+
+export interface UploadProgress {
+  file: File;
+  progress: number;
+  completed: boolean;
+  error?: string;
+}
