@@ -50,10 +50,12 @@ spring:
 # Swagger config
 springdoc:
   swagger-ui:
+    use-root-path: true
     enabled: true
     urls:
       - name: user-service
         url: /v3/api-docs/user
+  
 
 eureka:
   client:

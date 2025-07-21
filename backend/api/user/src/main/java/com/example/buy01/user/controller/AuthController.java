@@ -56,9 +56,12 @@ public class AuthController {
     @Operation(summary = "Inscription d’un utilisateur")
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserDTO> register(
+
             @RequestPart("data") @Valid UserCreateDTO request,
+
             @RequestPart(value = "avatar", required = false) MultipartFile avatar) throws IOException {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(request, avatar));
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(
+                request, avatar));
     }
 
     @Operation(summary = "Connexion de l’utilisateur")

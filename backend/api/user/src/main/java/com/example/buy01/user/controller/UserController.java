@@ -3,6 +3,7 @@ package com.example.buy01.user.controller;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,9 +25,11 @@ import com.example.buy01.user.repository.UserRepository;
 import com.example.buy01.user.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.http.MediaType;
 
 @Tag(name = "User Controller", description = "Gestion des opérations utilisateurs")
 @RestController
@@ -75,25 +78,38 @@ public class UserController {
         return ResponseEntity.ok(userService.updateUser(id, dto));
     }
 
-
-    @Operation(summary = "Mettre à jour l'avatar de l'utilisateur (Accessible par ADMIN ou SELLER)")
-    @PutMapping("/avatar")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('SELLER')") // Autorise l'accès aux utilisateurs
-                                                           // ayant les rôles CLIENT, SELLER ou
-                                                           // ADMIN
-    public ResponseEntity<?> uploadAvatar(@RequestParam("file") MultipartFile file,
+    @Operation(summary = "Mettre à jour l'avatar de l'utilisateur", description = "Accessible uniquement par les utilisateurs avec les rôles ADMIN ou SELLER. "
+            + "Le fichier doit être une image envoyée via multipart/form-data.", requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Fichier avatar (image)", required = true, content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE)))
+    @PutMapping(value = "update/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SELLER')")
+    public ResponseEntity<?> uploadAvatar(
+            @RequestParam("file") MultipartFile file,
             @RequestHeader("X-USER-EMAIL") String email) {
+
         try {
-            User user = userRepository.findByEmail(email);
-            if (user == null) {
-                throw new ResourceNotFoundException("Utilisateur non trouvé");
+            if (file.isEmpty()) {
+                return ResponseEntity.badRequest().body("Le fichier ne doit pas être vide");
             }
 
-            return ResponseEntity.ok(Map.of("avatarUrl", userService.uploadAvatar(file, user).getAvatar()));
+            if (file.getContentType() == null || !file.getContentType().startsWith("image/")) {
+                return ResponseEntity.badRequest().body("Le fichier doit être une image");
+            }
+
+            User user = userRepository.findByEmail(email);
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Utilisateur non trouvé");
+            }
+
+            User updatedUser = userService.uploadAvatar(file, user);
+            return ResponseEntity.ok(Map.of("avatarUrl", updatedUser.getAvatar()));
+
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Échec de l’upload de l’avatar");
+            return ResponseEntity.internalServerError()
+                    .body("Erreur lors de l’upload de l’avatar : " + e.getMessage());
         }
     }
+
 }
