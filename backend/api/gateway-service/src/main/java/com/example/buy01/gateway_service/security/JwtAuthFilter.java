@@ -75,9 +75,16 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
     }
 
     private boolean isPublicEndpoint(ServerHttpRequest request) {
-    String path = request.getURI().getPath();
-    return path.startsWith("/api/auth/") || path.equals("/");
-}
+        String path = request.getURI().getPath();
+        return path.startsWith("/api/auth/")
+                || path.startsWith("/v3/api-docs")
+                || path.startsWith("/swagger-ui.html")
+                || path.startsWith("/swagger-ui")
+                || path.startsWith("/swagger-resources")
+                || path.startsWith("/webjars")
+                || path.equals("/");
+
+    }
 
     @Override
     public int getOrder() {

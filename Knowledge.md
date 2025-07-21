@@ -347,6 +347,122 @@ Ta jwt.secret doit faire au moins 32 caractères pour être compatible avec hmac
 
 Si tu veux que RateLimiter s'applique uniquement sur /api/auth/login, garde cette logique dans ta classe, tu n’as pas besoin de définir plus dans le YAML.
 
+.
+
+🧠 Qu’est-ce que Swagger (Springdoc OpenAPI) ?
+Swagger est un écosystème d’outils pour la documentation d’API REST.
+👉 Avec Spring Boot, on utilise principalement la lib Springdoc OpenAPI.
+
+Elle te permet :
+
+d’avoir une UI web avec tous tes endpoints listés et testables (/swagger-ui.html),
+
+de générer automatiquement la spécification OpenAPI (/v3/api-docs),
+
+d’avoir une documentation interactive pour tes routes.
+
+✅ Ajout de Swagger (Springdoc) à ton user-service
+1. Ajoute les dépendances Maven
+xml
+Copier
+Modifier
+<!-- Swagger / OpenAPI UI -->
+<dependency>
+  <groupId>org.springdoc</groupId>
+  <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+  <version>2.5.0</version> <!-- ou la dernière stable -->
+</dependency>
+💡 Si tu es en Spring WebFlux, prends plutôt :
+springdoc-openapi-starter-webflux-ui
+
+2. Accéder à l’interface Swagger
+Après redémarrage, accède à :
+
+bash
+Copier
+Modifier
+http://localhost:8081/swagger-ui.html
+Ou avec API Gateway :
+
+bash
+Copier
+Modifier
+http://localhost:8090/swagger-ui.html
+Si tu veux aussi avoir Swagger sur gateway-service, ce n’est pas recommandé, car le Gateway ne contient pas de logique métier.
+
+3. Configurer l’info de ton API (optionnel)
+Crée une classe de config :
+
+java
+Copier
+Modifier
+package com.example.buy01.user.config;
+
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.OpenAPI;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class SwaggerConfig {
+
+    @Bean
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+            .info(new Info()
+                .title("User Service API")
+                .version("1.0.0")
+                .description("Documentation de l'API utilisateur")
+                .contact(new Contact().name("Dedy Pangou").email("dedy@example.com")));
+    }
+}
+4. Annotations utiles dans tes contrôleurs
+@Operation(summary = "...") pour décrire une méthode.
+
+@Parameter, @ApiResponses, etc.
+
+Exemple :
+
+java
+Copier
+Modifier
+@Operation(summary = "Récupère l'utilisateur connecté")
+@GetMapping("/me")
+public ResponseEntity<?> getCurrentUser(@RequestHeader("X-USER-EMAIL") String email) {
+    ...
+}
+⚠️ Swagger + Gateway
+L’interface Swagger n’est pas accessible directement via le Gateway, sauf si tu rediriges les endpoints swagger-ui.html et /v3/api-docs dans les routes de ton Gateway — mais c’est une config plus avancée, et pas recommandée pour un environnement de prod.
+
+🔐 Swagger et Sécurité
+Swagger n’inclut pas automatiquement le header Authorization. Pour le tester avec JWT :
+
+Ajoute une config de sécurité dans Swagger :
+
+java
+Copier
+Modifier
+@Bean
+public OpenAPI openAPIWithJWT() {
+    return new OpenAPI()
+        .components(new Components()
+            .addSecuritySchemes("BearerAuth",
+                new SecurityScheme()
+                    .type(SecurityScheme.Type.HTTP)
+                    .scheme("bearer")
+                    .bearerFormat("JWT")
+            ))
+        .addSecurityItem(new SecurityRequirement().addList("BearerAuth"));
+}
+Ensuite, dans Swagger UI, tu pourras cliquer sur Authorize 🔒 et coller ton token.
+
+✅ 3. Accès à Swagger
+Après avoir redémarré l’application user-service :
+
+Swagger UI : http://localhost:8081/swagger-ui.html
+
+OpenAPI JSON : http://localhost:8081/v3/api-docs
 
 
 
@@ -356,6 +472,11 @@ Traitement de chaque services pour un bon fonctionnement :
 
 User service In progress...
 
-passerelle gateway à mettre en place pour permettre la communication entre les micros-services ...
+Api swagger for documentation
 
-Eureka à étudier pour comprendre l'utilité et l'implémentation
+Product Service and media service to implement 
+
+https ssl to encrypt data in transit
+
+Global Readme file to explain how to run the project
+

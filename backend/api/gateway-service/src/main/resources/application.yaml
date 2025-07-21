@@ -40,6 +40,20 @@ spring:
             - Path=/api/products/**
           filters:
             - AddRequestHeader=X-Gateway, gateway-service
+        # Swagger doc route for aggregation
+        - id: user-service-swagger
+          uri: lb://user-service
+          predicates:
+            - Path=/v3/api-docs/user
+          filters:
+            - RewritePath=/v3/api-docs/user, /v3/api-docs
+# Swagger config
+springdoc:
+  swagger-ui:
+    enabled: true
+    urls:
+      - name: user-service
+        url: /v3/api-docs/user
 
 eureka:
   client:

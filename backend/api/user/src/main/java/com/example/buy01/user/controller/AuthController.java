@@ -24,6 +24,8 @@ import com.example.buy01.user.security.JwtService;
 import com.example.buy01.user.security.UserDetailsImpl;
 import com.example.buy01.user.service.UserService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -37,6 +39,7 @@ import lombok.RequiredArgsConstructor;
 // Elle est annotée avec @RequiredArgsConstructor pour générer un constructeur avec les dépendances
 // Elle utilise Lombok pour générer le constructeur et les méthodes d'accès
 
+@Tag(name = "Authentication", description = "Inscription et connexion")
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -50,6 +53,7 @@ public class AuthController {
     // AuthenticationManager is used to authenticate the user credentials
     private final AuthenticationManager authenticationManager;
 
+    @Operation(summary = "Inscription d’un utilisateur")
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserDTO> register(
             @RequestPart("data") @Valid UserCreateDTO request,
@@ -57,6 +61,7 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(request, avatar));
     }
 
+    @Operation(summary = "Connexion de l’utilisateur")
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequest request) {
 

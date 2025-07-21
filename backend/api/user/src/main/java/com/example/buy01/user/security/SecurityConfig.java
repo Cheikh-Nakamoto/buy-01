@@ -35,16 +35,22 @@ public class SecurityConfig {
     @Autowired
     private GatewayAuthFilter gatewayAuthFilter;
 
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable()) // Disable CSRF for REST API
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .anyRequest().authenticated()
-                        ).addFilterBefore(gatewayAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                        .requestMatchers(
+                                "/api/auth/**",
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/swagger-resources/**",
+                                "/webjars/**")
+                        .permitAll()
+                        .anyRequest().authenticated())
+                .addFilterBefore(gatewayAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 

@@ -15,6 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.buy01.user.dto.UserDTO;
 import com.example.buy01.user.service.UserService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 // Cette classe gère les requêtes d'administration des utilisateurs
 // Elle utilise le UserService pour interagir avec la base de données
 // Elle est annotée avec @RestController pour être détectée par Spring et injectée dans d'autres classes
@@ -22,9 +26,11 @@ import com.example.buy01.user.service.UserService;
 // Elle est annotée avec @PreAuthorize pour restreindre l'accès aux utilisateurs ayant le rôle ADMIN
 // Elle utilise Lombok pour générer le constructeur et les méthodes d'accès
 
+@Tag(name = "Administration", description = "Actions réservées à l’ADMIN")
 @RestController
 @RequestMapping("/api/admin")
 @PreAuthorize("hasRole('ADMIN')")
+@SecurityRequirement(name = "bearerAuth")
 public class AdminController {
 
     @Autowired
@@ -42,12 +48,14 @@ public class AdminController {
      */
 
     // Liste de tous les utilisateurs
+    @Operation(summary = "Lister tous les utilisateurs")
     @GetMapping("/users/all")
     public List<UserDTO> getAllUsers() {
         return userService.getAllUsers();
     }
 
     // Supprimer un utilisateur
+    @Operation(summary = "Supprimer un utilisateur")
     @DeleteMapping("/users/del/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable String id) {
         userService.deleteUser(id);
