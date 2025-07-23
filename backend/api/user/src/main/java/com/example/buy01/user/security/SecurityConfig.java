@@ -36,11 +36,13 @@ public class SecurityConfig {
     @Autowired
     private GatewayAuthFilter gatewayAuthFilter;
 
+    @Autowired
+    private InternalAccessFilter internalAccessFilter;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable()) // Disable CSRF for REST API
-                .cors(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
@@ -51,8 +53,10 @@ public class SecurityConfig {
                                 "/swagger-resources/**",
                                 "/webjars/**")
                         .permitAll()
+                        .requestMatchers("/api/users/internal/**").hasAuthority("INTERNAL_ACCESS")
                         .anyRequest().authenticated())
-                .addFilterBefore(gatewayAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(gatewayAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(internalAccessFilter, GatewayAuthFilter.class);
         return http.build();
     }
 

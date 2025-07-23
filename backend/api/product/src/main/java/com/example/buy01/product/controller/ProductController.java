@@ -48,26 +48,21 @@ public class ProductController {
         return productService.getProductById(id);
     }
 
-    @Operation(
-        summary = "Créer un nouveau produit avec images",
-        description = "Cette méthode permet aux vendeurs ou aux admins de créer un produit avec 0 à 3 images (2 Mo max chacun)"
-    )
+    @Operation(summary = "Créer un nouveau produit avec images", description = "Cette méthode permet aux vendeurs ou aux admins de créer un produit avec 0 à 3 images (2 Mo max chacun)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Produit créé avec succès"),
             @ApiResponse(responseCode = "400", description = "Requête invalide"),
             @ApiResponse(responseCode = "403", description = "Accès refusé"),
     })
     @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SELLER')")
     public ProductDTO create(
-            @Parameter(description = "Données du produit (JSON)", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
-            @Validated @RequestPart("data") ProductCreateDTO product,
+            @Parameter(description = "Données du produit (JSON)", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) @Validated @RequestPart("data") ProductCreateDTO product,
 
             @Parameter(description = "Email de l'utilisateur") @RequestHeader("X-USER-EMAIL") String email,
             @Parameter(description = "Rôle de l'utilisateur") @RequestHeader("X-USER-ROLE") String role,
 
-            @Parameter(description = "Jusqu’à 3 images (max 2 Mo chacune)")
-            @RequestPart(value = "files", required = false) MultipartFile[] files) {
+            @Parameter(description = "Jusqu’à 3 images (max 2 Mo chacune)") @RequestPart(value = "files", required = false) MultipartFile[] files) {
         return productService.createProduct(product, email, role, files);
     }
 
@@ -77,11 +72,40 @@ public class ProductController {
             @ApiResponse(responseCode = "403", description = "Non autorisé à modifier ce produit"),
             @ApiResponse(responseCode = "404", description = "Produit non trouvé")
     })
-    @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/update/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SELLER')")
     public ProductDTO update(
             @PathVariable String id,
-            @Validated @RequestBody ProductUpdateDTO product) {
-        return productService.updateProduct(id, product);
+            @Validated @RequestBody ProductUpdateDTO product,
+            @Parameter(description = "Email de l'utilisateur") @RequestHeader("X-USER-EMAIL") String email,
+            @Parameter(description = "Rôle de l'utilisateur") @RequestHeader("X-USER-ROLE") String role) {
+        return productService.updateProduct(id, product, email, role);
+    }
+
+    @Operation(summary = "Supprimer un produit")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Produit supprimé avec succès"),
+            @ApiResponse(responseCode = "403", description = "Non autorisé à supprimer ce produit"),
+            @ApiResponse(responseCode = "404", description = "Produit non trouvé")
+    })
+    @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SELLER')")
+    public void delete(@PathVariable String id,
+            @Parameter(description = "Email de l'utilisateur") @RequestHeader("X-USER-EMAIL") String email,
+            @Parameter(description = "Rôle de l'utilisateur") @RequestHeader("X-USER-ROLE") String role) {
+        productService.deleteProduct(id, email, role);
+    }
+
+    @Operation(summary = "Récupérer les produits d'un utilisateur par son ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Produits récupérés avec succès"),
+            @ApiResponse(responseCode = "404", description = "Aucun produit trouvé pour cet utilisateur")
+    })
+    @GetMapping("/myproducts")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SELLER')")
+    public List<ProductDTO> getProductsByUserId(
+            @Parameter(description = "Email de l'utilisateur") @RequestHeader("X-USER-EMAIL") String email,
+            @Parameter(description = "Rôle de l'utilisateur") @RequestHeader("X-USER-ROLE") String role) {
+        return productService.getProductsByUserId(email, role);
     }
 }

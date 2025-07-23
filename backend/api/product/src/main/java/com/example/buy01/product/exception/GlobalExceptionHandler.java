@@ -34,6 +34,13 @@ public class GlobalExceptionHandler {
                 return ResponseEntity.badRequest().body(buildError(request, HttpStatus.BAD_REQUEST, msg));
         }
 
+        // Gère les exceptions de type IllegalArgumentException
+        @ExceptionHandler(IllegalArgumentException.class)
+        public ResponseEntity<ApiErrorResponse> handleIllegalArgument(IllegalArgumentException ex,
+                        HttpServletRequest request) {
+                return ResponseEntity.badRequest().body(buildError(request, HttpStatus.BAD_REQUEST, ex.getMessage()));
+        }
+
         // Gère les exceptions d'authentification
         @ExceptionHandler({ UsernameNotFoundException.class, BadCredentialsException.class })
         public ResponseEntity<ApiErrorResponse> handleAuth(Exception ex, HttpServletRequest request) {

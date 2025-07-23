@@ -16,12 +16,16 @@ import com.example.buy01.product.exception.ResourceNotFoundException;
 import com.example.buy01.product.model.Product;
 import com.example.buy01.product.repository.ProductRepository;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
 public class ProductService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
 
     @Autowired
     private UserClient userClient;
@@ -44,7 +48,7 @@ public class ProductService {
         newProduct.setQuantity(product.getQuantity());
         newProduct.setUserId(product.getUserId());
 
-        if (role != null && role.equals("SELLER")) {
+        if (role != null && role.equals("ROLE_SELLER")) {
             newProduct.setUserId(user.getId()); // Assigner l'ID de l'utilisateur connecté au produit
         }
 
@@ -54,7 +58,6 @@ public class ProductService {
 
         ValidateMethods.validateProduct(newProduct);
         Product productSave = productRepository.save(newProduct);
-
         List<String> imageProduts = UploadImages(productSave.getId(), files);
         return toDTO(productSave, user.getName(), imageProduts);
     }
@@ -108,11 +111,19 @@ public class ProductService {
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
     }
 
-    public ProductDTO updateProduct(String id, ProductUpdateDTO updatedProduct) {
+    public ProductDTO updateProduct(String id, ProductUpdateDTO updatedProduct, String email, String role) {
         validateMethods.validateObjectId(id);
+
+        // Appel à user-service pour vérifier l'utilisateur
+        UserDTO userConnected = userClient.getUserByEmail(email);
 
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+
+        // Vérifie si l'utilisateur connecté est le propriétaire du produit ou un admin
+        if (!product.getUserId().equals(userConnected.getId()) && !role.equals("ROLE_ADMIN")) {
+            throw new IllegalArgumentException("Vous n'êtes pas autorisé à modifier ce produit");
+        }
 
         if (updatedProduct.getName() != null && !updatedProduct.getName().isBlank()) {
             product.setName(updatedProduct.getName());
@@ -132,17 +143,27 @@ public class ProductService {
 
 
         ValidateMethods.validateProduct(product);
+
         productRepository.save(product);
 
         return getProductById(product.getId());
     }
 
-    public void deleteProduct(String id) {
+    public void deleteProduct(String id, String email, String role) {
+
+        // Appel à user-service pour vérifier l'utilisateur
+        UserDTO user = userClient.getUserByEmail(email);
+
         validateMethods.validateObjectId(id);
 
-        if (!productRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Product not found");
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+
+        // Vérifie si l'utilisateur connecté est le propriétaire du produit ou un admin
+        if (!product.getUserId().equals(user.getId()) && !role.equals("ROLE_ADMIN")) {
+            throw new IllegalArgumentException("Vous n'êtes pas autorisé à supprimer ce produit");
         }
+
         // Supprimer les images associées si nécessaire
         // A implémenter : Sending de Kafka event pour que le consumer qui est dans le media supprimer toutes les images liées à ce produit
         productRepository.deleteById(id);
@@ -161,4 +182,22 @@ public class ProductService {
         return dto;
     }
 
+    public List<ProductDTO> getProductsByUserId(String email, String role) {
+        UserDTO user = userClient.getUserByEmail(email);
+
+        String userId = user.getId();
+
+        List<Product> products = productRepository.findByUserId(userId);
+
+        if (products.isEmpty()) {
+            throw new ResourceNotFoundException("Aucun produit trouvé pour cet utilisateur");
+        }
+
+        return products.stream()
+                .map(product -> {
+                    String sellerName = userClient.getSellerNameById(product.getUserId());
+                    return toDTO(product, sellerName, List.of() /* imageUrls */);
+                })
+                .collect(Collectors.toList());
+    }
 }

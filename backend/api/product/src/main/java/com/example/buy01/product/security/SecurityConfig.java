@@ -30,26 +30,27 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor // Génère un constructeur avec les champs finaux
 public class SecurityConfig {
 
-    @Autowired
-    private GatewayAuthFilter gatewayAuthFilter;
+        @Autowired
+        private GatewayAuthFilter gatewayAuthFilter;
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable()) // Disable CSRF for REST API
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/api/products/all",
-                                "/api/products/{id}",
-                                "/v3/api-docs/**",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/swagger-resources/**",
-                                "/webjars/**")
-                        .permitAll()
-                        .anyRequest().authenticated())
-                .addFilterBefore(gatewayAuthFilter, UsernamePasswordAuthenticationFilter.class);
-        return http.build();
-    }
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+                http
+                                .csrf(csrf -> csrf.disable()) // Disable CSRF for REST API
+                                .sessionManagement(session -> session
+                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                                .authorizeHttpRequests(auth -> auth
+                                                .requestMatchers(
+                                                                "/api/products/all",
+                                                                "/api/products/{id}",
+                                                                "/v3/api-docs/**",
+                                                                "/swagger-ui/**",
+                                                                "/swagger-ui.html",
+                                                                "/swagger-resources/**",
+                                                                "/webjars/**")
+                                                .permitAll()
+                                                .anyRequest().authenticated())
+                                .addFilterBefore(gatewayAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                return http.build();
+        }
 }

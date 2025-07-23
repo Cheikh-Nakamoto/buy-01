@@ -1,8 +1,10 @@
 package com.example.buy01.user.controller;
 
+import java.io.IOException;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PostAuthorize;
@@ -35,8 +37,7 @@ import org.springframework.http.MediaType;
 @RestController
 @RequestMapping("/api/users")
 @SecurityRequirement(name = "bearerAuth")
-@PreAuthorize("hasAnyRole('CLIENT', 'SELLER', 'ADMIN')") // Autorise l'accès aux utilisateurs ayant les rôles CLIENT,
-                                                         // ADMIN ou SELLER
+// ADMIN ou SELLER
 public class UserController {
 
     @Autowired
@@ -45,8 +46,12 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
+    @Value("${internal.token}")
+    private String internalToken;
+
     @Operation(summary = "Obtenir le profil utilisateur courant (Accessible par CLIENT, SELLER ou ADMIN)")
     @GetMapping("/me")
+    @PreAuthorize("hasRole('CLIENT') or hasRole('SELLER') or hasRole('ADMIN')")
     public ResponseEntity<UserDTO> getCurrentUser(@RequestHeader("X-USER-EMAIL") String email) {
         User user = userRepository.findByEmail(email);
         if (user == null) {
@@ -56,7 +61,7 @@ public class UserController {
     }
 
     // Récupérer un utilisateur par son ID
-    @Operation(summary = "Obtenir un utilisateur par son ID (Accessible par ADMIN ou l'utilisateur lui-même)")
+    @Operation(summary = "Obtenir un utilisateur par son ID (Accessible par ADMIN")
     @GetMapping("/profile/{id}")
     @PostAuthorize("hasRole('ADMIN')") // Autorise l'accès
                                        // si l'utilisateur
@@ -71,11 +76,25 @@ public class UserController {
     // Modifier un utilisateur
     @Operation(summary = "Modifier un utilisateur (Accessible par ADMIN ou l'utilisateur lui-même)")
     @PutMapping("/update/{id}")
-    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id") // Autorise l'accès si l'utilisateur est
-                                                                            // l'utilisateur demandé ou s'il a le rôle
-                                                                            // ADMIN
-    public ResponseEntity<UserDTO> updateUser(@PathVariable String id, @Valid @RequestBody UserUpdateDTO dto) {
-        return ResponseEntity.ok(userService.updateUser(id, dto));
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SELLER') or hasRole('CLIENT')")
+    public ResponseEntity<UserDTO> updateUser(@PathVariable String id, @Valid @RequestBody UserUpdateDTO dto,
+            @RequestHeader("X-USER-EMAIL") String email, @RequestHeader("X-USER-ROLE") String role) {
+
+        User user = userRepository.findByEmail(email);
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        if (role.equals("ROLE_ADMIN")) {
+            // Si l'utilisateur est un admin, on peut modifier n'importe quel utilisateur
+            return ResponseEntity.ok(userService.updateUser(id, dto));
+        } else if (!user.getId().equals(id)) {
+            // Si l'utilisateur n'est pas un admin, il ne peut modifier que son propre profil
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+
+        return ResponseEntity.ok(userService.updateUser(user.getId(), dto));
     }
 
     @Operation(summary = "Mettre à jour l'avatar de l'utilisateur", description = "Accessible uniquement par les utilisateurs avec les rôles ADMIN ou SELLER. "
@@ -84,7 +103,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN') or hasRole('SELLER')")
     public ResponseEntity<?> uploadAvatar(
             @RequestParam("file") MultipartFile file,
-            @RequestHeader("X-USER-EMAIL") String email) {
+            @RequestHeader("X-USER-EMAIL") String email) throws IOException {
 
         try {
             if (file.isEmpty()) {
@@ -96,24 +115,34 @@ public class UserController {
             }
 
             User user = userRepository.findByEmail(email);
+
             if (user == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Utilisateur non trouvé");
             }
 
+            if (!user.getRole().equals("ROLE_ADMIN") && !user.getRole().equals("ROLE_SELLER")) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body("Accès refusé : vous n'êtes pas autorisé à mettre à jour l'avatar");
+            }
+
             User updatedUser = userService.uploadAvatar(file, user);
+            
             return ResponseEntity.ok(Map.of("avatarUrl", updatedUser.getAvatar()));
 
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
 
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError()
-                    .body("Erreur lors de l’upload de l’avatar : " + e.getMessage());
         }
     }
 
-    @GetMapping("/email/{email}")
-    public ResponseEntity<UserDTO> getUserByEmail(@PathVariable String email) {
+    @GetMapping("/internal/email/{email}")
+    public ResponseEntity<?> getUserByEmail(@PathVariable String email,
+            @RequestHeader("X-INTERNAL-TOKEN") String token) {
+        System.out.println("🔍 Appel de l’API interne pour l'email : " + email);
+        if (!token.equals(internalToken)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied");
+        }
+
         User user = userRepository.findByEmail(email);
         if (user == null) {
             throw new ResourceNotFoundException("Utilisateur non trouvé avec l'email : " + email);
@@ -128,8 +157,12 @@ public class UserController {
         return ResponseEntity.ok(dto);
     }
 
-    @GetMapping("/name/{userId}")
-    public ResponseEntity<String> getSellerNameById(@PathVariable String userId) {
+    @GetMapping("/internal/name/{userId}")
+    public ResponseEntity<String> getSellerNameById(@PathVariable String userId,
+            @RequestHeader("X-INTERNAL-TOKEN") String token) {
+        if (!token.equals(internalToken)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied");
+        }
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Utilisateur non trouvé avec l'ID : " + userId));
         return ResponseEntity.ok(user.getName());
