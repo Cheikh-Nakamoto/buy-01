@@ -80,7 +80,7 @@ public class UserService {
         }
 
         // Envoi de l'événement de création à Kafka
-        kafkaProducer.sendUserCreatedEvent(user);
+        //kafkaProducer.sendUserCreatedEvent(user);
         return toDTO(user);
     }
 
