@@ -184,6 +184,243 @@ body {
     transition: all 0.3s ease;
 }
 
+
+/* Styles pour les informations utilisateur */
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 8px 16px;
+    max-width: 250px;
+    transition: all 0.3s ease;
+}
+
+.user-info:hover {
+    background-color: #f1f5f9;
+    border-color: #cbd5e1;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Styles pour le nom d'utilisateur */
+.username {
+    color: #1e293b;
+    font-weight: 600;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;
+    position: relative;
+    cursor: default;
+}
+
+/* Tooltip pour afficher le nom complet au survol */
+.username::before {
+    content: attr(data-full-name);
+    position: absolute;
+    bottom: -35px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #1f2937;
+    color: white;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 1001;
+    pointer-events: none;
+}
+
+.username::after {
+    content: '';
+    position: absolute;
+    bottom: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 5px solid #1f2937;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 1001;
+}
+
+.username:hover::before,
+.username:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Bouton de déconnexion */
+.logout-btn {
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 60px;
+}
+
+.logout-btn:hover {
+    background-color: #dc2626;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
+}
+
+.logout-btn:active {
+    transform: translateY(0);
+}
+
+/* Avatar optionnel (si vous voulez l'ajouter plus tard) */
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+/* Variante compacte pour les écrans moyens */
+@media (max-width: 1024px) {
+    .user-info {
+        max-width: 200px;
+        padding: 6px 12px;
+        gap: 10px;
+    }
+    
+    .username {
+        max-width: 120px;
+        font-size: 13px;
+    }
+    
+    .logout-btn {
+        padding: 5px 10px;
+        font-size: 11px;
+        min-width: 50px;
+    }
+}
+
+/* Responsive pour mobile */
+@media (max-width: 768px) {
+    .user-info {
+        max-width: 160px;
+        padding: 6px 10px;
+        gap: 8px;
+    }
+    
+    .username {
+        max-width: 80px;
+        font-size: 12px;
+    }
+    
+    .logout-btn {
+        padding: 4px 8px;
+        font-size: 10px;
+        min-width: 45px;
+    }
+    
+    /* Masquer le tooltip sur mobile */
+    .username:hover::before,
+    .username:hover::after {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .user-info {
+        max-width: 120px;
+        padding: 4px 8px;
+        gap: 6px;
+    }
+    
+    .username {
+        max-width: 60px;
+        font-size: 11px;
+    }
+    
+    .logout-btn {
+        padding: 3px 6px;
+        font-size: 9px;
+        min-width: 40px;
+    }
+}
+
+/* Style alternatif avec menu déroulant (optionnel) */
+.user-info.dropdown {
+    position: relative;
+    cursor: pointer;
+}
+
+.user-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 8px 0;
+    min-width: 180px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1002;
+}
+
+.user-info.dropdown:hover .user-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-item {
+    display: block;
+    width: 100%;
+    padding: 10px 16px;
+    text-align: left;
+    background: none;
+    border: none;
+    color: #374151;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background-color: #f3f4f6;
+}
+
+.dropdown-item.logout {
+    color: #ef4444;
+    border-top: 1px solid #e5e7eb;
+    margin-top: 4px;
+}
+
+.dropdown-item.logout:hover {
+    background-color: #fef2f2;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .navbar {

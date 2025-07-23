@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, TrackByFunction } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Product } from '../../models/interfaces';
+import { ProductService } from '../../services/product-service';
 
 @Component({
   selector: 'app-product-list',
@@ -34,10 +35,15 @@ export class ProductList {
   sortOrder: 'asc' | 'desc' = 'asc';
   isLoading: boolean = false;
 
-  ngOnInit() {
+  constructor(private productService: ProductService) { }
+
+ async ngOnInit() {
     this.loadProducts();
     this.extractCategories();
     this.applyFilters();
+    console.log('ProductList component initialized');
+    let products = await this.productService.getProducts();
+    console.log('Fetched products:', products);
   }
 
   // Simulation de chargement des produits (à remplacer par votre service)

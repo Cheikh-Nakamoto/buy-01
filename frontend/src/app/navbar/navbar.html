@@ -34,9 +34,18 @@
             </button>
 
             <!-- Bouton de connexion -->
-            <button class="signin-btn" (click)="onSignIn()">
-                Sign In
-            </button>
+            @if (!isSignIn()) {
+                <button class="signin-btn" (click)="onSignIn()">
+                    Sign In
+                </button>
+            }@else {
+                <div class="user-info">
+                    <span class="username"  [attr.data-full-name]="currentUser()?.name" (click)="myProfile()" >{{ currentUser()?.name }}</span>
+                    <button class="logout-btn" (click)="onSignOut()">
+                        Logout
+                    </button>
+                </div>
+            }
         </div>
 
         <!-- Menu mobile (hamburger) -->

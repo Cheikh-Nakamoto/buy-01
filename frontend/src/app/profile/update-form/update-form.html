@@ -1,0 +1,16 @@
+<h2 mat-dialog-title>Changer la photo de profil</h2>
+<mat-dialog-content>
+    <div class="preview-container">
+        <img *ngIf="previewUrl" [src]="previewUrl" class="image-preview">
+    </div>
+    <input type="file" accept="image/*" (change)="onFileSelected($event)" hidden #fileInput>
+    <button mat-raised-button (click)="fileInput.click()">
+        Choisir une image
+    </button>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()">Annuler</button>
+    <button mat-raised-button color="primary" (click)="onUpload()" [disabled]="!selectedFile">
+        Enregistrer
+    </button>
+</mat-dialog-actions>

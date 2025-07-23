@@ -3,14 +3,14 @@
     <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
       <!-- Header avec onglets -->
       <div class="flex border-b border-gray-200">
-        <button (click)="isSignUp = false" class="flex-1 py-4 px-6 text-center font-medium transition-colors"
-          [class.text-primary-600]="!isSignUp" [class.text-gray-500]="isSignUp" [class.bg-white]="!isSignUp"
-          [class.bg-gray-50]="isSignUp">
+        <button (click)="isSignUp.set(false)" class="flex-1 py-4 px-6 text-center font-medium transition-colors"
+          [class.text-primary-600]="!isSignUp()" [class.text-gray-500]="isSignUp()" [class.bg-white]="!isSignUp()"
+          [class.bg-gray-50]="isSignUp()">
           Sign In
         </button>
-        <button (click)="isSignUp = true" class="flex-1 py-4 px-6 text-center font-medium transition-colors"
-          [class.text-primary-600]="isSignUp" [class.text-gray-500]="!isSignUp" [class.bg-white]="isSignUp"
-          [class.bg-gray-50]="!isSignUp">
+        <button (click)="isSignUp.set(true)" class="flex-1 py-4 px-6 text-center font-medium transition-colors"
+          [class.text-primary-600]="isSignUp()" [class.text-gray-500]="!isSignUp()" [class.bg-white]="isSignUp()"
+          [class.bg-gray-50]="!isSignUp()">
           Sign Up
         </button>
       </div>
@@ -22,17 +22,17 @@
             <img src="/login.png" alt="">
           </div>
           <h2 class="text-2xl font-bold text-gray-900">
-            {{isSignUp ? 'Create your account' : 'Welcome back!'}}
+            {{isSignUp() ? 'Create your account' : 'Welcome back!'}}
           </h2>
           <p class="mt-2 text-gray-500">
-            {{isSignUp ? 'Join our marketplace today' : 'Sign in to continue to your account'}}
+            {{isSignUp() ? 'Join our marketplace today' : 'Sign in to continue to your account'}}
           </p>
         </div>
 
         <!-- Formulaire -->
         <form [formGroup]="authForm" (ngSubmit)="onSubmit()" class="space-y-5">
           <!-- Name field (only for sign up) -->
-          @if(isSignUp) {
+          @if(isSignUp()) {
           <div class="space-y-2">
             <label for="name" class="block text-sm font-medium text-gray-700">Full Name</label>
             <input id="name" type="text" formControlName="name"
@@ -98,7 +98,7 @@
           </div>
 
           <!-- Confirm Password field (only for sign up) -->
-          @if(isSignUp) {
+          @if(isSignUp()) {
           <div class="space-y-2">
             <label for="confirmPassword" class="block text-sm font-medium text-gray-700">Confirm Password</label>
             <div class="relative">
@@ -131,18 +131,18 @@
           }
 
           <!-- Role selection (only for sign up) -->
-          @if(isSignUp) {
+          @if(isSignUp()) {
           <div class="space-y-2">
             <label class="block text-sm font-medium text-gray-700">Account Type</label>
             <div class="grid grid-cols-2 gap-3">
               <label class="cursor-pointer">
-                <input type="radio" formControlName="role" value="buyer" class="sr-only">
+                <input type="radio" formControlName="role" value="CLIENT" class="sr-only">
                 <div class="border-2 rounded-lg p-4 text-center transition-all hover:border-primary-300"
-                  [class.border-primary-500]="authForm.get('role')?.value === 'buyer'"
-                  [class.bg-primary-50]="authForm.get('role')?.value === 'buyer'"
-                  [class.border-gray-200]="authForm.get('role')?.value !== 'buyer'">
-                  <svg class="w-6 h-6 mx-auto mb-2" [class.text-primary-500]="authForm.get('role')?.value === 'buyer'"
-                    [class.text-gray-400]="authForm.get('role')?.value !== 'buyer'" fill="none" stroke="currentColor"
+                  [class.border-primary-500]="authForm.get('role')?.value === 'CLIENT'"
+                  [class.bg-primary-50]="authForm.get('role')?.value === 'CLIENT'"
+                  [class.border-gray-200]="authForm.get('role')?.value !== 'CLIENT'">
+                  <svg class="w-6 h-6 mx-auto mb-2" [class.text-primary-500]="authForm.get('role')?.value === 'CLIENT'"
+                    [class.text-gray-400]="authForm.get('role')?.value !== 'CLIENT'" fill="none" stroke="currentColor"
                     viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
@@ -151,13 +151,13 @@
                 </div>
               </label>
               <label class="cursor-pointer">
-                <input type="radio" formControlName="role" value="seller" class="sr-only">
+                <input type="radio" formControlName="role" value="SELLER" class="sr-only">
                 <div class="border-2 rounded-lg p-4 text-center transition-all hover:border-primary-300"
-                  [class.border-primary-500]="authForm.get('role')?.value === 'seller'"
-                  [class.bg-primary-50]="authForm.get('role')?.value === 'seller'"
-                  [class.border-gray-200]="authForm.get('role')?.value !== 'seller'">
-                  <svg class="w-6 h-6 mx-auto mb-2" [class.text-primary-500]="authForm.get('role')?.value === 'seller'"
-                    [class.text-gray-400]="authForm.get('role')?.value !== 'seller'" fill="none" stroke="currentColor"
+                  [class.border-primary-500]="authForm.get('role')?.value === 'SELLER'"
+                  [class.bg-primary-50]="authForm.get('role')?.value === 'SELLER'"
+                  [class.border-gray-200]="authForm.get('role')?.value !== 'SELLER'">
+                  <svg class="w-6 h-6 mx-auto mb-2" [class.text-primary-500]="authForm.get('role')?.value === 'SELLER'"
+                    [class.text-gray-400]="authForm.get('role')?.value !== 'SELLER'" fill="none" stroke="currentColor"
                     viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
@@ -171,7 +171,7 @@
           }
 
           <!-- Remember me & Forgot password (only for sign in) -->
-          @if(!isSignUp) {
+          @if(!isSignUp()) {
           <div class="flex items-center justify-between">
             <div class="flex items-center">
               <input id="remember-me" name="remember-me" type="checkbox"
@@ -196,11 +196,11 @@
           }
 
           <!-- Submit button -->
-          <button type="submit" [disabled]="authForm.invalid || loading"
+          <button type="submit" [disabled]="authForm.invalid || loading()"
             class="w-full flex justify-center items-center py-3.5 px-6 rounded-xl shadow-md text-base font-semibold text-black bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 transition-all duration-200 ease-in-out transform hover:scale-[1.02] disabled:opacity-80 disabled:cursor-not-allowed disabled:transform-none">
 
             <!-- Animation de chargement -->
-            @if(loading) {
+            @if(loading()) {
             <span class="flex items-center">
               <svg class="animate-spin -ml-1 mr-2.5 h-5 w-5 text-white" viewBox="0 0 24 24">
                 <circle class="opacity-10" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -208,7 +208,7 @@
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
                 </path>
               </svg>
-              <span class="font-medium">{{isSignUp ? 'Creating Account...' : 'Signing In...'}}</span>
+              <span class="font-medium">{{isSignUp() ? 'Creating Account...' : 'Signing In...'}}</span>
             </span>
             }
             @else {
@@ -216,7 +216,7 @@
               <!-- Effet hover -->
               <span
                 class="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 rounded-xl transition-opacity duration-200"></span>
-              {{isSignUp ? 'Create Account' : 'Sign In'}}
+              {{isSignUp() ? 'Create Account' : 'Sign In'}}
             </span>
             }
           </button>
