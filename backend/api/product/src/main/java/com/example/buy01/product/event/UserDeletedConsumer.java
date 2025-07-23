@@ -18,7 +18,7 @@ public class UserDeletedConsumer {
     @KafkaListener(topics = "user-deleted-topic", groupId = "product-service-group")
     public void consumeUserDeleted(UserDeletedEvent event) {
         String sellerId = event.getUserId();
-        productRepository.deleteBySellerId(sellerId);
+        //productRepository.deleteBySellerId(sellerId);
         log.info("Produits du vendeur {} supprimés", sellerId);
     }
 }

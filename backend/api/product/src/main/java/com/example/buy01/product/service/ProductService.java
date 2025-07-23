@@ -56,7 +56,6 @@ public class ProductService {
         Product productSave = productRepository.save(newProduct);
 
         List<String> imageProduts = UploadImages(productSave.getId(), files);
-
         return toDTO(productSave, user.getName(), imageProduts);
     }
 
