@@ -5,7 +5,6 @@ import java.util.regex.Pattern;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Component;
 
-import com.example.buy01.product.exception.ResourceNotFoundException;
 import com.example.buy01.product.model.Product;
 
 @Component
@@ -44,7 +43,7 @@ public class ValidateMethods {
 
     public void validateObjectId(String id) {
         if (!ObjectId.isValid(id)) {
-            throw new ResourceNotFoundException("ID invalid");
+            throw new IllegalArgumentException("ID invalid");
         }
     }
 

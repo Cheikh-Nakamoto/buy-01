@@ -6,11 +6,13 @@ import jakarta.validation.constraints.Positive;
 public class ProductUpdateDTO {
     private String name;
     private String description;
-
     @Positive
-    @Min(0)
+    @Min(1)
     private Double price;
-
+    @Positive
+    @Min(1)
+    private Integer quantity;
+    
     // Getters and Setters
     public String getName() {
         return name;
@@ -35,4 +37,13 @@ public class ProductUpdateDTO {
     public void setPrice(Double price) {
         this.price = price;
     }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
+
 }

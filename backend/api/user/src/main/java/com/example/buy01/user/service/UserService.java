@@ -41,7 +41,7 @@ public class UserService {
     private String uploadDir;
 
     // Conversion User → DTO
-    private UserDTO toDTO(User user) {
+    public UserDTO toDTO(User user) {
         UserDTO dto = new UserDTO();
         dto.setName(user.getName());
         dto.setEmail(user.getEmail());

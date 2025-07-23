@@ -6,8 +6,8 @@ networks:
 
 services:
 
-  ### 🟩 MongoDB
-  mongodb:
+  ### 🟩 MongoDB pour User Service
+  user-mongodb:
     image: mongo:latest
     container_name: user-mongodb
     environment:
@@ -17,9 +17,25 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      - mongo_data:/data/db
+      - user_mongo_data:/data/db
     networks:
       - buy-network
+
+    ### 🟩 MongoDB pour Product Service
+  product-mongodb:
+    image: mongo:latest
+    container_name: product-mongodb
+    environment:
+      MONGO_INITDB_DATABASE: product_db
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: secret
+    ports:
+      - "27018:27017"
+    volumes:
+      - product_mongo_data:/data/db
+    networks:
+      - buy-network
+
 
   ### Eureka Server
   discovery-server:
@@ -37,7 +53,7 @@ services:
     ports:
       - "8081:8081"
     depends_on:
-      - mongodb
+      - user-mongodb
       - kafka
       - discovery-server
     environment:
@@ -51,6 +67,25 @@ services:
       - buy-network
       
     restart: always
+
+  ### 🟪 Product Service (Spring Boot)
+  product-service:
+    build: ./backend/api/product
+    container_name: product-service
+    ports:
+      - "8082:8082"
+    depends_on:
+      - product-mongodb
+      - kafka
+      - discovery-server
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://root:secret@mongodb:27017/product_db?authSource=admin
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka
+    volumes:
+      - ./uploads:/app/uploads
+    networks:
+      - buy-network
 
   ### 🟨 Zookeeper (nécessaire pour Kafka)
   zookeeper:
@@ -94,9 +129,13 @@ services:
       SPRING_CLOUD_GATEWAY_ROUTES_USER_SERVICE_URI: lb://user-service
       SPRING_CLOUD_GATEWAY_ROUTES_USER_SERVICE_ID: user-service
       SPRING_CLOUD_GATEWAY_ROUTES_USER_SERVICE_PREDICATE: Path=/users/**, Path=/auth/**, Path=/admin/**
+      SPRING_CLOUD_GATEWAY_ROUTES_PRODUCT_SERVICE_URI: lb://product-service
+      SPRING_CLOUD_GATEWAY_ROUTES_PRODUCT_SERVICE_ID: product-service
+      SPRING_CLOUD_GATEWAY_ROUTES_PRODUCT_SERVICE_PREDICATE: Path=/products/**, Path=/categories/**, Path=/images/**
       JWT_SECRET: N5Dztk+QsQEOFEhZ9WZ7ZzRp7uuOoT/knKWvYVZLNS7vt8BjnfHxLjzjGdBfEBu3
     networks:
       - buy-network
       
 volumes:
-  mongo_data:
+  user_mongo_data:
+  product_mongo_data:

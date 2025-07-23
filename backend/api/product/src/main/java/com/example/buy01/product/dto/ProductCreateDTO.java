@@ -1,6 +1,8 @@
 package com.example.buy01.product.dto;
 
 
+import java.util.List;
+
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -17,10 +19,16 @@ public class ProductCreateDTO {
 
     @NotNull(message = "Product price cannot be empty")
     @Positive
-    @Min(0)
+    @Min(1)
     private Double price;
+
+    @NotNull(message = "Product quantity cannot be empty")
+    @Positive
+    @Min(1)
+    private Integer quantity;
     
     private String userId;
+
 
     // Getters and Setters
     public String getName() {

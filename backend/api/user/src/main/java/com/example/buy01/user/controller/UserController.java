@@ -47,12 +47,12 @@ public class UserController {
 
     @Operation(summary = "Obtenir le profil utilisateur courant (Accessible par CLIENT, SELLER ou ADMIN)")
     @GetMapping("/me")
-    public ResponseEntity<?> getCurrentUser(@RequestHeader("X-USER-EMAIL") String email) {
+    public ResponseEntity<UserDTO> getCurrentUser(@RequestHeader("X-USER-EMAIL") String email) {
         User user = userRepository.findByEmail(email);
         if (user == null) {
             throw new ResourceNotFoundException("Utilisateur non trouvé avec l'email : " + email);
         }
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(userService.toDTO(user));
     }
 
     // Récupérer un utilisateur par son ID
@@ -80,7 +80,7 @@ public class UserController {
 
     @Operation(summary = "Mettre à jour l'avatar de l'utilisateur", description = "Accessible uniquement par les utilisateurs avec les rôles ADMIN ou SELLER. "
             + "Le fichier doit être une image envoyée via multipart/form-data.", requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Fichier avatar (image)", required = true, content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE)))
-    @PutMapping(value = "update/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/update/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN') or hasRole('SELLER')")
     public ResponseEntity<?> uploadAvatar(
             @RequestParam("file") MultipartFile file,
@@ -110,6 +110,29 @@ public class UserController {
             return ResponseEntity.internalServerError()
                     .body("Erreur lors de l’upload de l’avatar : " + e.getMessage());
         }
+    }
+
+    @GetMapping("/email/{email}")
+    public ResponseEntity<UserDTO> getUserByEmail(@PathVariable String email) {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new ResourceNotFoundException("Utilisateur non trouvé avec l'email : " + email);
+        }
+
+        UserDTO dto = new UserDTO();
+        dto.setId(user.getId());
+        dto.setEmail(user.getEmail());
+        dto.setName(user.getName());
+        dto.setRole(user.getRole());
+
+        return ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("/name/{userId}")
+    public ResponseEntity<String> getSellerNameById(@PathVariable String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Utilisateur non trouvé avec l'ID : " + userId));
+        return ResponseEntity.ok(user.getName());
     }
 
 }
