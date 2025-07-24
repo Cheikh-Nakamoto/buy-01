@@ -35,7 +35,21 @@ services:
       - product_mongo_data:/data/db
     networks:
       - buy-network
-
+    
+    ### 🟩 MongoDB pour Media Servie
+  media-mongodb:
+    image: mongo:latest
+    container_name: media-mongodb
+    environment:
+      MONGO_INITDB_DATABASE: media_db
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: secret
+    ports:
+      - "27019:27017"
+    volumes:
+      - media_mongo_data:/data/db
+    networks:
+      - buy-network
 
   ### Eureka Server
   discovery-server:
@@ -57,7 +71,7 @@ services:
       - kafka
       - discovery-server
     environment:
-      SPRING_DATA_MONGODB_URI: mongodb://root:secret@mongodb:27017/user_db?authSource=admin
+      SPRING_DATA_MONGODB_URI: user-mongodb://root:secret@user-mongodb:27017/user_db?authSource=admin
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       JWT_SECRET: N5Dztk+QsQEOFEhZ9WZ7ZzRp7uuOoT/knKWvYVZLNS7vt8BjnfHxLjzjGdBfEBu3
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka
@@ -65,7 +79,6 @@ services:
       - ./uploads:/app/uploads
     networks:
       - buy-network
-      
     restart: always
 
   ### 🟪 Product Service (Spring Boot)
@@ -79,13 +92,34 @@ services:
       - kafka
       - discovery-server
     environment:
-      SPRING_DATA_MONGODB_URI: mongodb://root:secret@mongodb:27018/product_db?authSource=admin
+      SPRING_DATA_MONGODB_URI: product-mongodb://root:secret@product-mongodb:27018/product_db?authSource=admin
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka
     volumes:
       - ./uploads:/app/uploads
     networks:
       - buy-network
+    restart: always
+
+  ### 🟪 Media Service (Spring Boot)
+  media-service:
+    build: ./backend/api/media
+    container_name: media-service
+    ports:
+      - "8083:8083"
+    depends_on:
+      - media-mongodb
+      - kafka
+      - discovery-server
+    environment:
+      SPRING_DATA_MONGODB_URI: media-mongodb://root:secret@media-mongodb:27019/media_db?authSource=admin
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka
+    volumes:
+      - ./uploads:/app/uploads
+    networks:
+      - buy-network
+    restart: always
 
   ### 🟨 Zookeeper (nécessaire pour Kafka)
   zookeeper:
@@ -132,6 +166,9 @@ services:
       SPRING_CLOUD_GATEWAY_ROUTES_PRODUCT_SERVICE_URI: lb://product-service
       SPRING_CLOUD_GATEWAY_ROUTES_PRODUCT_SERVICE_ID: product-service
       SPRING_CLOUD_GATEWAY_ROUTES_PRODUCT_SERVICE_PREDICATE: Path=/products/**, Path=/categories/**, Path=/images/**
+      SPRING_CLOUD_GATEWAY_ROUTES_MEDIA_SERVICE_URI: lb://media-service
+      SPRING_CLOUD_GATEWAY_ROUTES_MEDIA_SERVICE_ID: media-service
+      SPRING_CLOUD_GATEWAY_ROUTES_MEDIA_SERVICE_PREDICATE: Path=/media/**
       JWT_SECRET: N5Dztk+QsQEOFEhZ9WZ7ZzRp7uuOoT/knKWvYVZLNS7vt8BjnfHxLjzjGdBfEBu3
     networks:
       - buy-network
@@ -139,3 +176,4 @@ services:
 volumes:
   user_mongo_data:
   product_mongo_data:
+  media_mongo_data:

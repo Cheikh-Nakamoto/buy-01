@@ -175,6 +175,14 @@ public class UserService {
         file.transferTo(dest);
 
         // Mettre à jour l'avatar de l'utilisateur
+        if (user.getAvatar() != null) {
+            // Supprimer l'ancien avatar si nécessaire
+            File oldAvatar = new File(uploadDir + user.getAvatar());
+            if (oldAvatar.exists()) {
+                oldAvatar.delete();
+            }
+        }
+        
         user.setAvatar("/avatars/" + filename);
 
         // Enregistrer l'utilisateur avec le nouvel avatar

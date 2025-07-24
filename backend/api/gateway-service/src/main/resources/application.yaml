@@ -40,6 +40,13 @@ spring:
             - Path=/api/products/**
           filters:
             - AddRequestHeader=X-Gateway, gateway-service
+        
+        - id: media-service
+          uri: lb://media-service
+          predicates:
+            - Path=/api/media/**
+          filters:
+            - AddRequestHeader=X-Gateway, gateway-service
 
         # Swagger doc route for aggregation
         - id: user-service-swagger
@@ -55,6 +62,13 @@ spring:
             - Path=/v3/api-docs/product
           filters:
             - RewritePath=/v3/api-docs/product, /v3/api-docs
+        
+        - id: media-service
+          uri: lb://media-service
+          predicates:
+            - Path=/v3/api-docs/media
+          filters:
+            - RewritePath=/v3/api-docs/media, /v3/api-docs
 
 # Swagger config
 springdoc:
@@ -66,6 +80,8 @@ springdoc:
         url: /v3/api-docs/user
       - name: product-service
         url: /v3/api-docs/product
+      - name: media-service
+        url: /v3/api-docs/media
 
 eureka:
   client:

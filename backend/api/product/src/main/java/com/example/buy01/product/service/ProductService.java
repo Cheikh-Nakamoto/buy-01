@@ -3,11 +3,11 @@ package com.example.buy01.product.service;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.buy01.product.dto.MediaDTO;
 import com.example.buy01.product.dto.ProductCreateDTO;
 import com.example.buy01.product.dto.ProductDTO;
 import com.example.buy01.product.dto.ProductUpdateDTO;
@@ -16,19 +16,20 @@ import com.example.buy01.product.exception.ResourceNotFoundException;
 import com.example.buy01.product.model.Product;
 import com.example.buy01.product.repository.ProductRepository;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class ProductService {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
-
     @Autowired
     private UserClient userClient;
+
+    @Autowired
+    private MediaClient mediaClient;
 
     @Autowired
     private ValidateMethods validateMethods;
@@ -56,37 +57,43 @@ public class ProductService {
             throw new IllegalArgumentException("User ID cannot be null");
         }
 
+        
+        if (files.length > 3) {
+            throw new IllegalArgumentException("Maximum 3 images autorisées");
+        }
+        
         ValidateMethods.validateProduct(newProduct);
         Product productSave = productRepository.save(newProduct);
-        List<String> imageProduts = UploadImages(productSave.getId(), files);
+        List<MediaDTO> imageProduts = UploadImages(productSave.getId(), files);
         return toDTO(productSave, user.getName(), imageProduts);
     }
 
-    private List<String> UploadImages(String id, MultipartFile[] files) {
+    private List<MediaDTO> UploadImages(String productId, MultipartFile[] files) {
 
-        // Sending by RestTemplate to media service
-        // A implémenter : Upload des images et récupérer les URLs
+        List<MediaDTO> mediaList = new ArrayList<>();
 
-        /*
-         * if (files != null) {
-         * if (files.length > 3) {
-         * throw new IllegalArgumentException("Maximum 3 images autorisées");
-         * }
-         * 
-         * for (MultipartFile file : files) {
-         * if (file.getSize() > 2 * 1024 * 1024) {
-         * throw new IllegalArgumentException("Chaque image doit faire moins de 2 Mo");
-         * }
-         * 
-         * // Vérifie le type mime si nécessaire
-         * if (!file.getContentType().startsWith("image/")) {
-         * throw new IllegalArgumentException("Le fichier doit être une image");
-         * }
-         * }
-         * }
-         */
+        if (files != null) {
+            for (MultipartFile file : files) {
+                if (file.getSize() > 2 * 1024 * 1024) {
+                    throw new IllegalArgumentException("Chaque image doit faire moins de 2 Mo");
+                }
 
-        return List.of(); // Retourne une liste vide pour l'instant, à remplacer par les URLs des images
+                // Vérifie le type mime si nécessaire
+                if (!file.getContentType().startsWith("image/")) {
+                    throw new IllegalArgumentException("Le fichier doit être une image");
+                }
+
+                MediaDTO media = mediaClient.store(file, productId);
+
+                if (media == null) {
+                    throw new IllegalArgumentException("Erreur lors de l'upload de l'image");
+                } else {
+                    mediaList.add(media);
+                }
+            }
+        }
+
+        return mediaList;
     }
 
     // Récupération de tous les produits
@@ -104,9 +111,12 @@ public class ProductService {
         return productRepository.findById(id)
                 .map(product -> {
                     String name = userClient.getSellerNameById(product.getUserId());
-                    // List<String> imageUrls = List.of() // Créer une méthode pour récupérer les
-                    // URLs des images
-                    return toDTO(product, name, List.of() /* imageUrls */);
+                    List<MediaDTO> imageUrls = mediaClient.getMediasByProductId(product.getId());
+                    if (imageUrls == null) {
+                        imageUrls = new ArrayList<>(); // Si aucune image n'est trouvée, on initialise une liste vide
+                    }
+
+                    return toDTO(product, name, imageUrls);
                 })
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
     }
@@ -141,7 +151,6 @@ public class ProductService {
             product.setQuantity(updatedProduct.getQuantity());
         }
 
-
         ValidateMethods.validateProduct(product);
 
         productRepository.save(product);
@@ -163,14 +172,14 @@ public class ProductService {
         if (!product.getUserId().equals(user.getId()) && !role.equals("ROLE_ADMIN")) {
             throw new IllegalArgumentException("Vous n'êtes pas autorisé à supprimer ce produit");
         }
+        // Supprime les médias associés au produit
+        mediaClient.deleteMediaByProductId(id);
 
-        // Supprimer les images associées si nécessaire
-        // A implémenter : Sending de Kafka event pour que le consumer qui est dans le media supprimer toutes les images liées à ce produit
         productRepository.deleteById(id);
     }
 
     // 🔒 Masque les données sensibles
-    private ProductDTO toDTO(Product product, String sellerName, List<String> imageUrls) {
+    private ProductDTO toDTO(Product product, String sellerName, List<MediaDTO> imageUrls) {
         ProductDTO dto = new ProductDTO();
         dto.setId(product.getId());
         dto.setName(product.getName());
@@ -199,5 +208,27 @@ public class ProductService {
                     return toDTO(product, sellerName, List.of() /* imageUrls */);
                 })
                 .collect(Collectors.toList());
+    }
+
+    public boolean validateProduct(String productId, String email) {
+
+        // Appel à user-service pour vérifier l'utilisateur
+        UserDTO user = userClient.getUserByEmail(email);
+
+        if (productId == null || productId.isEmpty() || email == null || email.isEmpty() || user == null) {
+            return false;
+        }
+
+        Optional<Product> product = productRepository.findById(productId);
+
+        if (product.isEmpty()) {
+            return false;
+        }
+
+        if (!product.get().getUserId().equals(user.getId())) {
+            return false;
+        }
+
+        return true;
     }
 }

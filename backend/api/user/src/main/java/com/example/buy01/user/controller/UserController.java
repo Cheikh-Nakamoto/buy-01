@@ -1,5 +1,6 @@
 package com.example.buy01.user.controller;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
@@ -48,6 +49,9 @@ public class UserController {
 
     @Value("${internal.token}")
     private String internalToken;
+
+    @Value("${file.upload-dir}")
+    private String uploadDir;
 
     @Operation(summary = "Obtenir le profil utilisateur courant (Accessible par CLIENT, SELLER ou ADMIN)")
     @GetMapping("/me")
@@ -133,6 +137,27 @@ public class UserController {
             return ResponseEntity.badRequest().body(e.getMessage());
 
         }
+    }
+
+    @Operation(summary = "Supprimer l'avatar de l'utilisateur", description = "Accessible uniquement par les utilisateurs avec les rôles ADMIN ou SELLER.")
+    @PutMapping("/delete/avatar")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SELLER')")
+    public ResponseEntity<?> deleteAvatar(@RequestHeader("X-USER-EMAIL") String email) {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Utilisateur non trouvé");
+        }
+        
+        if (user.getAvatar() != null) {
+            // Supprimer l'ancien avatar
+            File oldAvatar = new File(uploadDir + user.getAvatar());
+            if (oldAvatar.exists()) {
+                oldAvatar.delete();
+            }
+            user.setAvatar(null);
+            userRepository.save(user);
+        }
+        return ResponseEntity.ok("Avatar supprimé avec succès");
     }
 
     @GetMapping("/internal/email/{email}")

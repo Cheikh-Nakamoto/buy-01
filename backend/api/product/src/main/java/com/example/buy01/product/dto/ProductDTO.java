@@ -12,7 +12,7 @@ public class ProductDTO {
     private Double price;
     private Integer quantity;
     private String sellerName;
-    private List<String> imageUrls;
+    private List<MediaDTO> imageUrls;
 
     public void setId(String id) {
         this.id = id;
