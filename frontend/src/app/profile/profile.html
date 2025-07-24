@@ -1,0 +1,126 @@
+<div class="profile-container">
+  @if (user()) {
+  <!-- Header avec image de fond et avatar -->
+  <div class="profile-header">
+    <div class="profile-avatar">
+      @if (user()!.avatar) {
+      <img [src]="user()!.avatar" [alt]="user()!.name + ' avatar'">
+      } @else {
+      <span>{{ getInitials(user()!.name) }}</span>
+      }
+      <div class="status-badge online"></div>
+      <button mat-icon-button (click)="openUploadDialog()">
+        <mat-icon>photo_camera</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Informations principales -->
+  <div class="profile-info">
+    <h1 class="profile-name">{{ user()!.name }}</h1>
+    <p class="profile-role">{{ getRoleLabel(user()!.role) }}</p>
+    <p class="profile-member-since">Membre depuis {{ getFormattedDate(user()!.createdAt) }}</p>
+  </div>
+
+  <!-- Contenu principal -->
+  <div class="profile-content">
+    <!-- Colonne gauche - Détails -->
+    <div class="profile-details">
+      <!-- Informations de base -->
+      <div class="detail-section">
+        <h3 class="section-title">
+          <span>👤</span>
+          Informations
+        </h3>
+        <div class="section-content">
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Email :</span>
+              <span class="info-value">{{ user()!.email }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Rôle :</span>
+              <span class="info-value role-badge" [class]="user()!.role">
+                {{ getRoleLabel(user()!.role) }}
+              </span>
+            </div>
+            <!-- <div class="info-item">
+                <span class="info-label">ID :</span>
+                <span class="info-value user-id">{{ user()!.id }}</span>
+              </div> -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Activité -->
+      <div class="detail-section">
+        <h3 class="section-title">
+          <span>📊</span>
+          Activité
+        </h3>
+        <div class="section-content">
+          <div class="activity-item">
+            <span class="activity-label">Inscription :</span>
+            <span class="activity-value">{{ getFormattedDate(user()!.createdAt) }}</span>
+          </div>
+          <div class="activity-item">
+            <span class="activity-label">Dernière connexion :</span>
+            <span class="activity-value">Aujourd'hui</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Colonne droite - Actions -->
+    <div class="profile-stats">
+      <!-- Actions rapides -->
+      <div class="profile-actions">
+        <button class="action-btn btn-primary" (click)="onEditProfile()">
+          <span>✏️</span>
+          Modifier le profil
+        </button>
+
+        <!-- @if (user()!.role === 'seller') {
+        <button class="action-btn btn-secondary" (click)="onViewProducts()">
+          <span>🛍️</span>
+          Mes produits
+        </button>
+        } -->
+        <!-- 
+        @if (user()!.role === 'client') {
+        <button class="action-btn btn-secondary" (click)="onViewOrders()">
+          <span>📦</span>
+          Mes commandes
+        </button>
+        } -->
+
+      </div>
+
+      <!-- Informations complémentaires -->
+      <div class="profile-summary">
+        <div class="summary-card">
+          <div class="summary-icon">🎯</div>
+          <div class="summary-content">
+            <h4>Statut du compte</h4>
+            <p>Compte {{ user()!.role === 'seller' ? 'vendeur' : 'acheteur' }} actif</p>
+          </div>
+        </div>
+
+        <div class="summary-card">
+          <div class="summary-icon">⏰</div>
+          <div class="summary-content">
+            <h4>Ancienneté</h4>
+            <p>{{ getAccountAge(user()!.createdAt) }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  } @else {
+  <!-- Loading state -->
+  <div class="loading-container">
+    <div class="loading-spinner"></div>
+    <p>Chargement du profil...</p>
+  </div>
+  }
+</div>

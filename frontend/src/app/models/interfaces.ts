@@ -2,7 +2,7 @@ export interface User {
   id: string;
   email: string;
   name: string;
-  role: 'buyer' | 'seller';
+  role: 'client' | 'seller';
   avatar?: string;
   createdAt: Date;
 }
@@ -55,6 +55,7 @@ export interface ProductFormData {
   price: number;
   category: string;
   stock: number;
+  sellerId?: string;
   images: string[];
 }
 
@@ -63,4 +64,9 @@ export interface UploadProgress {
   progress: number;
   completed: boolean;
   error?: string;
+}
+
+export interface AuthResponse {
+  user?: User;
+  token: string;
 }
