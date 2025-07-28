@@ -41,6 +41,13 @@ public class MediaService {
             throw new AccessDeniedException("Access denied for this operation.");
         }
 
+        // get medias by productId
+        List<Media> existingMedia = mediaRepository.findByProductId(productId);
+
+        if (existingMedia.size() >= 3) {
+            throw new IllegalArgumentException("Un produit ne peut pas avoir plus de 3 images.");
+        }
+
         String filename = uploadAndgenerateFileName(file);
 
         Media media = new Media();
@@ -129,10 +136,6 @@ public class MediaService {
 
     public boolean whichMake(String productId, String token, String email, String role) {
         if (role != null && role.equals("ROLE_CLIENT")) {
-            return false;
-        }
-
-        if (token != null && !internalToken.equals(token)) {
             return false;
         }
 

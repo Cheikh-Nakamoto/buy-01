@@ -33,7 +33,7 @@ public class MediaClient {
 
     public MediaDTO store(MultipartFile file, String productId) {
     try {
-        String url = "http://media-service/api/media/upload/" + productId;
+        String url = "http://media-service/api/media/internal/upload/" + productId;
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -72,7 +72,7 @@ public class MediaClient {
 
     public List<MediaDTO> getMediasByProductId(String productId) {
         try {
-            String url = "http://media-service/api/media/get/" + productId;
+            String url = "http://media-service/api/media/internal/get/" + productId;
 
             HttpHeaders headers = new HttpHeaders();
             headers.set("X-INTERNAL-TOKEN", internalToken);
@@ -95,7 +95,7 @@ public class MediaClient {
 
     public void deleteMediaByProductId(String id) {
         try {
-            String url = "http://media-service/api/media/internal/delete/product/" + id;
+            String url = "http://media-service/api/media/internal/delete/medias/" + id;
 
             HttpHeaders headers = new HttpHeaders();
             headers.set("X-INTERNAL-TOKEN", internalToken);

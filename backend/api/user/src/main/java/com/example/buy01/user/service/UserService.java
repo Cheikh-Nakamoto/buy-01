@@ -39,8 +39,6 @@ public class UserService {
     @Autowired
     private KafkaUserProducer kafkaProducer;
 
-    private static final Logger log = LoggerFactory.getLogger(UserService.class);
-
     @Value("${file.upload-dir}")
     private String uploadDir;
 
@@ -190,8 +188,6 @@ public class UserService {
                 oldAvatar.delete();
             }
         }
-
-        log.info("Enregistrement de l'avatar dans le chemin : {}", dest.getAbsolutePath());
 
         user.setAvatar("/avatars/" + filename);
 

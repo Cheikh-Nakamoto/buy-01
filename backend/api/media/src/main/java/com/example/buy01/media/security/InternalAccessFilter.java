@@ -29,7 +29,7 @@ public class InternalAccessFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         String token = request.getHeader("X-INTERNAL-TOKEN");
 
-        if (path.startsWith("/api/media/")) {
+        if (path.startsWith("/api/media/internal")) {
             if (token != null && token.equals(internalToken)) {
                 UsernamePasswordAuthenticationToken auth =
                     new UsernamePasswordAuthenticationToken("internal-service", null,

@@ -55,6 +55,13 @@ spring:
           filters:
             - AddRequestHeader=X-Gateway, gateway-service
 
+        - id: media-service-productsImages
+          uri: lb://media-service
+          predicates:
+            - Path=/productsImages/**
+          filters:
+            - AddRequestHeader=X-Gateway, gateway-service
+
         # Swagger doc route for aggregation
         - id: user-service-swagger
           uri: lb://user-service

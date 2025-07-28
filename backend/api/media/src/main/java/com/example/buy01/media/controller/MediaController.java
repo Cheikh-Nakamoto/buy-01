@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,19 +27,38 @@ public class MediaController {
     @Autowired
     private MediaService mediaService;
 
-    @Operation(summary = "Uploader un fichier média pour un produit", description = "Upload d’un fichier image lié à un produit (externe ou interne)")
+    @Operation(summary = "Uploader un fichier média pour un produit par le produit", description = "Upload d’un fichier image lié à un produit (usage interne)")
     @ApiResponse(responseCode = "200", description = "Fichier uploadé avec succès")
     @ApiResponse(responseCode = "400", description = "Requête invalide ou headers manquants")
     @ApiResponse(responseCode = "500", description = "Erreur serveur")
-    @PostMapping(value = "/upload/{productId}", consumes = "multipart/form-data")
+    @PostMapping(value = "internal/upload/{productId}", consumes = "multipart/form-data")
     public ResponseEntity<?> upload(
             @Parameter(description = "ID du produit") @PathVariable String productId,
             @Parameter(description = "Fichier image") @RequestPart("file") MultipartFile file,
-            @RequestHeader(value = "X-INTERNAL-TOKEN", required = false) String internalToken,
-            @RequestHeader(value = "X-USER-EMAIL", required = false) String email,
-            @RequestHeader(value = "X-USER-ROLE", required = false) String role) {
+            @RequestHeader(value = "X-INTERNAL-TOKEN", required = true) String internalToken) {
         try {
-            Media media = mediaService.store(file, productId, internalToken, email, role);
+            Media media = mediaService.store(file, productId, internalToken, "", "");
+            return ResponseEntity.ok(media);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Erreur lors du téléchargement: " + e.getMessage());
+        }
+    }
+
+    @Operation(summary = "Uploader un fichier média pour un produit directement", description = "Upload d’un fichier image lié à un produit (usage externe)")
+    @ApiResponse(responseCode = "200", description = "Fichier uploadé avec succès")
+    @ApiResponse(responseCode = "400", description = "Requête invalide ou headers manquants")
+    @ApiResponse(responseCode = "500", description = "Erreur serveur")
+    @PostMapping(value = "/add/{productId}", consumes = "multipart/form-data")
+    @PreAuthorize("hasRole('SELLER') or hasRole('ADMIN')")
+    public ResponseEntity<?> upload(
+            @Parameter(description = "ID du produit") @PathVariable String productId,
+            @Parameter(description = "Fichier image") @RequestPart("file") MultipartFile file,
+            @RequestHeader(value = "X-USER-EMAIL", required = true) String email,
+            @RequestHeader(value = "X-USER-ROLE", required = true) String role) {
+        try {
+            Media media = mediaService.store(file, productId, "", email, role);
             return ResponseEntity.ok(media);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -51,10 +71,10 @@ public class MediaController {
     @ApiResponse(responseCode = "200", description = "Liste des médias retournée")
     @ApiResponse(responseCode = "404", description = "Aucun média trouvé")
     @ApiResponse(responseCode = "500", description = "Erreur serveur")
-    @GetMapping("/get/{productId}")
+    @GetMapping("/internal/get/{productId}")
     public ResponseEntity<?> getMediaByProductId(
             @Parameter(description = "ID du produit") @PathVariable String productId,
-            @RequestHeader(value = "X-INTERNAL-TOKEN", required = false) String internalToken) {
+            @RequestHeader(value = "X-INTERNAL-TOKEN", required = true) String internalToken) {
         try {
             List<Media> media = mediaService.getMediaByProductId(productId, internalToken);
             return ResponseEntity.ok(media);
@@ -67,13 +87,13 @@ public class MediaController {
     @ApiResponse(responseCode = "200", description = "Média supprimé avec succès")
     @ApiResponse(responseCode = "500", description = "Erreur serveur")
     @DeleteMapping("/delete/{mediaId}")
+    @PreAuthorize("hasRole('SELLER') or hasRole('ADMIN')")
     public ResponseEntity<?> deleteMedia(
             @Parameter(description = "ID du média") @PathVariable String mediaId,
-            @RequestHeader(value = "X-INTERNAL-TOKEN", required = false) String internalToken,
-            @RequestHeader(value = "X-USER-EMAIL", required = false) String email,
-            @RequestHeader(value = "X-USER-ROLE", required = false) String role) {
+            @RequestHeader(value = "X-USER-EMAIL", required = true) String email,
+            @RequestHeader(value = "X-USER-ROLE", required = true) String role) {
         try {
-            mediaService.deleteMedia(mediaId, internalToken, email, role);
+            mediaService.deleteMedia(mediaId, "", email, role);
             return ResponseEntity.ok("Media deleted successfully.");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Erreur lors de la suppression du média: " + e.getMessage());
@@ -83,7 +103,7 @@ public class MediaController {
     @Operation(summary = "Supprimer tous les médias liés à un produit (interne)", description = "Suppression en cascade de tous les médias liés à un produit")
     @ApiResponse(responseCode = "200", description = "Médias supprimés avec succès")
     @ApiResponse(responseCode = "500", description = "Erreur serveur")
-    @DeleteMapping("/internal/delete/product/{productId}")
+    @DeleteMapping("/internal/delete/medias/{productId}")
     public ResponseEntity<?> deleteMediaByProductId(
             @Parameter(description = "ID du produit") @PathVariable String productId,
             @RequestHeader(value = "X-INTERNAL-TOKEN", required = true) String internalToken) {
@@ -101,14 +121,14 @@ public class MediaController {
     @ApiResponse(responseCode = "400", description = "Erreur de validation")
     @ApiResponse(responseCode = "500", description = "Erreur serveur")
     @PutMapping(value = "/update/{mediaId}", consumes = "multipart/form-data")
+    @PreAuthorize("hasRole('SELLER') or hasRole('ADMIN')")
     public ResponseEntity<?> updateMedia(
             @Parameter(description = "ID du média") @PathVariable String mediaId,
             @Parameter(description = "Nouveau fichier image") @RequestPart("file") MultipartFile file,
-            @RequestHeader(value = "X-INTERNAL-TOKEN", required = false) String internalToken,
             @RequestHeader(value = "X-USER-EMAIL", required = false) String email,
             @RequestHeader(value = "X-USER-ROLE", required = false) String role) {
         try {
-            Media updatedMedia = mediaService.updateMedia(mediaId, file, internalToken, email, role);
+            Media updatedMedia = mediaService.updateMedia(mediaId, file, "", email, role);
             return ResponseEntity.ok(updatedMedia);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
