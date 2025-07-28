@@ -1,7 +1,8 @@
 <div class="profile-container">
   @if (user()) {
   <!-- Header avec image de fond et avatar -->
-  <div class="profile-header">
+  <div class="profile-header" [style.background-image]="getBackgroundImage()">
+    <div class="profile-header-overlay"></div>
     <div class="profile-avatar">
       @if (user()!.avatar) {
       <img [src]="user()!.avatar" [alt]="user()!.name + ' avatar'">
@@ -14,7 +15,6 @@
       </button>
     </div>
   </div>
-
   <!-- Informations principales -->
   <div class="profile-info">
     <h1 class="profile-name">{{ user()!.name }}</h1>

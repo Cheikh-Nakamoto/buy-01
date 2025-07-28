@@ -15,7 +15,8 @@ export class SignIn implements OnInit {
   isSignUp = signal(false);
   loading = signal(false);
   errorMessage = '';
-
+  avatarPreview: string | ArrayBuffer | null = null;
+  selectedAvatarFile!: File;
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
@@ -31,14 +32,45 @@ export class SignIn implements OnInit {
       return;
     }
   }
+  onAvatarSelected(event: any) {
+    const file = event.target.files[0];
+    
+    if (file && file instanceof File) {
+      console.log('Avatar input changed:', file);
+      
+      // Validation
+      if (file.size > 5 * 1024 * 1024) { // 5MB max
+        console.error('File too large');
+        return;
+      }
 
+      if (!file.type.startsWith('image/')) {
+        console.error('Not an image file');
+        return;
+      }
+
+      // Stocker le fichier dans une propriété séparée
+      this.selectedAvatarFile = file;
+
+      // Prévisualisation
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.avatarPreview = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+
+      // Marquer le champ comme touché pour la validation
+      this.authForm.get('avatar')?.markAsTouched();
+    }
+  }
   private createForm(): FormGroup {
     return this.fb.group({
       name: [''],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: [''],
-      role: ['CLIENT', Validators.required]
+      role: ['CLIENT', Validators.required],
+      avatar: [null]
     });
   }
 
@@ -77,12 +109,12 @@ export class SignIn implements OnInit {
     const formData = this.authForm.value;
 
     if (this.isSignUp()) {
-      await this.authService.signUp(formData);
+      await this.authService.signUp(formData, this.selectedAvatarFile);
       this.toggleMode();
     } else {
       await this.authService.signIn(formData);
+      this.router.navigate(['/']);
     }
     this.loading.set(false);
-    this.router.navigate(['/']);
   }
 }

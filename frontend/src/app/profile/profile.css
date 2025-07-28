@@ -24,7 +24,36 @@ body {
   padding: 20px;
   color: var(--text-dark);
 }
+/* background user avatar  */
 
+.profile-header {
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 200px; /* Ajustez selon vos besoins */
+  display: flex;
+  align-items: flex-end;
+  padding: 20px;
+  
+  /* Fallback si pas d'image */
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.profile-header-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3); /* Overlay sombre pour améliorer la lisibilité */
+  pointer-events: none;
+}
+
+.profile-avatar {
+  position: relative;
+  z-index: 2; /* Au-dessus de l'overlay */
+}
 /* Container principal */
 .profile-container {
   max-width: 900px;
@@ -39,7 +68,7 @@ body {
 
 /* En-tête du profil */
 .profile-header {
-  height: 200px;
+  height: 400px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   position: relative;
   display: flex;

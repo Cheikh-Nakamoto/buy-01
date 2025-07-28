@@ -30,7 +30,43 @@
         </div>
 
         <!-- Formulaire -->
-        <form [formGroup]="authForm" (ngSubmit)="onSubmit()" class="space-y-5">
+        <form [formGroup]="authForm" (ngSubmit)="onSubmit()" class="space-y-5" enctype="multipart/form-data">
+          <!-- Avatar field (only for sign up) -->
+          @if(isSignUp()) {
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700 text-center">Profile Picture</label>
+            <div class="flex justify-center">
+              <div class="avatar-upload">
+                <div class="avatar-preview" (click)="avatarInput.click()">
+                  <div class="avatar-placeholder" [class.hidden]="avatarPreview">
+                    <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                  </div>
+                  <img *ngIf="avatarPreview" [src]="avatarPreview" alt="Avatar preview" class="avatar-image">
+                  <div class="avatar-overlay">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2-2H5a2 2 0 01-2-2V9z">
+                      </path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                  </div>
+                </div>
+                <input #avatarInput type="file" class="avatar-input" accept="image/*"
+                  (change)="onAvatarSelected($event)" formControlName="avatar">
+              </div>
+            </div>
+            <p class="text-xs text-gray-500 text-center">Click to upload a profile picture (optional)</p>
+            @if (authForm.get('avatar')?.invalid && authForm.get('avatar')?.touched) {
+            <p class="text-sm text-red-600 text-center">
+              Please select a valid image file
+            </p>
+            }
+          </div>
+          }
           <!-- Name field (only for sign up) -->
           @if(isSignUp()) {
           <div class="space-y-2">

@@ -22,6 +22,13 @@ export class Profile {
     console.log('Current user:', this.user());
   }
 
+  getBackgroundImage(): string {
+    if (this.user()?.avatar) {
+      return `url(${this.user()!.avatar})`;
+    }
+    return ''; // Utilisera le gradient CSS par défaut
+  }
+
   /**
    * Génère les initiales à partir du nom complet
    */
