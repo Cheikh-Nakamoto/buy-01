@@ -61,9 +61,9 @@ public class MediaService {
 
         List<Media> mediaList = mediaRepository.findByProductId(productId);
         if (mediaList.isEmpty()) {
-            throw new ResourceNotFoundException("No media found for product ID: " + productId);
+            mediaList = null; // Retourne null si aucun média trouvé
         }
-
+        
         return mediaList;
     }
 
@@ -116,11 +116,11 @@ public class MediaService {
 
     public boolean validateProduct(String productId, String email) {
 
-        if (productId == null || productId.isEmpty()) {
+        if (productId == null) {
             throw new IllegalArgumentException("Product ID cannot be null or empty.");
         }
 
-        if (email == null || email.isEmpty()) {
+        if (email == null) {
             throw new IllegalArgumentException("Email cannot be null or empty.");
         }
 
@@ -128,15 +128,15 @@ public class MediaService {
     }
 
     public boolean whichMake(String productId, String token, String email, String role) {
-        if (role.equals("ROLE_CLIENT")) {
+        if (role != null && role.equals("ROLE_CLIENT")) {
             return false;
         }
 
-        if (!internalToken.equals(token) && !token.isEmpty()) {
+        if (token != null && !internalToken.equals(token)) {
             return false;
         }
 
-        if (!email.isEmpty() && !role.isEmpty() && token.isEmpty()) {
+        if (email != null && role != null && token == null) {
             if (role.equals("ROLE_SELLER")) {
                 if (!validateProduct(productId, email)) {
                     return false;

@@ -143,7 +143,7 @@ public class UserService {
             throw new ResourceNotFoundException("User not found");
         }
         userRepository.deleteById(id);
-        kafkaProducer.sendUserDeletedEvent(id); // Envoi de l'événement de suppression à Kafka
+        //kafkaProducer.sendUserDeletedEvent(id); // Envoi de l'événement de suppression à Kafka
     }
 
     public User uploadAvatar(MultipartFile file, User user) throws IOException {

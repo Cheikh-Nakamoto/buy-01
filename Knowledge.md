@@ -470,13 +470,11 @@ OpenAPI JSON : http://localhost:8081/v3/api-docs
 
 Traitement de chaque services pour un bon fonctionnement :
 
-User service In progress...
-
-Api swagger for documentation
-
 Product Service and media service to implement 
+
+kafka implementation
 
 https ssl to encrypt data in transit
 
-Global Readme file to explain how to run the project
+Global Readme file to explain how to run the project with dockerfile
 

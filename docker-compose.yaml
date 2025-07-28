@@ -71,7 +71,7 @@ services:
       - kafka
       - discovery-server
     environment:
-      SPRING_DATA_MONGODB_URI: user-mongodb://root:secret@user-mongodb:27017/user_db?authSource=admin
+      SPRING_DATA_MONGODB_URI: mongodb://root:secret@user-mongodb:27017/user_db?authSource=admin
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       JWT_SECRET: N5Dztk+QsQEOFEhZ9WZ7ZzRp7uuOoT/knKWvYVZLNS7vt8BjnfHxLjzjGdBfEBu3
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka
@@ -92,7 +92,7 @@ services:
       - kafka
       - discovery-server
     environment:
-      SPRING_DATA_MONGODB_URI: product-mongodb://root:secret@product-mongodb:27018/product_db?authSource=admin
+      SPRING_DATA_MONGODB_URI: mongodb://root:secret@product-mongodb:27018/product_db?authSource=admin
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka
     volumes:
@@ -112,7 +112,7 @@ services:
       - kafka
       - discovery-server
     environment:
-      SPRING_DATA_MONGODB_URI: media-mongodb://root:secret@media-mongodb:27019/media_db?authSource=admin
+      SPRING_DATA_MONGODB_URI: mongodb://root:secret@media-mongodb:27019/media_db?authSource=admin
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka
     volumes:

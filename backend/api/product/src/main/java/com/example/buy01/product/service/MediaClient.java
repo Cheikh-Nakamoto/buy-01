@@ -2,6 +2,8 @@ package com.example.buy01.product.service;
 
 import org.springframework.http.HttpHeaders;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
@@ -18,7 +21,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.buy01.product.dto.MediaDTO;
-
 
 @Component
 public class MediaClient {
@@ -30,34 +32,43 @@ public class MediaClient {
     private String internalToken;
 
     public MediaDTO store(MultipartFile file, String productId) {
-        try {
-            String url = "http://media-service/api/media/upload/" + productId;
+    try {
+        String url = "http://media-service/api/media/upload/" + productId;
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("X-INTERNAL-TOKEN", internalToken);
-            headers.set("Content-Type", "multipart/form-data");
-            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-            body.add("file", new FileSystemResource(file.getOriginalFilename()) {
-                @Override
-                public String getFilename() {
-                    return file.getOriginalFilename();
-                }
-            });
-            
-            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        headers.set("X-INTERNAL-TOKEN", internalToken);
 
-            ResponseEntity<MediaDTO> response = restTemplate.exchange(
-                    url,
-                    HttpMethod.POST,
-                    requestEntity,
-                    MediaDTO.class);
+        // Convert MultipartFile to a real file
+        File tempFile = File.createTempFile("upload-", file.getOriginalFilename());
+        file.transferTo(tempFile);
 
-            return response.getBody();
-        } catch (RestClientException e) {
-            System.err.println("❌ Erreur d’appel à media-service : " + e.getMessage());
-            return null;
-        }
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("file", new FileSystemResource(tempFile));
+
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+
+        ResponseEntity<MediaDTO> response = restTemplate.exchange(
+                url,
+                HttpMethod.POST,
+                requestEntity,
+                MediaDTO.class);
+
+        // Clean up the temporary file
+        tempFile.delete();
+
+        return response.getBody();
+
+    } catch (IOException e) {
+        System.err.println("❌ Erreur de conversion du fichier : " + e.getMessage());
+        return null;
+    } catch (RestClientException e) {
+        System.err.println("❌ Erreur d’appel à media-service : " + e.getMessage());
+        return null;
     }
+}
+
 
     public List<MediaDTO> getMediasByProductId(String productId) {
         try {
@@ -72,7 +83,8 @@ public class MediaClient {
                     url,
                     HttpMethod.GET,
                     requestEntity,
-                    new org.springframework.core.ParameterizedTypeReference<List<MediaDTO>>() {});
+                    new org.springframework.core.ParameterizedTypeReference<List<MediaDTO>>() {
+                    });
 
             return response.getBody();
         } catch (RestClientException e) {

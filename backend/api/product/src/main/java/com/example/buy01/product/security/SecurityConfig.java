@@ -33,6 +33,9 @@ public class SecurityConfig {
         @Autowired
         private GatewayAuthFilter gatewayAuthFilter;
 
+        @Autowired
+        private InternalAccessFilter internalAccessFilter;
+
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
                 http
@@ -50,7 +53,8 @@ public class SecurityConfig {
                                                                 "/webjars/**")
                                                 .permitAll()
                                                 .anyRequest().authenticated())
-                                .addFilterBefore(gatewayAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                                .addFilterBefore(gatewayAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                                .addFilterBefore(internalAccessFilter, GatewayAuthFilter.class);
                 return http.build();
         }
 }

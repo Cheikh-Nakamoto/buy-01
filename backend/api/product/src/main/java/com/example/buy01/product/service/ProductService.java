@@ -86,7 +86,7 @@ public class ProductService {
                 MediaDTO media = mediaClient.store(file, productId);
 
                 if (media == null) {
-                    throw new IllegalArgumentException("Erreur lors de l'upload de l'image");
+                    mediaList = null; // Retourne null si l'upload échoue
                 } else {
                     mediaList.add(media);
                 }
