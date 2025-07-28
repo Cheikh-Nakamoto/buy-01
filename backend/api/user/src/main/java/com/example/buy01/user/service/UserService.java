@@ -1,5 +1,6 @@
 package com.example.buy01.user.service;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.*;
@@ -21,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
+import org.slf4j.Logger;
 
 @Service
 public class UserService {
@@ -36,6 +38,8 @@ public class UserService {
 
     @Autowired
     private KafkaUserProducer kafkaProducer;
+
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
 
     @Value("${file.upload-dir}")
     private String uploadDir;
@@ -69,7 +73,7 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setAvatar(null); // Initialiser l'avatar à null
         ValidateMethods.validateUser(user);
-        
+
         // Gestion de l'avatar
         // Si l'avatar est fourni, on l'upload
         // Si l'avatar n'est pas fourni, on le met à null
@@ -82,7 +86,7 @@ public class UserService {
         }
 
         // Envoi de l'événement de création à Kafka
-        //kafkaProducer.sendUserCreatedEvent(user);
+        // kafkaProducer.sendUserCreatedEvent(user);
         return toDTO(user);
     }
 
@@ -145,7 +149,8 @@ public class UserService {
             throw new ResourceNotFoundException("User not found");
         }
         userRepository.deleteById(id);
-        //kafkaProducer.sendUserDeletedEvent(id); // Envoi de l'événement de suppression à Kafka
+        // kafkaProducer.sendUserDeletedEvent(id); // Envoi de l'événement de
+        // suppression à Kafka
     }
 
     public User uploadAvatar(MultipartFile file, User user) throws IOException {
@@ -170,7 +175,8 @@ public class UserService {
         String filename = UUID.randomUUID() + ext;
 
         File dir = new File(uploadDir);
-        if (!dir.exists()) dir.mkdirs();
+        if (!dir.exists())
+            dir.mkdirs();
 
         // Créer le chemin absolu
         File dest = new File(dir, filename);
@@ -184,7 +190,9 @@ public class UserService {
                 oldAvatar.delete();
             }
         }
-        
+
+        log.info("Enregistrement de l'avatar dans le chemin : {}", dest.getAbsolutePath());
+
         user.setAvatar("/avatars/" + filename);
 
         // Enregistrer l'utilisateur avec le nouvel avatar
