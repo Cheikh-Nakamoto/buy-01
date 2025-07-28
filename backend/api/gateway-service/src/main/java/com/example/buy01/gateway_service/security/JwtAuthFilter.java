@@ -84,7 +84,7 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
                 || path.startsWith("/swagger-ui")
                 || path.startsWith("/swagger-resources")
                 || path.startsWith("/webjars")
-                || path.startsWith("api/users/avatars/")
+                || path.startsWith("/avatars/")
                 || path.equals("/");
 
     }

@@ -33,6 +33,13 @@ spring:
             - Path=/api/admin/**
           filters:
             - AddRequestHeader=X-Gateway, gateway-service
+          
+        - id: user-service-avatars
+          uri: lb://user-service
+          predicates:
+            - Path=/avatars/**
+          filters:
+            - AddRequestHeader=X-Gateway, gateway-service
 
         - id: product-service
           uri: lb://product-service
