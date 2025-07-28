@@ -67,6 +67,7 @@ public class UserService {
         user.setEmail(dto.getEmail());
         user.setRole(dto.getRole());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        user.setAvatar(null); // Initialiser l'avatar à null
         ValidateMethods.validateUser(user);
         
         // Gestion de l'avatar
@@ -76,6 +77,7 @@ public class UserService {
             user = uploadAvatar(avatar, user);
         } else {
             // Enregistrement de l'utilisateur
+            user.setAvatar(null); // Pas d'avatar pour les utilisateurs non-sellers
             user = userRepository.save(user);
         }
 

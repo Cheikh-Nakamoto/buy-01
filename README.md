@@ -22,3 +22,10 @@ data:
 
 Mutltipart file pour l'encryption du fichier image 
 
+
+
+
+Commandes pour permettre l'enregistrement des images en local depuis le même point d'enregistrement que sur le docker
+sudo mkdir -p /app/uploads/avatars
+sudo mkdir -p /app/uploads/productsImages
+sudo chmod -R 777 /app/uploads
