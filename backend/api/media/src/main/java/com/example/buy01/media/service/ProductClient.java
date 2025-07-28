@@ -33,12 +33,13 @@ public class ProductClient {
 
             HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
 
-            ResponseEntity<Void> response = restTemplate.exchange(
+            ResponseEntity<?> response = restTemplate.exchange(
                     url,
                     HttpMethod.GET,
                     requestEntity,
                     Void.class);
-
+                    
+            System.out.println("Response status: " + response.getStatusCode());
             if (response.getStatusCode().is2xxSuccessful()) {
                 return true; // Product is valid
             } else {

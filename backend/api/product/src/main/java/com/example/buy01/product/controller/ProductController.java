@@ -3,6 +3,7 @@ package com.example.buy01.product.controller;
 import com.example.buy01.product.dto.ProductCreateDTO;
 import com.example.buy01.product.dto.ProductDTO;
 import com.example.buy01.product.dto.ProductUpdateDTO;
+import com.example.buy01.product.exception.ResourceNotFoundException;
 import com.example.buy01.product.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -14,6 +15,7 @@ import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -121,14 +123,15 @@ public class ProductController {
         })
 
         @GetMapping("/internal/validate/{productId}")
-        public boolean validateProduct(
+        public ResponseEntity<?> validateProduct(
                         @PathVariable String productId,
                         @Parameter(description = "Email de l'utilisateur") @RequestHeader("X-USER-EMAIL") String email,
                         @Parameter(description = "Token interne") @RequestHeader("X-INTERNAL-TOKEN") String token) {
-
-                if(!token.equals(internalToken)) {
-                        throw new AccessDeniedException("Access denied for this operation.");
+                boolean isValid = productService.validateProduct(productId, email);
+                if (isValid) {
+                        return ResponseEntity.ok("Produit validé avec succès");
+                } else {
+                        throw new ResourceNotFoundException("Produit non trouvé ou invalide");
                 }
-                return productService.validateProduct(productId, email);
         }
 }

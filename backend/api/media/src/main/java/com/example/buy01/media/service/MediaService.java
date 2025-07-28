@@ -135,16 +135,16 @@ public class MediaService {
     }
 
     public boolean whichMake(String productId, String token, String email, String role) {
-        if (role != null && role.equals("ROLE_CLIENT")) {
-            return false;
-        }
-
-        if (email != null && role != null && token == null) {
+        if (email != null && role != null && token == "") {
             if (role.equals("ROLE_SELLER")) {
+                System.out.println("Role is SELLER, checking product ownership.");
                 if (!validateProduct(productId, email)) {
+                    System.out.println("Product does not belong to user: " + email);
                     return false;
                 }
             }
+        } else {
+            return false;
         }
 
         return true;

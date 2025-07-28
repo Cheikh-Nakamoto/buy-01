@@ -214,18 +214,19 @@ public class ProductService {
 
         // Appel à user-service pour vérifier l'utilisateur
         UserDTO user = userClient.getUserByEmail(email);
-
+        System.out.println("User: " + user);
         if (productId == null || productId.isEmpty() || email == null || email.isEmpty() || user == null) {
             return false;
         }
 
         Optional<Product> product = productRepository.findById(productId);
-
+        System.out.println("Product: " + product);
         if (product.isEmpty()) {
             return false;
         }
 
         if (!product.get().getUserId().equals(user.getId())) {
+            System.out.println("Product does not belong to user: " + user.getId());
             return false;
         }
 
