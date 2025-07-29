@@ -130,10 +130,6 @@ public class UserService {
             user.setName(dto.getName());
         }
 
-        if (dto.getEmail() != null && !dto.getEmail().isBlank()) {
-            user.setEmail(dto.getEmail());
-        }
-
         ValidateMethods.validateUser(user);
         return toDTO(userRepository.save(user));
     }

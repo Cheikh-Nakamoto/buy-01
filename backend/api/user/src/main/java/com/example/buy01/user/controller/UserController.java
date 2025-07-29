@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -103,7 +104,7 @@ public class UserController {
     @PutMapping(value = "/update/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN') or hasRole('SELLER')")
     public ResponseEntity<?> uploadAvatar(
-            @RequestParam("file") MultipartFile file,
+            @RequestPart("avatar") MultipartFile file,
             @RequestHeader("X-USER-EMAIL") String email) throws IOException {
 
         try {
@@ -119,11 +120,6 @@ public class UserController {
 
             if (user == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Utilisateur non trouvé");
-            }
-
-            if (!user.getRole().equals("ROLE_ADMIN") && !user.getRole().equals("ROLE_SELLER")) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body("Accès refusé : vous n'êtes pas autorisé à mettre à jour l'avatar");
             }
 
             User updatedUser = userService.uploadAvatar(file, user);
