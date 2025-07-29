@@ -470,9 +470,7 @@ OpenAPI JSON : http://localhost:8081/v3/api-docs
 
 Traitement de chaque services pour un bon fonctionnement :
 
-Product Service and media service to implement 
-
-kafka implementation
+kafka implementation for user to product
 
 https ssl to encrypt data in transit
 

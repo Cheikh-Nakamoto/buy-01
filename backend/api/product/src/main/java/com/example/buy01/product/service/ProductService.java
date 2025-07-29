@@ -3,7 +3,6 @@ package com.example.buy01.product.service;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -79,14 +78,15 @@ public class ProductService {
                 }
 
                 // Vérifie le type mime si nécessaire
-                if (!file.getContentType().startsWith("image/")) {
+                String contentType = file.getContentType();
+                if (contentType == null || !contentType.startsWith("image/")) {
                     throw new IllegalArgumentException("Le fichier doit être une image");
                 }
 
                 MediaDTO media = mediaClient.store(file, productId);
 
                 if (media == null) {
-                    mediaList = null; // Retourne null si l'upload échoue
+                    throw new IllegalArgumentException("L'upload de l'image a échoué");
                 } else {
                     mediaList.add(media);
                 }
@@ -231,5 +231,23 @@ public class ProductService {
         }
 
         return true;
+    }
+
+    public void deleteAllProductsByUserId(String userId) {
+        validateMethods.validateObjectId(userId);
+        List<Product> products = productRepository.findByUserId(userId);
+        
+        if (products.isEmpty()) {
+            throw new ResourceNotFoundException("Aucun produit trouvé pour l'utilisateur avec ID: " + userId);
+        }
+
+        // Supprimer les médias associés aux produits
+        for (Product product : products) {
+            mediaClient.deleteMediaByProductId(product.getId());
+        }
+
+        // Supprimer les produits
+        productRepository.deleteAll(products);
+        System.out.println("Tous les produits de l'utilisateur avec ID " + userId + " ont été supprimés.");
     }
 }

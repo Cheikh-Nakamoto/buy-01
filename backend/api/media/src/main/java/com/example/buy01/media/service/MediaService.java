@@ -62,15 +62,11 @@ public class MediaService {
 
     public List<Media> getMediaByProductId(String productId, String token) {
 
-        if (!whichMake(productId, token, "", "")) {
-            throw new AccessDeniedException("Access denied for this operation.");
-        }
-
         List<Media> mediaList = mediaRepository.findByProductId(productId);
         if (mediaList.isEmpty()) {
             mediaList = null; // Retourne null si aucun média trouvé
         }
-        
+
         return mediaList;
     }
 
@@ -100,7 +96,7 @@ public class MediaService {
         if (!whichMake(media.getProductId(), internalToken, email, role)) {
             throw new AccessDeniedException("Access denied for this operation.");
         }
-        
+
         try {
             String filename = uploadAndgenerateFileName(file);
 
@@ -178,21 +174,15 @@ public class MediaService {
 
     public void deleteMediaByProductId(String productId, String token) {
 
-        if(!token.equals(internalToken)) {
-            throw new AccessDeniedException("Access denied for this operation.");
-        }
-
         List<Media> mediaList = mediaRepository.findByProductId(productId);
-        if (mediaList.isEmpty()) {
-            throw new ResourceNotFoundException("No media found for product ID: " + productId);
-        }
-
-        for (Media media : mediaList) {
-            File file = new File(UPLOAD_DIR + media.getImagePath());
-            if (file.exists()) {
-                file.delete();
+        if (!mediaList.isEmpty()) {
+            for (Media media : mediaList) {
+                File file = new File(UPLOAD_DIR + media.getImagePath());
+                if (file.exists()) {
+                    file.delete();
+                }
+                mediaRepository.delete(media);
             }
-            mediaRepository.delete(media);
         }
     }
 

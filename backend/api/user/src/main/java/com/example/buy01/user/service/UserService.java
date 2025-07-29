@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
-import org.slf4j.Logger;
 
 @Service
 public class UserService {
@@ -37,7 +36,7 @@ public class UserService {
     private BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
-    private KafkaUserProducer kafkaProducer;
+    private KafkaUserProducer kafkaUserProducer;
 
     @Value("${file.upload-dir}")
     private String uploadDir;
@@ -146,9 +145,12 @@ public class UserService {
         if (!userRepository.existsById(id)) {
             throw new ResourceNotFoundException("User not found");
         }
+
+        // Suppression de l'utilisateur
         userRepository.deleteById(id);
-        // kafkaProducer.sendUserDeletedEvent(id); // Envoi de l'événement de
-        // suppression à Kafka
+
+        // Envoi de l'événement de suppression à Kafka pour la suppression de tous ses produits
+        kafkaUserProducer.sendUserDeletedEvent(id); 
     }
 
     public User uploadAvatar(MultipartFile file, User user) throws IOException {
