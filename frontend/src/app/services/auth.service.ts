@@ -32,8 +32,9 @@ export class AuthService {
       console.log('Login response:', res);
       this._isSignIn.set(true);
       localStorage.setItem('token', res.token);
+      await this.checkAuth();
     } catch (error: any) {
-      console.error('Login failed:', error);
+     alert('Login failed: ' + error);
       return false;
     }
     return true;
@@ -63,7 +64,7 @@ export class AuthService {
       console.log('Avatar is a Blob, converting...');
       formData.append('avatar', file, 'avatar.jpg');
     } else {
-      console.error('Invalid avatar file type:', typeof avatarFile, avatarFile);
+     alert('Invalid avatar file type: ' + typeof avatarFile + ', ' + avatarFile);
       throw new Error('Invalid avatar file');
     }
   }
@@ -91,7 +92,7 @@ export class AuthService {
       return result;
 
     } catch (error: any) {
-      console.error('Registration failed:', error);
+     alert('Registration failed: ' + error);
       throw new Error(error.message || 'Registration failed');
     }
   }
@@ -123,7 +124,7 @@ export class AuthService {
         return true;
       }
     } catch (error) {
-      console.error('Auth check failed:', error);
+     alert('Auth check failed: ' + error);
     }
 
     this._isSignIn.set(false);

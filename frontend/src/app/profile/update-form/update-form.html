@@ -1,16 +1,65 @@
-<h2 mat-dialog-title>Changer la photo de profil</h2>
-<mat-dialog-content>
-    <div class="preview-container">
-        <img *ngIf="previewUrl" [src]="previewUrl" class="image-preview">
-    </div>
-    <input type="file" accept="image/*" (change)="onFileSelected($event)" hidden #fileInput>
-    <button mat-raised-button (click)="fileInput.click()">
-        Choisir une image
+<mat-dialog-content class="dialog-content">
+    <form [formGroup]="authForm" (ngSubmit)="onSave()" enctype="multipart/form-data">
+        <!-- Section photo de profil centrée -->
+       @if (user().role === 'SELLER') {
+         <div class="form-section image-section">
+             <div class="avatar-upload-container">
+                 <div class="flex flex-col items-center space-y-4">
+                     <div class="avatar-upload">
+                         <div class="avatar-preview" (click)="avatarInput.click()">
+                             <div class="avatar-placeholder" [class.hidden]="previewUrl">
+                                 <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor"
+                                     viewBox="0 0 24 24">
+                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                         d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                 </svg>
+                             </div>
+                             <img *ngIf="previewUrl" [src]="previewUrl" alt="Avatar preview" class="avatar-image">
+                         </div>
+                         <input #avatarInput type="file" class="avatar-input" accept="image/*" formControlName="avatar"
+                             (change)="onFileSelected($event)">
+                     </div>
+
+                     <div *ngIf="authForm.get('avatar')?.invalid && authForm.get('avatar')?.touched" class="text-center">
+                         <p class="text-sm text-red-500">
+                             Veuillez sélectionner une image valide (JPEG, PNG)
+                         </p>
+                     </div>
+                 </div>
+             </div>
+         </div>
+       }
+        <!-- Section informations personnelles -->
+        <div class="form-section">
+            <h3 class="section-title">
+                <mat-icon>person_outline</mat-icon>
+                Informations personnelles
+            </h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <mat-form-field appearance="fill">
+                        <input matInput formControlName="name" placeholder="Jean Dupont" required>
+                        <mat-icon matSuffix>person</mat-icon>
+                    </mat-form-field>
+                </div>
+
+                <div class="form-group">
+                    <mat-form-field appearance="fill">
+                        <input matInput type="password" formControlName="password" placeholder="Mot de passe" >
+                        <mat-icon matSuffix>lock</mat-icon>
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+<mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-stroked-button type="button" (click)="onCancel()" class="btn-cancel">
+        <mat-icon>close</mat-icon>
+        Annuler
     </button>
-</mat-dialog-content>
-<mat-dialog-actions align="end">
-    <button mat-button (click)="onCancel()">Annuler</button>
-    <button mat-raised-button color="primary" (click)="onUpload()" [disabled]="!selectedFile">
+    <button mat-raised-button color="primary" type="submit" class="btn-save">
+        <mat-icon>save</mat-icon>
         Enregistrer
     </button>
 </mat-dialog-actions>
+</form>
+</mat-dialog-content>

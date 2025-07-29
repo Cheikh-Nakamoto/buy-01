@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { MediaManagement } from './media-management';
+import { FormProduct } from './form-product';
 
-describe('MediaManagement', () => {
-  let component: MediaManagement;
-  let fixture: ComponentFixture<MediaManagement>;
+describe('FormProduct', () => {
+  let component: FormProduct;
+  let fixture: ComponentFixture<FormProduct>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [MediaManagement]
+      imports: [FormProduct]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(MediaManagement);
+    fixture = TestBed.createComponent(FormProduct);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
