@@ -93,9 +93,6 @@ public class UserController {
         if (role.equals("ROLE_ADMIN")) {
             // Si l'utilisateur est un admin, on peut modifier n'importe quel utilisateur
             return ResponseEntity.ok(userService.updateUser(id, dto));
-        } else if (!user.getId().equals(id)) {
-            // Si l'utilisateur n'est pas un admin, il ne peut modifier que son propre profil
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
 
         return ResponseEntity.ok(userService.updateUser(user.getId(), dto));
