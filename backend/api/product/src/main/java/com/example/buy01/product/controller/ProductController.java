@@ -6,13 +6,9 @@ import com.example.buy01.product.dto.ProductUpdateDTO;
 import com.example.buy01.product.exception.ResourceNotFoundException;
 import com.example.buy01.product.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-
 import jakarta.annotation.security.PermitAll;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,16 +23,17 @@ import java.util.List;
 @RequestMapping("/api/products")
 public class ProductController {
 
-        @Autowired
-        private ProductService productService;
+        private final ProductService productService;
 
         @Value("${internal.token}")
         private String internalToken;
 
+        public ProductController(ProductService productService) {
+                this.productService = productService;
+        }
+
         @Operation(summary = "Récupérer tous les produits")
-        @ApiResponses(value = {
-                        @ApiResponse(responseCode = "200", description = "Liste des produits récupérée avec succès")
-        })
+        @ApiResponse(responseCode = "200", description = "Liste des produits récupérée avec succès")
         @GetMapping("/all")
         @PermitAll
         public List<ProductDTO> getAll() {
@@ -44,7 +41,7 @@ public class ProductController {
         }
 
         @Operation(summary = "Récupérer un produit par son ID")
-        @ApiResponses(value = {
+        @ApiResponses({
                         @ApiResponse(responseCode = "200", description = "Produit trouvé"),
                         @ApiResponse(responseCode = "404", description = "Produit non trouvé")
         })
@@ -54,28 +51,26 @@ public class ProductController {
                 return productService.getProductById(id);
         }
 
-        @Operation(summary = "Créer un nouveau produit avec images", description = "Cette méthode permet aux vendeurs ou aux admins de créer un produit avec 0 à 3 images (2 Mo max chacun)")
-        @ApiResponses(value = {
-                        @ApiResponse(responseCode = "201", description = "Produit créé avec succès"),
+        @Operation(summary = "Créer un produit avec images")
+        @ApiResponses({
+                        @ApiResponse(responseCode = "201", description = "Produit créé"),
                         @ApiResponse(responseCode = "400", description = "Requête invalide"),
-                        @ApiResponse(responseCode = "403", description = "Accès refusé"),
+                        @ApiResponse(responseCode = "403", description = "Accès refusé")
         })
         @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
         @PreAuthorize("hasRole('ADMIN') or hasRole('SELLER')")
         public ProductDTO create(
-                        @Parameter(description = "Données du produit (JSON)", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) @Validated @RequestPart("data") ProductCreateDTO product,
-
-                        @Parameter(description = "Email de l'utilisateur") @RequestHeader("X-USER-EMAIL") String email,
-                        @Parameter(description = "Rôle de l'utilisateur") @RequestHeader("X-USER-ROLE") String role,
-
-                        @Parameter(description = "Jusqu’à 5 images (max 2 Mo chacune)") @RequestPart(value = "files", required = false) MultipartFile[] files) {
+                        @Validated @RequestPart("data") ProductCreateDTO product,
+                        @RequestHeader("X-USER-EMAIL") String email,
+                        @RequestHeader("X-USER-ROLE") String role,
+                        @RequestPart(value = "files", required = false) MultipartFile[] files) {
                 return productService.createProduct(product, email, role, files);
         }
 
         @Operation(summary = "Mettre à jour un produit")
-        @ApiResponses(value = {
+        @ApiResponses({
                         @ApiResponse(responseCode = "200", description = "Produit mis à jour"),
-                        @ApiResponse(responseCode = "403", description = "Non autorisé à modifier ce produit"),
+                        @ApiResponse(responseCode = "403", description = "Non autorisé"),
                         @ApiResponse(responseCode = "404", description = "Produit non trouvé")
         })
         @PutMapping("/update/{id}")
@@ -83,49 +78,49 @@ public class ProductController {
         public ProductDTO update(
                         @PathVariable String id,
                         @Validated @RequestBody ProductUpdateDTO product,
-                        @Parameter(description = "Email de l'utilisateur") @RequestHeader("X-USER-EMAIL") String email,
-                        @Parameter(description = "Rôle de l'utilisateur") @RequestHeader("X-USER-ROLE") String role) {
+                        @RequestHeader("X-USER-EMAIL") String email,
+                        @RequestHeader("X-USER-ROLE") String role) {
                 return productService.updateProduct(id, product, email, role);
         }
 
         @Operation(summary = "Supprimer un produit")
-        @ApiResponses(value = {
-                        @ApiResponse(responseCode = "204", description = "Produit supprimé avec succès"),
-                        @ApiResponse(responseCode = "403", description = "Non autorisé à supprimer ce produit"),
+        @ApiResponses({
+                        @ApiResponse(responseCode = "204", description = "Produit supprimé"),
+                        @ApiResponse(responseCode = "403", description = "Non autorisé"),
                         @ApiResponse(responseCode = "404", description = "Produit non trouvé")
         })
         @DeleteMapping("/delete/{id}")
         @PreAuthorize("hasRole('ADMIN') or hasRole('SELLER')")
-        public void delete(@PathVariable String id,
-                        @Parameter(description = "Email de l'utilisateur") @RequestHeader("X-USER-EMAIL") String email,
-                        @Parameter(description = "Rôle de l'utilisateur") @RequestHeader("X-USER-ROLE") String role) {
+        public void delete(
+                        @PathVariable String id,
+                        @RequestHeader("X-USER-EMAIL") String email,
+                        @RequestHeader("X-USER-ROLE") String role) {
                 productService.deleteProduct(id, email, role);
         }
 
-        @Operation(summary = "Récupérer les produits d'un utilisateur par son ID")
-        @ApiResponses(value = {
-                        @ApiResponse(responseCode = "200", description = "Produits récupérés avec succès"),
-                        @ApiResponse(responseCode = "404", description = "Aucun produit trouvé pour cet utilisateur")
+        @Operation(summary = "Récupérer les produits d'un utilisateur")
+        @ApiResponses({
+                        @ApiResponse(responseCode = "200", description = "Produits récupérés"),
+                        @ApiResponse(responseCode = "404", description = "Aucun produit trouvé")
         })
         @GetMapping("/myproducts")
         @PreAuthorize("hasRole('ADMIN') or hasRole('SELLER')")
-        public List<ProductDTO> getProductsByUserId(
-                        @Parameter(description = "Email de l'utilisateur") @RequestHeader("X-USER-EMAIL") String email,
-                        @Parameter(description = "Rôle de l'utilisateur") @RequestHeader("X-USER-ROLE") String role) {
+        public List<ProductDTO> getUserProducts(
+                        @RequestHeader("X-USER-EMAIL") String email,
+                        @RequestHeader("X-USER-ROLE") String role) {
                 return productService.getProductsByUserId(email, role);
         }
 
-        @Operation(summary = "Valider un produit interne")
-        @ApiResponses(value = {
-                        @ApiResponse(responseCode = "200", description = "Produit validé avec succès"),
-                        @ApiResponse(responseCode = "404", description = "Produit non trouvé ou invalide")
+        @Operation(summary = "Valider un produit (interne)")
+        @ApiResponses({
+                        @ApiResponse(responseCode = "200", description = "Produit validé"),
+                        @ApiResponse(responseCode = "404", description = "Produit non trouvé")
         })
-
         @GetMapping("/internal/validate/{productId}")
         public ResponseEntity<?> validateProduct(
                         @PathVariable String productId,
-                        @Parameter(description = "Email de l'utilisateur") @RequestHeader("X-USER-EMAIL") String email,
-                        @Parameter(description = "Token interne") @RequestHeader("X-INTERNAL-TOKEN") String token) {
+                        @RequestHeader("X-USER-EMAIL") String email,
+                        @RequestHeader("X-INTERNAL-TOKEN") String token) {
                 boolean isValid = productService.validateProduct(productId, email);
                 if (isValid) {
                         return ResponseEntity.ok("Produit validé avec succès");

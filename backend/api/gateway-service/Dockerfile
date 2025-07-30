@@ -3,7 +3,7 @@ FROM maven:3.9.4-eclipse-temurin-17 AS builder
 
 WORKDIR /app
 
-COPY keystore.p12 /app/keystore.p12
+#COPY ./src/main/resources/keystore.p12 /app/keystore.p12
 
 # Copier tous les fichiers du projet
 COPY . .

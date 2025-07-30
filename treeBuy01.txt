@@ -1,0 +1,587 @@
+.
+├── backend
+│   ├── api
+│   │   ├── common
+│   │   │   └── ValidateMethods.java
+│   │   ├── discovery-server
+│   │   │   ├── Dockerfile
+│   │   │   ├── HELP.md
+│   │   │   ├── mvnw
+│   │   │   ├── mvnw.cmd
+│   │   │   ├── pom.xml
+│   │   │   ├── src
+│   │   │   │   ├── main
+│   │   │   │   │   ├── java
+│   │   │   │   │   │   └── com
+│   │   │   │   │   │       └── example
+│   │   │   │   │   │           └── buy01
+│   │   │   │   │   │               └── discovery_server
+│   │   │   │   │   │                   └── DiscoveryServerApplication.java
+│   │   │   │   │   └── resources
+│   │   │   │   │       ├── application.properties
+│   │   │   │   │       ├── static
+│   │   │   │   │       └── templates
+│   │   │   │   └── test
+│   │   │   │       └── java
+│   │   │   │           └── com
+│   │   │   │               └── example
+│   │   │   │                   └── buy01
+│   │   │   │                       └── discovery_server
+│   │   │   │                           └── DiscoveryServerApplicationTests.java
+│   │   │   └── target
+│   │   │       ├── classes
+│   │   │       │   ├── application.properties
+│   │   │       │   └── com
+│   │   │       │       └── example
+│   │   │       │           └── buy01
+│   │   │       │               └── discovery_server
+│   │   │       │                   └── DiscoveryServerApplication.class
+│   │   │       ├── discovery-server-0.0.1-SNAPSHOT.jar
+│   │   │       ├── discovery-server-0.0.1-SNAPSHOT.jar.original
+│   │   │       ├── generated-sources
+│   │   │       │   └── annotations
+│   │   │       ├── generated-test-sources
+│   │   │       │   └── test-annotations
+│   │   │       ├── maven-archiver
+│   │   │       │   └── pom.properties
+│   │   │       ├── maven-status
+│   │   │       │   └── maven-compiler-plugin
+│   │   │       │       ├── compile
+│   │   │       │       │   └── default-compile
+│   │   │       │       │       ├── createdFiles.lst
+│   │   │       │       │       └── inputFiles.lst
+│   │   │       │       └── testCompile
+│   │   │       │           └── default-testCompile
+│   │   │       │               ├── createdFiles.lst
+│   │   │       │               └── inputFiles.lst
+│   │   │       └── test-classes
+│   │   │           └── com
+│   │   │               └── example
+│   │   │                   └── buy01
+│   │   │                       └── discovery_server
+│   │   │                           └── DiscoveryServerApplicationTests.class
+│   │   ├── gateway-service
+│   │   │   ├── Dockerfile
+│   │   │   ├── HELP.md
+│   │   │   ├── mvnw
+│   │   │   ├── mvnw.cmd
+│   │   │   ├── pom.xml
+│   │   │   ├── src
+│   │   │   │   ├── main
+│   │   │   │   │   ├── java
+│   │   │   │   │   │   └── com
+│   │   │   │   │   │       └── example
+│   │   │   │   │   │           └── buy01
+│   │   │   │   │   │               └── gateway_service
+│   │   │   │   │   │                   ├── GatewayServiceApplication.java
+│   │   │   │   │   │                   └── security
+│   │   │   │   │   │                       ├── CorsConfig.java
+│   │   │   │   │   │                       ├── JwtAuthFilter.java
+│   │   │   │   │   │                       └── RateLimiterFilter.java
+│   │   │   │   │   └── resources
+│   │   │   │   │       ├── application.dis.properties
+│   │   │   │   │       ├── application.yaml
+│   │   │   │   │       └── keystore.p12
+│   │   │   │   └── test
+│   │   │   │       └── java
+│   │   │   │           └── com
+│   │   │   │               └── example
+│   │   │   │                   └── buy01
+│   │   │   │                       └── gateway_service
+│   │   │   │                           └── GatewayServiceApplicationTests.java
+│   │   │   └── target
+│   │   │       ├── classes
+│   │   │       │   ├── application.dis.properties
+│   │   │       │   ├── application.yaml
+│   │   │       │   ├── com
+│   │   │       │   │   └── example
+│   │   │       │   │       └── buy01
+│   │   │       │   │           └── gateway_service
+│   │   │       │   │               ├── GatewayServiceApplication.class
+│   │   │       │   │               └── security
+│   │   │       │   │                   ├── CorsConfig.class
+│   │   │       │   │                   ├── JwtAuthFilter.class
+│   │   │       │   │                   └── RateLimiterFilter.class
+│   │   │       │   └── keystore.p12
+│   │   │       ├── generated-sources
+│   │   │       │   └── annotations
+│   │   │       ├── generated-test-sources
+│   │   │       │   └── test-annotations
+│   │   │       ├── maven-status
+│   │   │       │   └── maven-compiler-plugin
+│   │   │       │       ├── compile
+│   │   │       │       │   └── default-compile
+│   │   │       │       │       ├── createdFiles.lst
+│   │   │       │       │       └── inputFiles.lst
+│   │   │       │       └── testCompile
+│   │   │       │           └── default-testCompile
+│   │   │       │               ├── createdFiles.lst
+│   │   │       │               └── inputFiles.lst
+│   │   │       └── test-classes
+│   │   │           └── com
+│   │   │               └── example
+│   │   │                   └── buy01
+│   │   │                       └── gateway_service
+│   │   │                           └── GatewayServiceApplicationTests.class
+│   │   ├── media
+│   │   │   ├── Dockerfile
+│   │   │   ├── HELP.md
+│   │   │   ├── mvnw
+│   │   │   ├── mvnw.cmd
+│   │   │   ├── pom.xml
+│   │   │   ├── src
+│   │   │   │   ├── main
+│   │   │   │   │   ├── java
+│   │   │   │   │   │   └── com
+│   │   │   │   │   │       └── example
+│   │   │   │   │   │           └── buy01
+│   │   │   │   │   │               └── media
+│   │   │   │   │   │                   ├── controller
+│   │   │   │   │   │                   │   └── MediaController.java
+│   │   │   │   │   │                   ├── dto
+│   │   │   │   │   │                   │   └── MediaDto.java
+│   │   │   │   │   │                   ├── exception
+│   │   │   │   │   │                   │   ├── ApiErrorResponse.java
+│   │   │   │   │   │                   │   ├── GlobalExceptionHandler.java
+│   │   │   │   │   │                   │   ├── MediaException.java
+│   │   │   │   │   │                   │   └── ResourceNotFoundException.java
+│   │   │   │   │   │                   ├── MediaApplication.java
+│   │   │   │   │   │                   ├── model
+│   │   │   │   │   │                   │   └── Media.java
+│   │   │   │   │   │                   ├── repository
+│   │   │   │   │   │                   │   └── MediaRepository.java
+│   │   │   │   │   │                   ├── security
+│   │   │   │   │   │                   │   ├── GatewayAuthFilter.java
+│   │   │   │   │   │                   │   ├── InternalAccessFilter.java
+│   │   │   │   │   │                   │   ├── MediaSecurity.java
+│   │   │   │   │   │                   │   ├── RestTemplateConfig.java
+│   │   │   │   │   │                   │   ├── SecurityConfig.java
+│   │   │   │   │   │                   │   ├── SwaggerConfig.java
+│   │   │   │   │   │                   │   └── WebConfig.java
+│   │   │   │   │   │                   ├── service
+│   │   │   │   │   │                   │   ├── MediaService.java
+│   │   │   │   │   │                   │   └── ProductClient.java
+│   │   │   │   │   │                   └── utils
+│   │   │   │   │   │                       └── FileValidator.java
+│   │   │   │   │   └── resources
+│   │   │   │   │       ├── application.properties
+│   │   │   │   │       ├── static
+│   │   │   │   │       └── templates
+│   │   │   │   └── test
+│   │   │   │       └── java
+│   │   │   │           └── com
+│   │   │   │               └── example
+│   │   │   │                   └── buy01
+│   │   │   │                       └── media
+│   │   │   │                           └── MediaApplicationTests.java
+│   │   │   └── target
+│   │   │       ├── classes
+│   │   │       │   ├── application.properties
+│   │   │       │   └── com
+│   │   │       │       └── example
+│   │   │       │           └── buy01
+│   │   │       │               └── media
+│   │   │       │                   ├── controller
+│   │   │       │                   │   └── MediaController.class
+│   │   │       │                   ├── dto
+│   │   │       │                   ├── exception
+│   │   │       │                   │   ├── ApiErrorResponse.class
+│   │   │       │                   │   ├── GlobalExceptionHandler.class
+│   │   │       │                   │   └── ResourceNotFoundException.class
+│   │   │       │                   ├── MediaApplication.class
+│   │   │       │                   ├── model
+│   │   │       │                   │   └── Media.class
+│   │   │       │                   ├── repository
+│   │   │       │                   │   └── MediaRepository.class
+│   │   │       │                   ├── security
+│   │   │       │                   │   ├── GatewayAuthFilter.class
+│   │   │       │                   │   ├── InternalAccessFilter.class
+│   │   │       │                   │   ├── RestTemplateConfig.class
+│   │   │       │                   │   ├── SecurityConfig.class
+│   │   │       │                   │   ├── SwaggerConfig.class
+│   │   │       │                   │   └── WebConfig.class
+│   │   │       │                   ├── service
+│   │   │       │                   │   ├── MediaService.class
+│   │   │       │                   │   └── ProductClient.class
+│   │   │       │                   └── utils
+│   │   │       │                       └── FileValidator.class
+│   │   │       ├── generated-sources
+│   │   │       │   └── annotations
+│   │   │       ├── generated-test-sources
+│   │   │       │   └── test-annotations
+│   │   │       ├── maven-status
+│   │   │       │   └── maven-compiler-plugin
+│   │   │       │       ├── compile
+│   │   │       │       │   └── default-compile
+│   │   │       │       │       ├── createdFiles.lst
+│   │   │       │       │       └── inputFiles.lst
+│   │   │       │       └── testCompile
+│   │   │       │           └── default-testCompile
+│   │   │       │               ├── createdFiles.lst
+│   │   │       │               └── inputFiles.lst
+│   │   │       ├── surefire-reports
+│   │   │       │   ├── com.example.buy01.media.MediaApplicationTests.txt
+│   │   │       │   └── TEST-com.example.buy01.media.MediaApplicationTests.xml
+│   │   │       └── test-classes
+│   │   │           └── com
+│   │   │               └── example
+│   │   │                   └── buy01
+│   │   │                       └── media
+│   │   │                           └── MediaApplicationTests.class
+│   │   ├── product
+│   │   │   ├── Dockerfile
+│   │   │   ├── HELP.md
+│   │   │   ├── mvnw
+│   │   │   ├── mvnw.cmd
+│   │   │   ├── pom.xml
+│   │   │   ├── src
+│   │   │   │   ├── main
+│   │   │   │   │   ├── java
+│   │   │   │   │   │   └── com
+│   │   │   │   │   │       └── example
+│   │   │   │   │   │           └── buy01
+│   │   │   │   │   │               └── product
+│   │   │   │   │   │                   ├── controller
+│   │   │   │   │   │                   │   └── ProductController.java
+│   │   │   │   │   │                   ├── dto
+│   │   │   │   │   │                   │   ├── MediaDTO.java
+│   │   │   │   │   │                   │   ├── ProductCreateDTO.java
+│   │   │   │   │   │                   │   ├── ProductDTO.java
+│   │   │   │   │   │                   │   ├── ProductUpdateDTO.java
+│   │   │   │   │   │                   │   └── UserDTO.java
+│   │   │   │   │   │                   ├── event
+│   │   │   │   │   │                   │   └── KafkaUserConsumer.java
+│   │   │   │   │   │                   ├── exception
+│   │   │   │   │   │                   │   ├── ApiErrorResponse.java
+│   │   │   │   │   │                   │   ├── GlobalExceptionHandler.java
+│   │   │   │   │   │                   │   ├── productException.java
+│   │   │   │   │   │                   │   └── ResourceNotFoundException.java
+│   │   │   │   │   │                   ├── model
+│   │   │   │   │   │                   │   └── Product.java
+│   │   │   │   │   │                   ├── ProductApplication.java
+│   │   │   │   │   │                   ├── repository
+│   │   │   │   │   │                   │   └── ProductRepository.java
+│   │   │   │   │   │                   ├── security
+│   │   │   │   │   │                   │   ├── GatewayAuthFilter.java
+│   │   │   │   │   │                   │   ├── InternalAccessFilter.java
+│   │   │   │   │   │                   │   ├── ProductSecurity.java
+│   │   │   │   │   │                   │   ├── RestTemplateConfig.java
+│   │   │   │   │   │                   │   ├── SecurityConfig.java
+│   │   │   │   │   │                   │   └── SwaggerConfig.java
+│   │   │   │   │   │                   └── service
+│   │   │   │   │   │                       ├── MediaClient.java
+│   │   │   │   │   │                       ├── ProductService.java
+│   │   │   │   │   │                       ├── UserClient.java
+│   │   │   │   │   │                       └── ValidateMethods.java
+│   │   │   │   │   └── resources
+│   │   │   │   │       ├── application.properties
+│   │   │   │   │       ├── static
+│   │   │   │   │       └── templates
+│   │   │   │   └── test
+│   │   │   │       └── java
+│   │   │   │           └── com
+│   │   │   │               └── example
+│   │   │   │                   └── buy01
+│   │   │   │                       └── product
+│   │   │   │                           └── ProductApplicationTests.java
+│   │   │   └── target
+│   │   │       ├── classes
+│   │   │       │   ├── application.properties
+│   │   │       │   └── com
+│   │   │       │       └── example
+│   │   │       │           └── buy01
+│   │   │       │               └── product
+│   │   │       │                   ├── controller
+│   │   │       │                   │   └── ProductController.class
+│   │   │       │                   ├── dto
+│   │   │       │                   │   ├── MediaDTO.class
+│   │   │       │                   │   ├── ProductCreateDTO.class
+│   │   │       │                   │   ├── ProductDTO.class
+│   │   │       │                   │   ├── ProductUpdateDTO.class
+│   │   │       │                   │   └── UserDTO.class
+│   │   │       │                   ├── event
+│   │   │       │                   │   └── KafkaUserConsumer.class
+│   │   │       │                   ├── exception
+│   │   │       │                   │   ├── ApiErrorResponse.class
+│   │   │       │                   │   ├── GlobalExceptionHandler.class
+│   │   │       │                   │   └── ResourceNotFoundException.class
+│   │   │       │                   ├── model
+│   │   │       │                   │   └── Product.class
+│   │   │       │                   ├── ProductApplication.class
+│   │   │       │                   ├── repository
+│   │   │       │                   │   └── ProductRepository.class
+│   │   │       │                   ├── security
+│   │   │       │                   │   ├── GatewayAuthFilter.class
+│   │   │       │                   │   ├── InternalAccessFilter.class
+│   │   │       │                   │   ├── ProductSecurity.class
+│   │   │       │                   │   ├── RestTemplateConfig.class
+│   │   │       │                   │   ├── SecurityConfig.class
+│   │   │       │                   │   └── SwaggerConfig.class
+│   │   │       │                   └── service
+│   │   │       │                       ├── MediaClient$1.class
+│   │   │       │                       ├── MediaClient.class
+│   │   │       │                       ├── ProductService.class
+│   │   │       │                       ├── UserClient.class
+│   │   │       │                       └── ValidateMethods.class
+│   │   │       ├── generated-sources
+│   │   │       │   └── annotations
+│   │   │       ├── generated-test-sources
+│   │   │       │   └── test-annotations
+│   │   │       ├── maven-status
+│   │   │       │   └── maven-compiler-plugin
+│   │   │       │       ├── compile
+│   │   │       │       │   └── default-compile
+│   │   │       │       │       ├── createdFiles.lst
+│   │   │       │       │       └── inputFiles.lst
+│   │   │       │       └── testCompile
+│   │   │       │           └── default-testCompile
+│   │   │       │               ├── createdFiles.lst
+│   │   │       │               └── inputFiles.lst
+│   │   │       └── test-classes
+│   │   │           └── com
+│   │   │               └── example
+│   │   │                   └── buy01
+│   │   │                       └── product
+│   │   │                           └── ProductApplicationTests.class
+│   │   └── user
+│   │       ├── Dockerfile
+│   │       ├── HELP.md
+│   │       ├── mvnw
+│   │       ├── mvnw.cmd
+│   │       ├── pom.xml
+│   │       ├── src
+│   │       │   ├── main
+│   │       │   │   ├── java
+│   │       │   │   │   └── com
+│   │       │   │   │       └── example
+│   │       │   │   │           └── buy01
+│   │       │   │   │               └── user
+│   │       │   │   │                   ├── AdminInitializer.java
+│   │       │   │   │                   ├── controller
+│   │       │   │   │                   │   ├── AdminController.java
+│   │       │   │   │                   │   ├── AuthController.java
+│   │       │   │   │                   │   └── UserController.java
+│   │       │   │   │                   ├── dto
+│   │       │   │   │                   │   ├── AuthRequest.java
+│   │       │   │   │                   │   ├── UserCreateDTO.java
+│   │       │   │   │                   │   ├── UserDTO.java
+│   │       │   │   │                   │   └── UserUpdateDTO.java
+│   │       │   │   │                   ├── event
+│   │       │   │   │                   │   └── KafkaUserProducer.java
+│   │       │   │   │                   ├── exception
+│   │       │   │   │                   │   ├── ApiErrorResponse.java
+│   │       │   │   │                   │   ├── EmailAlreadyUsedException.java
+│   │       │   │   │                   │   ├── GlobalExceptionHandler.java
+│   │       │   │   │                   │   ├── InvalidException.java
+│   │       │   │   │                   │   ├── JwtException.java
+│   │       │   │   │                   │   ├── PasswordTooWeakException.java
+│   │       │   │   │                   │   └── ResourceNotFoundException.java
+│   │       │   │   │                   ├── model
+│   │       │   │   │                   │   ├── User.java
+│   │       │   │   │                   │   └── UserRoleType.java
+│   │       │   │   │                   ├── repository
+│   │       │   │   │                   │   └── UserRepository.java
+│   │       │   │   │                   ├── security
+│   │       │   │   │                   │   ├── GatewayAuthFilter.java
+│   │       │   │   │                   │   ├── InternalAccessFilter.java
+│   │       │   │   │                   │   ├── JwtService.java
+│   │       │   │   │                   │   ├── SecurityConfig.java
+│   │       │   │   │                   │   ├── SwaggerConfig.java
+│   │       │   │   │                   │   ├── UserDetailsImpl.java
+│   │       │   │   │                   │   ├── UserDetailsServiceImpl.java
+│   │       │   │   │                   │   └── WebConfig.java
+│   │       │   │   │                   ├── service
+│   │       │   │   │                   │   └── UserService.java
+│   │       │   │   │                   ├── UserApplication.java
+│   │       │   │   │                   └── utils
+│   │       │   │   │                       └── ValidateMethods.java
+│   │       │   │   └── resources
+│   │       │   │       ├── application.properties
+│   │       │   │       ├── static
+│   │       │   │       └── templates
+│   │       │   └── test
+│   │       │       └── java
+│   │       │           └── com
+│   │       │               └── example
+│   │       │                   └── buy01
+│   │       │                       └── user
+│   │       │                           └── UserApplicationTests.java
+│   │       └── target
+│   │           ├── classes
+│   │           │   ├── application.properties
+│   │           │   └── com
+│   │           │       └── example
+│   │           │           └── buy01
+│   │           │               └── user
+│   │           │                   ├── AdminInitializer.class
+│   │           │                   ├── controller
+│   │           │                   │   ├── AdminController.class
+│   │           │                   │   ├── AuthController.class
+│   │           │                   │   └── UserController.class
+│   │           │                   ├── dto
+│   │           │                   │   ├── AuthRequest.class
+│   │           │                   │   ├── UserCreateDTO.class
+│   │           │                   │   ├── UserDTO.class
+│   │           │                   │   └── UserUpdateDTO.class
+│   │           │                   ├── event
+│   │           │                   │   └── KafkaUserProducer.class
+│   │           │                   ├── exception
+│   │           │                   │   ├── ApiErrorResponse.class
+│   │           │                   │   ├── EmailAlreadyUsedException.class
+│   │           │                   │   ├── GlobalExceptionHandler.class
+│   │           │                   │   ├── InvalidException.class
+│   │           │                   │   ├── JwtException.class
+│   │           │                   │   ├── PasswordTooWeakException.class
+│   │           │                   │   └── ResourceNotFoundException.class
+│   │           │                   ├── model
+│   │           │                   │   ├── User.class
+│   │           │                   │   ├── UserRoleType$UserRole.class
+│   │           │                   │   └── UserRoleType.class
+│   │           │                   ├── repository
+│   │           │                   │   └── UserRepository.class
+│   │           │                   ├── security
+│   │           │                   │   ├── GatewayAuthFilter.class
+│   │           │                   │   ├── InternalAccessFilter.class
+│   │           │                   │   ├── JwtService.class
+│   │           │                   │   ├── SecurityConfig.class
+│   │           │                   │   ├── SwaggerConfig.class
+│   │           │                   │   ├── UserDetailsImpl.class
+│   │           │                   │   ├── UserDetailsServiceImpl.class
+│   │           │                   │   └── WebConfig.class
+│   │           │                   ├── service
+│   │           │                   │   └── UserService.class
+│   │           │                   ├── UserApplication.class
+│   │           │                   └── utils
+│   │           │                       └── ValidateMethods.class
+│   │           ├── generated-sources
+│   │           │   └── annotations
+│   │           ├── generated-test-sources
+│   │           │   └── test-annotations
+│   │           ├── maven-archiver
+│   │           │   └── pom.properties
+│   │           ├── maven-status
+│   │           │   └── maven-compiler-plugin
+│   │           │       ├── compile
+│   │           │       │   └── default-compile
+│   │           │       │       ├── createdFiles.lst
+│   │           │       │       └── inputFiles.lst
+│   │           │       └── testCompile
+│   │           │           └── default-testCompile
+│   │           │               ├── createdFiles.lst
+│   │           │               └── inputFiles.lst
+│   │           ├── surefire-reports
+│   │           │   ├── com.example.buy01.user.UserApplicationTests.txt
+│   │           │   └── TEST-com.example.buy01.user.UserApplicationTests.xml
+│   │           ├── test-classes
+│   │           │   └── com
+│   │           │       └── example
+│   │           │           └── buy01
+│   │           │               └── user
+│   │           │                   └── UserApplicationTests.class
+│   │           ├── user-0.0.1-SNAPSHOT.jar
+│   │           └── user-0.0.1-SNAPSHOT.jar.original
+│   ├── database
+│   │   ├── Dockerfile
+│   │   └── Readme_Mongodb.md
+│   └── target
+│       ├── classes
+│       ├── generated-sources
+│       │   └── annotations
+│       ├── generated-test-sources
+│       │   └── test-annotations
+│       └── test-classes
+├── create_structure.py
+├── data
+│   └── uploads
+│       └── avatars
+├── Database-Design.png
+├── docker-compose.yaml
+├── frontend
+│   ├── angular.json
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── proxy.conf.json
+│   ├── public
+│   │   ├── favicon.ico
+│   │   ├── login.png
+│   │   └── logo.png
+│   ├── README.md
+│   ├── src
+│   │   ├── app
+│   │   │   ├── app.config.ts
+│   │   │   ├── app.css
+│   │   │   ├── app.html
+│   │   │   ├── app.routes.ts
+│   │   │   ├── app.spec.ts
+│   │   │   ├── app.ts
+│   │   │   ├── auth
+│   │   │   │   └── sign-in
+│   │   │   │       ├── sign-in.css
+│   │   │   │       ├── sign-in.html
+│   │   │   │       ├── sign-in.spec.ts
+│   │   │   │       └── sign-in.ts
+│   │   │   ├── models
+│   │   │   │   └── interfaces.ts
+│   │   │   ├── navbar
+│   │   │   │   ├── navbar.css
+│   │   │   │   ├── navbar.html
+│   │   │   │   ├── navbar.spec.ts
+│   │   │   │   └── navbar.ts
+│   │   │   ├── products
+│   │   │   │   ├── product-card
+│   │   │   │   │   ├── product-card.css
+│   │   │   │   │   ├── product-card.html
+│   │   │   │   │   ├── product-card.spec.ts
+│   │   │   │   │   └── product-card.ts
+│   │   │   │   └── product-list
+│   │   │   │       ├── product-list.css
+│   │   │   │       ├── product-list.html
+│   │   │   │       ├── product-list.spec.ts
+│   │   │   │       └── product-list.ts
+│   │   │   ├── profile
+│   │   │   │   ├── profile.css
+│   │   │   │   ├── profile.html
+│   │   │   │   ├── profile.spec.ts
+│   │   │   │   ├── profile.ts
+│   │   │   │   └── update-form
+│   │   │   │       ├── update-form.css
+│   │   │   │       ├── update-form.html
+│   │   │   │       ├── update-form.spec.ts
+│   │   │   │       └── update-form.ts
+│   │   │   ├── seller
+│   │   │   │   ├── dashboard
+│   │   │   │   │   ├── dashboard.css
+│   │   │   │   │   ├── dashboard.html
+│   │   │   │   │   ├── dashboard.spec.ts
+│   │   │   │   │   └── dashboard.ts
+│   │   │   │   ├── form-product
+│   │   │   │   │   ├── form-product.css
+│   │   │   │   │   ├── form-product.html
+│   │   │   │   │   ├── form-product.spec.ts
+│   │   │   │   │   └── form-product.ts
+│   │   │   │   └── product-management
+│   │   │   │       ├── product-management.css
+│   │   │   │       ├── product-management.html
+│   │   │   │       ├── product-management.spec.ts
+│   │   │   │       └── product-management.ts
+│   │   │   └── services
+│   │   │       ├── api-url-service.ts
+│   │   │       ├── auth.service.ts
+│   │   │       ├── guard-service.spec.ts
+│   │   │       ├── guard-service.ts
+│   │   │       ├── product-service.spec.ts
+│   │   │       ├── product-service.ts
+│   │   │       ├── user-service.spec.ts
+│   │   │       └── user-service.ts
+│   │   ├── index.html
+│   │   ├── main.ts
+│   │   └── styles.css
+│   ├── tailwind.config.js
+│   ├── tsconfig.app.json
+│   ├── tsconfig.json
+│   └── tsconfig.spec.json
+├── Knowledge.md
+├── README.md
+├── run_microservice.sh
+├── tree.txt
+└── uploads

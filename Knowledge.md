@@ -465,6 +465,34 @@ Swagger UI : http://localhost:8081/swagger-ui.html
 OpenAPI JSON : http://localhost:8081/v3/api-docs
 
 
+Installer les dépendances pour mkcert: 
+
+sudo apt install libnss3-tools
+
+sudo apt install mkcert
+
+- Créer un certificat sous le nom "localhost"
+mkcert localhost
+
+- Convertir en .p12:
+
+openssl pkcs12 -export \
+  -in localhost.pem \
+  -inkey localhost-key.pem \
+  -out keystore.p12 \
+  -name springboot \
+  -CAfile "$(mkcert -CAROOT)/rootCA.pem" \
+  -caname rootCA
+
+- On déplace le keystore.p12 dans les ressources de notre service(gateway) 
+
+- Ajouter ces infos dans le application.properties ou yml du service(gateway)
+
+server.ssl.enabled=true
+server.ssl.key-store=classpath:keystore.p12
+server.ssl.key-store-password=changeit
+server.ssl.key-store-type=PKCS12
+server.ssl.key-alias=springboot
 
 ------ TAF
 

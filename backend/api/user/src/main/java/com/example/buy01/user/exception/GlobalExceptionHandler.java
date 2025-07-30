@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
+import java.net.BindException;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
@@ -25,7 +26,7 @@ public class GlobalExceptionHandler {
         }
 
         // Gère les exceptions de validation des arguments
-        @ExceptionHandler(MethodArgumentNotValidException.class)
+        @ExceptionHandler({MethodArgumentNotValidException.class, BindException.class})
         public ResponseEntity<ApiErrorResponse> handleValidation(MethodArgumentNotValidException ex,
                         HttpServletRequest request) {
                 String msg = ex.getBindingResult().getFieldErrors()
@@ -67,8 +68,8 @@ public class GlobalExceptionHandler {
         // Gère les exceptions générales non détectés
         @ExceptionHandler(Exception.class)
         public ResponseEntity<ApiErrorResponse> handleGeneric(Exception ex, HttpServletRequest request) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                .body(buildError(request, HttpStatus.BAD_REQUEST, ex.getMessage()));
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                .body(buildError(request, HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage()));
         }
 
         @ExceptionHandler(MaxUploadSizeExceededException.class)
