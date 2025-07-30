@@ -11,26 +11,17 @@
     <!-- Search Box -->
     <div class="search-box">
       <span class="search-icon">🔍</span>
-      <input 
-        type="text" 
-        placeholder="Rechercher un produit..." 
-        [(ngModel)]="searchTerm"
-        (input)="onSearchChange()"
-      >
+      <input type="text" placeholder="Rechercher un produit..." [(ngModel)]="searchTerm" (input)="onSearchChange()">
     </div>
-    
+
     <!-- Category Filters -->
     <div class="filter-buttons">
-      <button 
-        *ngFor="let category of categories"
-        class="filter-btn"
-        [class.active]="selectedCategory === category"
-        (click)="onCategoryChange(category)"
-      >
+      <button *ngFor="let category of categories" class="filter-btn" [class.active]="selectedCategory === category"
+        (click)="onCategoryChange(category)">
         {{ category === 'all' ? 'Tous' : category }}
       </button>
     </div>
-    
+
     <!-- Sort Options -->
     <div class="sort-options">
       <select class="sort-select" aria-label="Trier les produits par">
@@ -39,21 +30,13 @@
         <option value="date">Trier par date</option>
       </select>
     </div>
-    
+
     <!-- View Toggle -->
     <div class="view-toggle">
-      <button 
-        class="view-btn"
-        [class.active]="viewMode === 'grid'"
-        (click)="onViewModeChange('grid')"
-      >
+      <button class="view-btn" [class.active]="viewMode === 'grid'" (click)="onViewModeChange('grid')">
         🔳
       </button>
-      <button 
-        class="view-btn"
-        [class.active]="viewMode === 'list'"
-        (click)="onViewModeChange('list')"
-      >
+      <button class="view-btn" [class.active]="viewMode === 'list'" (click)="onViewModeChange('list')">
         📋
       </button>
     </div>
@@ -64,122 +47,55 @@
     <p>{{ filteredProductsCount }} produit(s) trouvé(s)</p>
   </div>
 
-  <!-- Products Grid View -->
+ <!-- Products Grid View -->
   <div class="products-grid" *ngIf="viewMode === 'grid'">
-    <div 
-      class="product-card"
-      *ngFor="let product of filteredProducts; trackBy: trackByProductId"
-      (click)="viewProductDetails(product.id)"
-    >
-      <!-- Product Image -->
-      <div class="product-image">
-        <img 
-          [src]="product.images[0]" 
-          [alt]="product.name"
-          loading="lazy"
-        >
-        <div 
-          class="product-badge"
-          [ngClass]="getBadgeClass(getProductBadge(product))"
-          *ngIf="getProductBadge(product)"
-        >
-          {{ getProductBadge(product) }}
-        </div>
-      </div>
-      
-      <!-- Product Info -->
-      <div class="product-info">
-        <div class="product-category">{{ product.category }}</div>
-        <h3 class="product-title">{{ product.name }}</h3>
-        <p class="product-description">{{ product.description }}</p>
-        
-        <!-- Seller Info -->
-        <div class="seller-info">
-          <img 
-            [src]="product.sellerAvatar" 
-            [alt]="product.sellerName"
-            class="seller-avatar"
-            *ngIf="product.sellerAvatar"
-          >
-          <span class="seller-name">{{ product.sellerName }}</span>
-        </div>
-        
-        <!-- Stock Status -->
-        <div class="stock-status" [ngClass]="getStockClass(product.stock)">
-          {{ getStockStatus(product.stock) }}
-        </div>
-        
-        <!-- Product Footer -->
-        <div class="product-footer">
-          <div class="product-price">{{ formatPrice(product.price) }}</div>
-          <button 
-            class="add-to-cart"
-            [disabled]="product.stock === 0"
-            (click)="addToCart(product); $event.stopPropagation()"
-          >
-            <span *ngIf="product.stock > 0">Ajouter</span>
-            <span *ngIf="product.stock === 0">Indisponible</span>
-          </button>
-        </div>
-      </div>
-    </div>
+    @for (product of filteredProducts; track product.id) {
+      <app-product-card 
+        [product]="product"
+        (viewDetails)="viewProductDetails($event)"
+        (addToCartEvent)="addToCart($event)">
+      </app-product-card>
+    }
   </div>
 
   <!-- Products List View -->
   <div class="products-list" *ngIf="viewMode === 'list'">
-    <div 
-      class="product-list-item"
-      *ngFor="let product of filteredProducts; trackBy: trackByProductId"
-      (click)="viewProductDetails(product.id)"
-    >
-      <img 
-        [src]="product.images[0]" 
-        [alt]="product.name"
-        class="list-image"
-        loading="lazy"
-      >
-      
+    <div class="product-list-item" *ngFor="let product of filteredProducts; trackBy: trackByProductId"
+      (click)="viewProductDetails(product.id)">
+      <img [src]="product.imageUrls[0]" [alt]="product.name" class="list-image" loading="lazy">
+
       <div class="list-info">
         <div class="list-header">
           <h3 class="list-title">{{ product.name }}</h3>
-          <div 
-            class="product-badge"
-            [ngClass]="getBadgeClass(getProductBadge(product))"
-            *ngIf="getProductBadge(product)"
-          >
+          <div class="product-badge" [ngClass]="getBadgeClass(getProductBadge(product))"
+            *ngIf="getProductBadge(product)">
             {{ getProductBadge(product) }}
           </div>
         </div>
-        
+
         <div class="list-meta">
           <span class="list-category">{{ product.category }}</span>
           <span class="list-seller">par {{ product.sellerName }}</span>
         </div>
-        
+
         <p class="list-description">{{ product.description }}</p>
-        
+
         <div class="list-details">
-          <div class="stock-status" [ngClass]="getStockClass(product.stock)">
-            {{ getStockStatus(product.stock) }}
+          <div class="stock-status" [ngClass]="getStockClass(product.quantity!)">
+            {{ getStockStatus(product.quantity!) }}
           </div>
-          <div class="list-date">Ajouté le {{ formatDate(product.createdAt) }}</div>
+          <div class="list-date">Ajouté le {{ formatDate(product.createdAt!) }}</div>
         </div>
       </div>
-      
+
       <div class="list-actions">
         <div class="list-price">{{ formatPrice(product.price) }}</div>
-        <button 
-          class="add-to-cart"
-          [disabled]="product.stock === 0"
-          (click)="addToCart(product); $event.stopPropagation()"
-        >
-          <span *ngIf="product.stock > 0">Ajouter</span>
-          <span *ngIf="product.stock === 0">Indisponible</span>
+        <button class="add-to-cart" [disabled]="product.quantity === 0"
+          (click)="addToCart(product); $event.stopPropagation()">
+          <span *ngIf="product.quantity! > 0">Ajouter</span>
+          <span *ngIf="product.quantity === 0">Indisponible</span>
         </button>
-        <button 
-          class="contact-seller"
-          (click)="contactSeller(product.sellerId); $event.stopPropagation()"
-        >
+        <button class="contact-seller" (click)="$event.stopPropagation()">
           Contacter
         </button>
       </div>

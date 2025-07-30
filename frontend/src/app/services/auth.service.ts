@@ -34,7 +34,7 @@ export class AuthService {
       localStorage.setItem('token', res.token);
       await this.checkAuth();
     } catch (error: any) {
-     alert('Login failed: ' + error);
+     alert('Login failed: ' + error.error);
       return false;
     }
     return true;
@@ -93,7 +93,7 @@ export class AuthService {
 
     } catch (error: any) {
      alert('Registration failed: ' + error);
-      throw new Error(error.message || 'Registration failed');
+      throw new Error(error.error || 'Registration failed');
     }
   }
 
@@ -123,8 +123,8 @@ export class AuthService {
         this._isSignIn.set(true);
         return true;
       }
-    } catch (error) {
-     alert('Auth check failed: ' + error);
+    } catch (error : any) {
+     alert('Auth check failed: ' + error.error);
     }
 
     this._isSignIn.set(false);

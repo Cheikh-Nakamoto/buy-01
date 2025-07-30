@@ -3,10 +3,11 @@ import { Component, TrackByFunction } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Product } from '../../models/interfaces';
 import { ProductService } from '../../services/product-service';
+import { ProductCard } from "../product-card/product-card";
 
 @Component({
   selector: 'app-product-list',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ProductCard],
   templateUrl: './product-list.html',
   styleUrl: './product-list.css'
 })
@@ -38,107 +39,115 @@ export class ProductList {
   constructor(private productService: ProductService) { }
 
  async ngOnInit() {
-    this.loadProducts();
+    //this.loadProducts();
     this.extractCategories();
     this.applyFilters();
     console.log('ProductList component initialized');
-    let products = await this.productService.getProducts();
-    console.log('Fetched products:', products);
+    this.productService.getProducts().subscribe({
+      next: (products) => {
+        this.products = products;
+        this.filteredProducts = products; // Initialiser les produits filtrés
+        this.extractCategories(); // Extraire les catégories après chargement des produits
+        console.log('Products loaded:', this.products);
+      },
+      error: (error) => {
+        console.error('Error fetching products:', error);
+        alert('Failed to load products. Please try again later.');
+      }
+    });
+    console.log('Fetched products:', this.products);
   }
 
   // Simulation de chargement des produits (à remplacer par votre service)
   loadProducts() {
-    this.products = [
-      {
-        id: '1',
-        name: 'Smartphone Pro Max',
-        description: 'Le dernier smartphone avec une technologie révolutionnaire et des performances exceptionnelles pour tous vos besoins quotidiens.',
-        price: 999,
-        category: 'Électronique',
-        stock: 25,
-        images: ['https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=400&h=250&fit=crop'],
-        sellerId: 'seller1',
-        sellerName: 'TechStore Pro',
-        sellerAvatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=50&h=50&fit=crop&crop=face',
-        createdAt: new Date('2024-01-15'),
-        updatedAt: new Date('2024-01-20')
-      },
-      {
-        id: '2',
-        name: 'Veste en Cuir Premium',
-        description: 'Veste en cuir véritable, design moderne et confort optimal pour toutes les saisons. Finitions artisanales de haute qualité.',
-        price: 249,
-        category: 'Mode',
-        stock: 12,
-        images: ['https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=250&fit=crop'],
-        sellerId: 'seller2',
-        sellerName: 'Fashion Elite',
-        sellerAvatar: 'https://images.unsplash.com/photo-1494790108755-2616b9e9e3bc?w=50&h=50&fit=crop&crop=face',
-        createdAt: new Date('2024-01-10'),
-        updatedAt: new Date('2024-01-18')
-      },
-      {
-        id: '3',
-        name: 'Lampe Designer LED',
-        description: 'Éclairage moderne avec contrôle intelligent et design minimaliste pour transformer votre intérieur.',
-        price: 159,
-        category: 'Maison',
-        stock: 8,
-        images: ['https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=250&fit=crop'],
-        sellerId: 'seller3',
-        sellerName: 'Deco Moderne',
-        sellerAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=50&h=50&fit=crop&crop=face',
-        createdAt: new Date('2024-01-05'),
-        updatedAt: new Date('2024-01-15')
-      },
-      {
-        id: '4',
-        name: 'Baskets Running Pro',
-        description: 'Chaussures de course haute performance avec technologie d\'amorti avancée pour vos entraînements intensifs.',
-        price: 179,
-        category: 'Sport',
-        stock: 30,
-        images: ['https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=250&fit=crop'],
-        sellerId: 'seller4',
-        sellerName: 'SportMax',
-        sellerAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=50&h=50&fit=crop&crop=face',
-        createdAt: new Date('2024-01-12'),
-        updatedAt: new Date('2024-01-22')
-      },
-      {
-        id: '5',
-        name: 'Casque Audio Sans Fil',
-        description: 'Son haute fidélité avec réduction de bruit active et autonomie longue durée pour une expérience audio exceptionnelle.',
-        price: 299,
-        category: 'Électronique',
-        stock: 15,
-        images: ['https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=250&fit=crop'],
-        sellerId: 'seller1',
-        sellerName: 'TechStore Pro',
-        sellerAvatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=50&h=50&fit=crop&crop=face',
-        createdAt: new Date('2024-01-08'),
-        updatedAt: new Date('2024-01-19')
-      },
-      {
-        id: '6',
-        name: 'Sac à Main Luxe',
-        description: 'Sac en cuir italien, design élégant et finitions artisanales de haute qualité pour un style incomparable.',
-        price: 399,
-        category: 'Mode',
-        stock: 5,
-        images: ['https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=250&fit=crop'],
-        sellerId: 'seller2',
-        sellerName: 'Fashion Elite',
-        sellerAvatar: 'https://images.unsplash.com/photo-1494790108755-2616b9e9e3bc?w=50&h=50&fit=crop&crop=face',
-        createdAt: new Date('2024-01-03'),
-        updatedAt: new Date('2024-01-17')
-      }
-    ];
+    // this.products = [
+    //   {
+    //     id: '1',
+    //     name: 'Smartphone Pro Max',
+    //     description: 'Le dernier smartphone avec une technologie révolutionnaire et des performances exceptionnelles pour tous vos besoins quotidiens.',
+    //     price: 999,
+    //     category: 'Électronique',
+    //     quantity: 25,
+    //     images: ['https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=400&h=250&fit=crop'],
+    //     sellerName: 'TechStore Pro',
+    //     sellerAvatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=50&h=50&fit=crop&crop=face',
+    //     createdAt: new Date('2024-01-15'),
+    //     updatedAt: new Date('2024-01-20')
+    //   },
+    //   {
+    //     id: '2',
+    //     name: 'Veste en Cuir Premium',
+    //     description: 'Veste en cuir véritable, design moderne et confort optimal pour toutes les saisons. Finitions artisanales de haute qualité.',
+    //     price: 249,
+    //     category: 'Mode',
+    //     quantity: 12,
+    //     images: ['https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=250&fit=crop'],
+    //     sellerName: 'Fashion Elite',
+    //     sellerAvatar: 'https://images.unsplash.com/photo-1494790108755-2616b9e9e3bc?w=50&h=50&fit=crop&crop=face',
+    //     createdAt: new Date('2024-01-10'),
+    //     updatedAt: new Date('2024-01-18')
+    //   },
+    //   {
+    //     id: '3',
+    //     name: 'Lampe Designer LED',
+    //     description: 'Éclairage moderne avec contrôle intelligent et design minimaliste pour transformer votre intérieur.',
+    //     price: 159,
+    //     category: 'Maison',
+    //     quantity: 8,
+    //     images: ['https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=250&fit=crop'],
+    //     sellerName: 'Deco Moderne',
+    //     sellerAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=50&h=50&fit=crop&crop=face',
+    //     createdAt: new Date('2024-01-05'),
+    //     updatedAt: new Date('2024-01-15')
+    //   },
+    //   {
+    //     id: '4',
+    //     name: 'Baskets Running Pro',
+    //     description: 'Chaussures de course haute performance avec technologie d\'amorti avancée pour vos entraînements intensifs.',
+    //     price: 179,
+    //     category: 'Sport',
+    //     quantity: 30,
+    //     images: ['https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=250&fit=crop'],
+    //     sellerName: 'SportMax',
+    //     sellerAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=50&h=50&fit=crop&crop=face',
+    //     createdAt: new Date('2024-01-12'),
+    //     updatedAt: new Date('2024-01-22')
+    //   },
+    //   {
+    //     id: '5',
+    //     name: 'Casque Audio Sans Fil',
+    //     description: 'Son haute fidélité avec réduction de bruit active et autonomie longue durée pour une expérience audio exceptionnelle.',
+    //     price: 299,
+    //     category: 'Électronique',
+    //     quantity: 15,
+    //     images: ['https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=250&fit=crop'],
+    //     sellerName: 'TechStore Pro',
+    //     sellerAvatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=50&h=50&fit=crop&crop=face',
+    //     createdAt: new Date('2024-01-08'),
+    //     updatedAt: new Date('2024-01-19')
+    //   },
+    //   {
+    //     id: '6',
+    //     name: 'Sac à Main Luxe',
+    //     description: 'Sac en cuir italien, design élégant et finitions artisanales de haute qualité pour un style incomparable.',
+    //     price: 399,
+    //     category: 'Mode',
+    //     quantity: 5,
+    //     images: ['https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=250&fit=crop'],
+    //     sellerName: 'Fashion Elite',
+    //     sellerAvatar: 'https://images.unsplash.com/photo-1494790108755-2616b9e9e3bc?w=50&h=50&fit=crop&crop=face',
+    //     createdAt: new Date('2024-01-03'),
+    //     updatedAt: new Date('2024-01-17')
+    //   }
+    // ];
   }
+
+
+  
 
   // Extraire les catégories uniques
   extractCategories() {
-    const uniqueCategories = [...new Set(this.products.map(product => product.category))];
+    const uniqueCategories = [...new Set(this.products.map(product => product.category != undefined ? product.category : 'Autre'))]; ;
     this.categories = ['all', ...uniqueCategories];
   }
 
@@ -157,7 +166,7 @@ export class ProductList {
       filtered = filtered.filter(product =>
         product.name.toLowerCase().includes(searchLower) ||
         product.description.toLowerCase().includes(searchLower) ||
-        product.category.toLowerCase().includes(searchLower) ||
+        product.category?.toLowerCase().includes(searchLower) ||
         product.sellerName.toLowerCase().includes(searchLower)
       );
     }
@@ -174,7 +183,7 @@ export class ProductList {
           comparison = a.price - b.price;
           break;
         case 'date':
-          comparison = new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          comparison = new Date(b.createdAt ? b.createdAt : 0).getTime() - new Date(a.createdAt ? a.createdAt : 0).getTime();
           break;
       }
 
@@ -211,11 +220,11 @@ export class ProductList {
   // Méthodes utilitaires
   getProductBadge(product: Product): string {
     const daysSinceCreation = Math.floor(
-      (new Date().getTime() - new Date(product.createdAt).getTime()) / (1000 * 60 * 60 * 24)
+      (new Date().getTime() - new Date(product.createdAt ? product.createdAt : 0).getTime()) / (1000 * 60 * 60 * 24)
     );
 
     if (daysSinceCreation <= 7) return 'Nouveau';
-    if (product.stock <= 5) return 'Stock Limité';
+    if (product.quantity ? product.quantity <= 5 : false) return 'Stock Limité';
     if (product.price < 200) return 'Promo';
     if (product.price > 300) return 'Premium';
     return '';
@@ -231,32 +240,29 @@ export class ProductList {
     }
   }
 
-  getStockStatus(stock: number): string {
-    if (stock === 0) return 'Rupture de stock';
-    if (stock <= 5) return `Plus que ${stock} en stock`;
-    return 'En stock';
+  getStockStatus(quantity: number): string {
+    if (quantity === 0) return 'Rupture de quantity';
+    if (quantity <= 5) return `Plus que ${quantity} en quantity`;
+    return 'En quantity';
   }
 
-  getStockClass(stock: number): string {
-    if (stock === 0) return 'stock-out';
-    if (stock <= 5) return 'stock-low';
-    return 'stock-ok';
+  getStockClass(quantity: number): string {
+    if (quantity === 0) return 'quantity-out';
+    if (quantity <= 5) return 'quantity-low';
+    return 'quantity-ok';
   }
 
   // Actions sur les produits
-  addToCart(product: Product) {
-    console.log('Produit ajouté au panier:', product);
-    // Ici vous pouvez appeler votre service de panier
-    // this.cartService.addToCart(product);
 
-    // Animation ou notification de succès
-    this.showNotification(`${product.name} ajouté au panier !`);
+   // Méthodes simplifiées
+  addToCart(product: Product) {
+    console.log('Product added to cart:', product);
+    // Appeler le service de panier ici
   }
 
   viewProductDetails(productId: string) {
-    console.log('Voir détails du produit:', productId);
+    console.log('View product details:', productId);
     // Navigation vers la page de détails
-    // this.router.navigate(['/products', productId]);
   }
 
   contactSeller(sellerId: string) {

@@ -1,76 +1,94 @@
 <div class="product-form-container">
-  <form class="product-form">
+  <form class="product-form" [formGroup]="productForm" (ngSubmit)="onSubmit()" >
     <h2 class="form-title">Nouveau Produit</h2>
-    
+
     <!-- Section Images avec Carrousel -->
     <div class="image-section">
       <div class="image-carousel">
-        <!-- Images ajoutées apparaîtront ici -->
-        <div class="empty-state" *ngIf="images.length === 0">
+        @if (images.length === 0) {
+        <div class="empty-state">
           <svg class="empty-icon" viewBox="0 0 24 24">
-            <path d="M19 13l-7 7-7-7m14-6l-7 7-7-7"/>
+            <path d="M19 13l-7 7-7-7m14-6l-7 7-7-7" />
           </svg>
           <p>Aucune image ajoutée</p>
         </div>
-        
-        <div class="carousel-track">
-          <div class="carousel-slide" *ngFor="let img of images">
-            <img [src]="img.preview" alt="Preview">
-            <button class="delete-image-btn">
-              <svg viewBox="0 0 24 24">
-                <path d="M19 6L5 18M5 6l14 12"/>
-              </svg>
-            </button>
+        } @else {
+        <!-- Carrousel avec navigation -->
+        <div class="carousel-container">
+          <div class="carousel-track" [style.transform]="'translateX(' + currentTranslate + 'px)'">
+            @for (img of images; track img.id) {
+            <div class="carousel-slide">
+              <img [src]="img.preview" alt="Preview">
+              <button type="button" class="delete-image-btn" title="Supprimer l'image" (click)="deleteImage(img.id)">
+                <svg viewBox="0 0 24 24">
+                  <path d="M19 6L5 18M5 6l14 12" />
+                </svg>
+              </button>
+            </div>
+            }
           </div>
+          
+          <!-- Navigation -->
+           @if (showNavigation) {
+             <div class="carousel-nav" >
+               <button type="button" class="nav-btn" (click)="previousSlide()" [disabled]="!canGoPrevious">
+                 ←
+               </button>
+               <button type="button" class="nav-btn" (click)="nextSlide()" [disabled]="!canGoNext">
+                 →
+               </button>
+             </div>
+           }
         </div>
+        }
       </div>
-      
+
       <label class="image-upload-btn">
-        <input type="file" accept="image/*" multiple style="display: none;">
+        <input type="file" accept="image/*" multiple style="display: none;" (change)="onFileSelected($event)">
         <svg class="upload-icon" viewBox="0 0 24 24">
-          <path d="M12 4v16m8-8H4"/>
+          <path d="M12 4v16m8-8H4" />
         </svg>
         Ajouter des images
       </label>
     </div>
-    
+
     <!-- Champs du formulaire -->
     <div class="form-group">
       <label>Nom du produit</label>
-      <input type="text" placeholder="Ex: T-shirt en coton">
+      <input type="text" name="name" formControlName="name" placeholder="Ex: T-shirt en coton" required>
     </div>
-    
+
     <div class="form-group">
       <label>Description</label>
-      <textarea placeholder="Décrivez le produit..."></textarea>
+      <textarea name="description" placeholder="Décrivez le produit..." formControlName="description" required></textarea>
     </div>
-    
+
     <div class="form-row">
       <div class="form-group">
         <label>Prix (€)</label>
-        <input type="number" placeholder="19.99">
+        <input type="number" name="price" placeholder="19.99" formControlName="price" step="0.01" min="0" required>
       </div>
-      
+
       <div class="form-group">
         <label>Stock</label>
-        <input type="number" placeholder="50">
+        <input type="number" name="quantity" formControlName="quantity" placeholder="50" min="0" required>
       </div>
     </div>
-    
-    <div class="form-group">
+
+    <!-- <div class="form-group">
       <label>Catégorie</label>
-      <select>
+      <select name="category" required>
         <option value="">Sélectionnez une catégorie</option>
-        <option>Vêtements</option>
-        <option>Électronique</option>
-        <option>Maison</option>
+        <option value="vetements">Vêtements</option>
+        <option value="electronique">Électronique</option>
+        <option value="maison">Maison</option>
       </select>
-    </div>
-    
+    </div> -->
+
     <!-- Bouton de soumission -->
-    <button type="submit" class="submit-btn">
+    <button type="submit" class="submit-btn" [disabled]="!productForm.valid">
       <svg class="submit-icon" viewBox="0 0 24 24">
-        <path d="M5 12l5 5L20 7"/>
+        <path d="M5 12l5 5L20 7" />
       </svg>
       Créer le produit
     </button>

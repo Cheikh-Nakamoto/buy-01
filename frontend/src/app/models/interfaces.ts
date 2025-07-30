@@ -22,14 +22,19 @@ export interface Product {
   name: string;
   description: string;
   price: number;
-  category: string;
-  stock: number;
-  images: string[];
-  sellerId: string;
+  category?: string;
+  quantity: number;
+  imageUrls: productImage[];
   sellerName: string;
   sellerAvatar?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface productImage {
+  id: string;
+  imagePath: string;
+  productId: string;
 }
 
 export interface MediaFile {
@@ -55,9 +60,9 @@ export interface ProductFormData {
   description: string;
   price: number;
   category: string;
-  stock: number;
-  sellerId?: string;
-  images: string[];
+  quantity: number;
+  sellerName?: string;
+  imageUrls: string[];
 }
 
 export interface UploadProgress {
