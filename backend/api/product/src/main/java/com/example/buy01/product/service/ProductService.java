@@ -57,7 +57,7 @@ public class ProductService {
         }
 
         
-        if (files.length > 5) {
+        if (files != null && files.length > 5) {
             throw new IllegalArgumentException("Maximum 5 images autorisées");
         }
         

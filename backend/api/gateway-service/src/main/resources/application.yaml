@@ -1,6 +1,13 @@
 server:
   port: 8090
 
+  #port: 8443
+  #ssl:
+  #  key-store-type: PKCS12
+  # key-store: classpath:keystore.p12
+  #key-store-password: changeit
+  #key-alias: selfsigned
+
 spring:
   application:
     name: gateway-service
@@ -33,7 +40,7 @@ spring:
             - Path=/api/admin/**
           filters:
             - AddRequestHeader=X-Gateway, gateway-service
-          
+
         - id: user-service-avatars
           uri: lb://user-service
           predicates:
@@ -47,7 +54,7 @@ spring:
             - Path=/api/products/**
           filters:
             - AddRequestHeader=X-Gateway, gateway-service
-        
+
         - id: media-service
           uri: lb://media-service
           predicates:
@@ -76,7 +83,7 @@ spring:
             - Path=/v3/api-docs/product
           filters:
             - RewritePath=/v3/api-docs/product, /v3/api-docs
-        
+
         - id: media-service-swagger
           uri: lb://media-service
           predicates:
@@ -112,5 +119,5 @@ jwt:
 
 # Internal token for service-to-service communication
 internal:
-    token-header: X-INTERNAL-TOKEN
-    token: NyKKbcadVWq1Mim/r7vwzPjy0SikZgFOiYJRO8GvE1A=
+  token-header: X-INTERNAL-TOKEN
+  token: NyKKbcadVWq1Mim/r7vwzPjy0SikZgFOiYJRO8GvE1A=
