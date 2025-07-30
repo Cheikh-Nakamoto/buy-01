@@ -157,7 +157,7 @@ services:
     build: ./backend/api/gateway-service
     container_name: gateway-service
     ports:
-      - "8090:8090"
+      - "8443:8443"
     depends_on:
       - discovery-server
       - user-service

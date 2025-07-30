@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class ApiUrlService {
- private readonly baseUrl = 'http://localhost:8090'; // À remplacer par environment.apiUrl en production
+ private readonly baseUrl = 'https://localhost:8443'; // À remplacer par environment.apiUrl en production
 
   // Auth Endpoints
   readonly REGISTER = `${this.baseUrl}/api/auth/register`;

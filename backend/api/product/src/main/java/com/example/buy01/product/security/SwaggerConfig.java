@@ -17,7 +17,7 @@ public class SwaggerConfig {
         public OpenAPI customOpenAPI() {
                 return new OpenAPI()
                                 .servers(List.of(
-                                                new Server().url("http://localhost:8090") // ← URL du Gateway
+                                                new Server().url("https://localhost:8443") // ← URL du Gateway
                                 ))
                                 .components(new Components()
                                                 .addSecuritySchemes("bearerAuth",

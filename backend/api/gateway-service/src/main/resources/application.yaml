@@ -1,12 +1,11 @@
 server:
-  port: 8090
-
-  #port: 8443
-  #ssl:
-  #  key-store-type: PKCS12
-  # key-store: classpath:keystore.p12
-  #key-store-password: changeit
-  #key-alias: selfsigned
+  #port: 8090
+  port: 8443
+  ssl:
+    key-store-type: PKCS12
+    key-store: classpath:keystore.p12
+    key-store-password: changeit
+    key-alias: selfsigned
 
 spring:
   application:
@@ -90,6 +89,8 @@ spring:
             - Path=/v3/api-docs/media
           filters:
             - RewritePath=/v3/api-docs/media, /v3/api-docs
+
+keystore: file:/app/keystore.p12
 
 # Swagger config
 springdoc:

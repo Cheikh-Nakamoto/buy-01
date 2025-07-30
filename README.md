@@ -4,7 +4,7 @@ User service:
 
 Login: 
 
-endpoints: http://localhost:8090/api/auth/login
+endpoints: https://localhost:8443/api/auth/login
 
 data: 
 Content-Type:application/json
@@ -14,7 +14,7 @@ Content-Type:application/json
 }
 
 Register :
-endpoints: http://localhost:8090/api/auth/register
+endpoints: https://localhost:8443/api/auth/register
 
 data:
 

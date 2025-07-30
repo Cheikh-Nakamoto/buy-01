@@ -387,7 +387,7 @@ Ou avec API Gateway :
 bash
 Copier
 Modifier
-http://localhost:8090/swagger-ui.html
+https://localhost:8443/swagger-ui.html
 Si tu veux aussi avoir Swagger sur gateway-service, ce n’est pas recommandé, car le Gateway ne contient pas de logique métier.
 
 3. Configurer l’info de ton API (optionnel)
