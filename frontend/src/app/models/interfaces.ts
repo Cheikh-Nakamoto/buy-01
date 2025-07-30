@@ -2,8 +2,9 @@ export interface User {
   id: string;
   email: string;
   name: string;
-  role: 'client' | 'seller';
+  role: 'CLIENT' | 'SELLER';
   avatar?: string;
+  password?: string;
   createdAt: Date;
 }
 
@@ -46,7 +47,7 @@ export interface AuthFormData {
   password: string;
   confirmPassword?: string;
   name?: string;
-  role?: 'buyer' | 'seller';
+  role?: 'CLIENT' | 'SELLER';
 }
 
 export interface ProductFormData {

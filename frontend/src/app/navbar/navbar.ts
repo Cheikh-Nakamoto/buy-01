@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, Signal } from '@angular/core';
+import { Component, effect, OnInit, signal, Signal } from '@angular/core';
 import { User } from '../models/interfaces';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
@@ -12,7 +12,16 @@ import { AuthService } from '../services/auth.service';
 export class Navbar implements OnInit {
   public currentUser = signal<User | null>(null);
   public isSignIn: Signal<boolean> = signal<boolean>(false);
-  constructor(private route: Router, private authService: AuthService) { }
+  constructor(private route: Router, private authService: AuthService) {
+    effect(() => {
+      const user = this.authService.currentUser$();
+      if (user) {
+        this.currentUser.set(user);
+      } else {
+        this.currentUser.set(null);
+      }
+    });
+  }
   async ngOnInit() {
     // Claim  the current user on authservice  signal
     await this.authService.checkAuth()

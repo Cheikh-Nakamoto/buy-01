@@ -44,10 +44,7 @@
                 {{ getRoleLabel(user()!.role) }}
               </span>
             </div>
-            <!-- <div class="info-item">
-                <span class="info-label">ID :</span>
-                <span class="info-value user-id">{{ user()!.id }}</span>
-              </div> -->
+           
           </div>
         </div>
       </div>
@@ -75,24 +72,10 @@
     <div class="profile-stats">
       <!-- Actions rapides -->
       <div class="profile-actions">
-        <button class="action-btn btn-primary" (click)="onEditProfile()">
+        <button class="action-btn btn-primary" (click)="openUploadDialog()">
           <span>✏️</span>
           Modifier le profil
         </button>
-
-        <!-- @if (user()!.role === 'seller') {
-        <button class="action-btn btn-secondary" (click)="onViewProducts()">
-          <span>🛍️</span>
-          Mes produits
-        </button>
-        } -->
-        <!-- 
-        @if (user()!.role === 'client') {
-        <button class="action-btn btn-secondary" (click)="onViewOrders()">
-          <span>📦</span>
-          Mes commandes
-        </button>
-        } -->
 
       </div>
 
@@ -102,7 +85,7 @@
           <div class="summary-icon">🎯</div>
           <div class="summary-content">
             <h4>Statut du compte</h4>
-            <p>Compte {{ user()!.role === 'seller' ? 'vendeur' : 'acheteur' }} actif</p>
+            <p>Compte {{ user()!.role === 'SELLER' ? 'vendeur' : 'acheteur' }} actif</p>
           </div>
         </div>
 
