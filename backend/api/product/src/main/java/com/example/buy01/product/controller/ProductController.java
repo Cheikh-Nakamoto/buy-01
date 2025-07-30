@@ -68,7 +68,7 @@ public class ProductController {
                         @Parameter(description = "Email de l'utilisateur") @RequestHeader("X-USER-EMAIL") String email,
                         @Parameter(description = "Rôle de l'utilisateur") @RequestHeader("X-USER-ROLE") String role,
 
-                        @Parameter(description = "Jusqu’à 3 images (max 2 Mo chacune)") @RequestPart(value = "files", required = false) MultipartFile[] files) {
+                        @Parameter(description = "Jusqu’à 5 images (max 2 Mo chacune)") @RequestPart(value = "files", required = false) MultipartFile[] files) {
                 return productService.createProduct(product, email, role, files);
         }
 

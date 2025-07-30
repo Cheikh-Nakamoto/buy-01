@@ -57,8 +57,8 @@ public class ProductService {
         }
 
         
-        if (files.length > 3) {
-            throw new IllegalArgumentException("Maximum 3 images autorisées");
+        if (files.length > 5) {
+            throw new IllegalArgumentException("Maximum 5 images autorisées");
         }
         
         ValidateMethods.validateProduct(newProduct);

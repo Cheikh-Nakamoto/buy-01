@@ -44,8 +44,8 @@ public class MediaService {
         // get medias by productId
         List<Media> existingMedia = mediaRepository.findByProductId(productId);
 
-        if (existingMedia.size() >= 3) {
-            throw new IllegalArgumentException("Un produit ne peut pas avoir plus de 3 images.");
+        if (existingMedia.size() >= 5) {
+            throw new IllegalArgumentException("Un produit ne peut pas avoir plus de 5 images.");
         }
 
         String filename = uploadAndgenerateFileName(file);

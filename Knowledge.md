@@ -476,3 +476,4 @@ https ssl to encrypt data in transit
 
 Global Readme file to explain how to run the project with dockerfile
 
+Adresse de mise à jour de l'ip publique pour le domaine buy01us.ydns.eu = curl -s "https://ydns.io/hosts/update/T2eHKRgkfRLUkqtQgokJYk5y"
