@@ -17,6 +17,7 @@ export class SignIn implements OnInit {
   errorMessage = '';
   avatarPreview: string | ArrayBuffer | null = null;
   selectedAvatarFile!: File;
+  canHide = signal<boolean>(false)
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
@@ -72,6 +73,14 @@ export class SignIn implements OnInit {
       role: ['CLIENT', Validators.required],
       avatar: [null]
     });
+  }
+
+  toggle(even? :string) {
+    if (even == "SELLER") {
+      this.canHide.set(true);
+      return
+    }
+    this.canHide.set(false)
   }
 
   toggleMode(): void {

@@ -10,10 +10,12 @@ import {
   CarouselItemComponent
 } from '@coreui/angular';
 import { CarouselCustomConfig } from './carroussel.config';
+import { MatButtonToggleModule } from "@angular/material/button-toggle";
+import { MatIconModule } from "@angular/material/icon";
 
 @Component({
     selector: 'app-circular-image',
-    imports: [CommonModule,CarouselComponent, CarouselInnerComponent, CarouselItemComponent, CarouselControlComponent, RouterLink],
+    imports: [CommonModule, CarouselComponent, CarouselInnerComponent, CarouselItemComponent, CarouselControlComponent, RouterLink, MatButtonToggleModule, MatIconModule],
     templateUrl: './circular-image.html',
     styleUrl: './circular-image.css',
     providers: [{ provide: CarouselConfig, useClass: CarouselCustomConfig }]

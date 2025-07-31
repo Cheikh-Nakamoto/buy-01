@@ -12,9 +12,11 @@
             <li class="navbar-item">
                 <a href="#" class="navbar-link active" (click)="navigateAndSetActive('/', $event)">Catalogue</a>
             </li>
+            @if (isSeller()) {
             <li class="navbar-item">
                 <a href="#" class="navbar-link" (click)="navigateAndSetActive('/dashboard', $event)">Dashboard</a>
             </li>
+            }
         </ul>
 
         <!-- Actions utilisateur -->
@@ -32,16 +34,17 @@
 
             <!-- Bouton de connexion -->
             @if (!isSignIn()) {
-                <button class="signin-btn" (click)="onSignIn()">
-                    Sign In
-                </button>
+            <button class="signin-btn" (click)="onSignIn()">
+                Sign In
+            </button>
             }@else {
-                <div class="user-info">
-                    <span class="username"  [attr.data-full-name]="currentUser()?.name" (click)="myProfile()" >{{ currentUser()?.name }}</span>
-                    <button class="logout-btn" (click)="onSignOut()">
-                        Logout
-                    </button>
-                </div>
+            <div class="user-info">
+                <span class="username" [attr.data-full-name]="currentUser()?.name" (click)="myProfile()">{{
+                    currentUser()?.name }}</span>
+                <button class="logout-btn" (click)="onSignOut()">
+                    Logout
+                </button>
+            </div>
             }
         </div>
 

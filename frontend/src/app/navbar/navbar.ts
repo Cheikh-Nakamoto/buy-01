@@ -39,6 +39,11 @@ export class Navbar implements OnInit {
     this.route.navigate(['profil']);
   }
 
+  isSeller():boolean {
+    const user = this.currentUser();
+    return user?.role == 'SELLER'
+  }
+
   onSignOut() {
     this.authService.signOut();
     this.route.navigate(['auth']);

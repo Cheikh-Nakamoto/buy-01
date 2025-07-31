@@ -24,10 +24,11 @@ export class ApiUrlService {
 
     // Product Endpoints
   readonly GET_PRODUCT_BY_ID = (id: number) => `${this.baseUrl}/api/products/${id}`;
-  readonly UPDATE_PRODUCT = (id: number) => `${this.baseUrl}/api/products/${id}`;
+  readonly UPDATE_PRODUCT = (id: string) => `${this.baseUrl}/api/products/update/${id}`;
   readonly CREATE_PRODUCT = `${this.baseUrl}/api/products/create`;
   readonly GET_ALL_PRODUCTS = `${this.baseUrl}/api/products/all`;
-
-  
+  readonly GET_MY_ALL_PRODUCT = `${this.baseUrl}/api/products/myproducts`
+  readonly DELETE_IMG_BY_Media_ID = (id: string) => `${this.baseUrl}/api/media/delete/${id}`
+  readonly ADD_IMG_BY_PRODUCT_ID = (id : string) => `${this.baseUrl}/api/media/add/${id}`
   constructor() { }
 }

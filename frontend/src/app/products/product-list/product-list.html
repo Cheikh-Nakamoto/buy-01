@@ -1,10 +1,13 @@
 <!-- product-list.component.html -->
 <div class="product-list-container">
+
+  @if (!canHide()) {
   <!-- Header -->
   <div class="header">
     <h1>✨ Catalogue Produits</h1>
     <p>Découvrez {{ totalProducts }} produits dans {{ totalCategories }} catégories</p>
   </div>
+  }
 
   <!-- Controls -->
   <div class="controls">
@@ -47,21 +50,17 @@
     <p>{{ filteredProductsCount }} produit(s) trouvé(s)</p>
   </div>
 
- <!-- Products Grid View -->
+  <!-- Products Grid View -->
   <div class="products-grid" *ngIf="viewMode === 'grid'">
     @for (product of filteredProducts; track product.id) {
-      <app-product-card 
-        [product]="product"
-        (viewDetails)="viewProductDetails($event)"
-        (addToCartEvent)="addToCart($event)">
-      </app-product-card>
+    <app-product-card [product]="product">
+    </app-product-card>
     }
   </div>
 
   <!-- Products List View -->
   <div class="products-list" *ngIf="viewMode === 'list'">
-    <div class="product-list-item" *ngFor="let product of filteredProducts; trackBy: trackByProductId"
-      (click)="viewProductDetails(product.id)">
+    <div class="product-list-item" *ngFor="let product of filteredProducts; trackBy: trackByProductId">
       <img [src]="product.imageUrls[0]" [alt]="product.name" class="list-image" loading="lazy">
 
       <div class="list-info">
@@ -91,9 +90,13 @@
       <div class="list-actions">
         <div class="list-price">{{ formatPrice(product.price) }}</div>
         <button class="add-to-cart" [disabled]="product.quantity === 0"
-          (click)="addToCart(product); $event.stopPropagation()">
-          <span *ngIf="product.quantity! > 0">Ajouter</span>
-          <span *ngIf="product.quantity === 0">Indisponible</span>
+         >
+          @if (!canHide() && product.quantity! > 0) {
+          <span>Ajouter</span>
+          }
+          @if (product.quantity === 0) {
+          <span>Indisponible</span>
+          }
         </button>
         <button class="contact-seller" (click)="$event.stopPropagation()">
           Contacter
@@ -118,6 +121,7 @@
     <p>Chargement des produits...</p>
   </div>
 
+  @if (!canHide()) {
   <!-- Statistics -->
   <div class="stats" *ngIf="filteredProducts.length > 0">
     <div class="stat-item">
@@ -133,4 +137,5 @@
       <span class="stat-label">Prix Moyen</span>
     </div>
   </div>
+  }
 </div>

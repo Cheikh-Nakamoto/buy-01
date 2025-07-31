@@ -43,19 +43,39 @@ export class ProductList {
     this.extractCategories();
     this.applyFilters();
     console.log('ProductList component initialized');
-    this.productService.getProducts().subscribe({
-      next: (products) => {
-        this.products = products;
-        this.filteredProducts = products; // Initialiser les produits filtrés
-        this.extractCategories(); // Extraire les catégories après chargement des produits
-        console.log('Products loaded:', this.products);
-      },
-      error: (error) => {
-        console.error('Error fetching products:', error);
-        alert('Failed to load products. Please try again later.');
-      }
-    });
+    if (location.pathname != "/products/myproduct") {
+      this.productService.getProducts().subscribe({
+        next: (products) => {
+          this.products = products;
+          this.filteredProducts = products; // Initialiser les produits filtrés
+          this.extractCategories(); // Extraire les catégories après chargement des produits
+          console.log('Products loaded:', this.products);
+        },
+        error: (error) => {
+          console.error('Error fetching products:', error);
+          alert('Failed to load products. Please try again later.');
+        }
+      });
+    }else{
+      console.log("mes produit")
+      this.productService.getMyProduct().subscribe({
+        next: (products) => {
+          this.products = products;
+          this.filteredProducts = products; // Initialiser les produits filtrés
+          this.extractCategories(); // Extraire les catégories après chargement des produits
+          console.log('Products loaded:', this.products);
+        },
+        error: (error) => {
+          console.error('Error fetching products:', error);
+          alert('Failed to load products. Please try again later.');
+        }
+      });
+    }
     console.log('Fetched products:', this.products);
+  }
+
+  canHide():boolean {
+    return location.pathname === "/products/myproduct";
   }
 
   // Simulation de chargement des produits (à remplacer par votre service)
@@ -252,18 +272,6 @@ export class ProductList {
     return 'quantity-ok';
   }
 
-  // Actions sur les produits
-
-   // Méthodes simplifiées
-  addToCart(product: Product) {
-    console.log('Product added to cart:', product);
-    // Appeler le service de panier ici
-  }
-
-  viewProductDetails(productId: string) {
-    console.log('View product details:', productId);
-    // Navigation vers la page de détails
-  }
 
   contactSeller(sellerId: string) {
     console.log('Contacter le vendeur:', sellerId);

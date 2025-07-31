@@ -2,18 +2,24 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Product } from '../../models/interfaces';
 import { CommonModule } from '@angular/common';
 import { CircularImage } from "../circular-image/circular-image";
+import { DataService } from '../../services/data-service';
+import { Router } from '@angular/router';
+import { MatIconModule } from "@angular/material/icon";
 
 @Component({
   selector: 'app-product-card',
-  imports: [CommonModule, CircularImage],
+  imports: [CommonModule, CircularImage, MatIconModule],
   templateUrl: './product-card.html',
   styleUrl: './product-card.css'
 })
 export class ProductCard {
-@Input() product!: Product;
+  @Input() product!: Product;
   @Output() viewDetails = new EventEmitter<string>();
   @Output() addToCartEvent = new EventEmitter<Product>();
   imageurls: string[] = [];
+
+  constructor(private datasharedService: DataService, private router: Router) { }
+
   get badgeText(): string {
     const daysSinceCreation = Math.floor(
       (new Date().getTime() - new Date(this.product.createdAt || 0).getTime()) / (1000 * 60 * 60 * 24)
@@ -67,4 +73,15 @@ export class ProductCard {
     event.stopPropagation();
     this.addToCartEvent.emit(this.product);
   }
+  canHide(): boolean {
+    return location.pathname === "/products/myproduct";
+  }
+
+  async goToUpdateProduct(event: Event) {
+    event.stopPropagation();
+    this.datasharedService.updateData(this.product);
+    // Correction de la navigation
+    await this.router.navigate(["/products/update"]);
+  }
+
 }

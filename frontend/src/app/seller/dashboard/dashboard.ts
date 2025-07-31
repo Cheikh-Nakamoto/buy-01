@@ -10,6 +10,10 @@ import { Router } from '@angular/router';
 export class Dashboard {
   constructor(private router: Router) {}
 
+  goToMyProduct(){
+     console.log('Navigating to new product form');
+    this.router.navigate(['/products/myproduct']);
+  }
 
   onNewProductClick(): void {
     console.log('Navigating to new product form');

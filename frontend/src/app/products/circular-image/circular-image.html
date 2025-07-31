@@ -1,14 +1,38 @@
-<div class="card">
-    <c-carousel class="carroussel" [interval]="0">
-         <c-carousel-control [routerLink] caption="Previous" direction="prev" />
-        <c-carousel-control [routerLink] caption="Next" direction="next" />
-        <c-carousel-inner>
-            @for (slide of slides; track slide.src) {
-            <c-carousel-item>
-                <img [src]="slide.src" alt="{{slide.title}}" class="d-block w-100" loading="lazy" />
-            </c-carousel-item>
-            }
-        </c-carousel-inner>
-       
+<div class="product-container">
+  <!-- Section Carousel -->
+  <div class="card carousel-section">
+    <c-carousel class="custom-carousel" [interval]="0">
+      <c-carousel-control [routerLink] caption="⬅️" direction="prev" />
+      <c-carousel-control [routerLink] caption="➡️" direction="next" />
+      <c-carousel-inner>
+        @for (slide of slides; track slide.src) {
+        <c-carousel-item>
+          <img [src]="slide.src" alt="{{slide.title}}" class="carousel-image" loading="lazy" />
+        </c-carousel-item>
+        }
+      </c-carousel-inner>
     </c-carousel>
+  </div>
+
+  <!-- Section Actions -->
+  <div class="actions-section">
+    <div class="toggle-group-container">
+      <div class="toggle-header">
+        <h3>Product Actions</h3>
+      </div>
+      
+      <div class="toggle-content">
+        <mat-button-toggle-group name="fontStyle" aria-label="Font Style" class="custom-toggle-group">
+          <mat-button-toggle value="italic" class="custom-toggle">
+            <mat-icon>edit</mat-icon>
+            Update Field
+          </mat-button-toggle>
+          <mat-button-toggle value="underline" class="custom-toggle">
+            <mat-icon>collections</mat-icon>
+            Media Management
+          </mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
+    </div>
+  </div>
 </div>

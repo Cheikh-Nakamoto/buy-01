@@ -204,8 +204,13 @@ public class ProductService {
 
         return products.stream()
                 .map(product -> {
-                    String sellerName = userClient.getSellerNameById(product.getUserId());
-                    return toDTO(product, sellerName, List.of() /* imageUrls */);
+                    String name = userClient.getSellerNameById(product.getUserId());
+                    List<MediaDTO> imageUrls = mediaClient.getMediasByProductId(product.getId());
+                    if (imageUrls == null) {
+                        imageUrls = new ArrayList<>(); // Si aucune image n'est trouvée, on initialise une liste vide
+                    }
+
+                    return toDTO(product, name, imageUrls);
                 })
                 .collect(Collectors.toList());
     }

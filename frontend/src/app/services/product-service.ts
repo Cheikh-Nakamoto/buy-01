@@ -24,6 +24,20 @@ export class ProductService {
       })
     );
   }
+
+  getMyProduct(): Observable<Product[]> {
+    console.log('Fetching products from:', this.apiUrl.GET_MY_ALL_PRODUCT);
+    return this.http.get<any[]>(this.apiUrl.GET_MY_ALL_PRODUCT, {
+      headers: {
+        'Authorization': this.getHeaderToken()
+      }
+    }).pipe(
+      catchError((error: any) => {
+        console.error('Error fetching products:', error.error);
+        return throwError(error.error || 'Failed to fetch products');
+      })
+    );
+  }
   getProductById(id: number): string {
     // This method would typically fetch a product by its ID
     return `Product ${id}`;
@@ -51,9 +65,9 @@ export class ProductService {
       }
     });
   }
-  updateProduct(id: number, product: FormData): void {
+  updateProduct(id: string, product: Product): void {
     // This method would typically update an existing product
-    this.http.put(`${this.apiUrl.UPDATE_PRODUCT}/${id}`, product, {
+    this.http.put(`${this.apiUrl.UPDATE_PRODUCT(id)}`, product, {
       headers: {
         'Authorization': this.getHeaderToken()
       }
@@ -66,8 +80,51 @@ export class ProductService {
       }
     });
   }
-  deleteProduct(id: number): void {
-    // This method would typically delete a product by its ID
-    console.log(`Product deleted: ${id}`);
+  async deleteImageInProduct(id: string): Promise<void> {
+    console.log(this.apiUrl.DELETE_IMG_BY_Media_ID(id))
+    try {
+      this.http.delete(this.apiUrl.DELETE_IMG_BY_Media_ID(id), {
+        headers: {
+          'Authorization': this.getHeaderToken()
+        }
+      }).subscribe({
+        next: (response) => {
+          console.log(`Product updated: ${response}`);
+        },
+        error: (error) => {
+          console.error('Error updating product:', error);
+        }
+      });
+    } catch (error: any) {
+      console.log("delete requets error")
+      throw new Error('No token found' + error.error);
+    }
+  }
+
+  async addImageInProduct(id: string, formdata: File[]): Promise<void> {
+    console.log(this.apiUrl.ADD_IMG_BY_PRODUCT_ID(id))
+    for (let index = 0; index < formdata.length; index++) {
+      const file = formdata[index];
+      let formulaire = new FormData();
+      formulaire.append("file", file);
+      try {
+        this.http.post(this.apiUrl.ADD_IMG_BY_PRODUCT_ID(id), formulaire, {
+          headers: {
+            'Authorization': this.getHeaderToken()
+          }
+        }).subscribe({
+          next: (response) => {
+            console.log(`Product updated: ${response}`);
+          },
+          error: (error) => {
+            console.error('Error updating product:', error);
+          }
+        });
+      } catch (error: any) {
+        throw new Error('No token found' + error.error);
+      }
+       await new Promise(resolve => setTimeout(resolve,100))
+    }
+
   }
 }
