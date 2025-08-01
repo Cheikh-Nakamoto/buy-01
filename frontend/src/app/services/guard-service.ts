@@ -8,21 +8,28 @@ import { Observable, of, switchMap } from 'rxjs';
   providedIn: 'root'
 })
 export class GuardService {
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) { }
 
   canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-    // Check if the user is authenticated
     return this.authService.checkAuth().then(authenticated => {
-      if (authenticated) {
-        return true;
-      } else {
+      if (!authenticated) {
         return this.router.createUrlTree(['/auth'], {
           queryParams: { returnUrl: state.url }
         });
       }
+
+      const user = this.authService.currentUser$(); // Supposons que cette méthode existe
+      const allowedRoutesForClient = ['/', '/profile'];
+
+      if (user?.role === 'CLIENT' && !allowedRoutesForClient.includes(state.url)) {
+        // Rediriger vers une page autorisée ou retourner false
+        return this.router.createUrlTree(['/']); // Ou return false;
+      }
+
+      return true;
     });
   }
 }

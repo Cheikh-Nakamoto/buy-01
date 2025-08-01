@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, computed, effect } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ProductService } from '../../services/product-service';
 import { DataService } from '../../services/data-service';
@@ -7,10 +7,12 @@ import { Subscription } from 'rxjs';
 import { MatButtonToggleChange, MatButtonToggleModule } from '@angular/material/button-toggle';
 import { Router } from '@angular/router';
 import { MatIconModule } from "@angular/material/icon";
+import { ToastError } from "../../error/toast-error/toast-error";
+import { handleHttpError } from '../../utils/utils';
 
 @Component({
   selector: 'app-form-product',
-  imports: [ReactiveFormsModule, MatButtonToggleModule, MatIconModule],
+  imports: [ReactiveFormsModule, MatButtonToggleModule, MatIconModule, ToastError],
   templateUrl: './form-product.html',
   styleUrl: './form-product.css'
 })
@@ -19,11 +21,17 @@ export class FormProduct implements OnInit, OnDestroy {
   private imageFiles: File[] = [];
   private imageDelete: string[] = [];
   currentProduct: Product | null = null;
-  private updateProductfield : Product | null = null; 
+  private updateProductfield: Product | null = null;
   productForm: FormGroup;
   media_management = signal<boolean>(true);
   field_management = signal<boolean>(false);
   action_button = signal<boolean>(false);
+
+  // Nouvelles propriétés pour la gestion d'état
+  isLoading = signal<boolean>(false);
+  errorMessage = signal<string>('');
+  successMessage = signal<string>('');
+
 
   // Souscription pour éviter les fuites mémoire
   private subscription!: Subscription;
@@ -33,8 +41,21 @@ export class FormProduct implements OnInit, OnDestroy {
   visibleSlides = 3;
   slideWidth = 216;
   currentTranslate = 0;
+  messageStatus = computed(() => ({
+    error: this.errorMessage(),
+    success: this.successMessage()
+  }));
+
+  private messageLoggerEffect = effect(() => {
+     console.log('DEBUG - Nouveau statut des messages :', this.messageStatus());
+    // Ici, vous pourriez intégrer une logique de logging externe,
+    // ou envoyer ces messages à un service de toasts/notifications
+  });
+
 
   constructor(private productService: ProductService, private dataSharedProduct: DataService, private router: Router) {
+    // Un computed qui génère un objet avec le contenu des messages
+
     // Initialisation du formulaire
     this.productForm = new FormGroup({
       name: new FormControl('', [Validators.required]),
@@ -111,7 +132,7 @@ export class FormProduct implements OnInit, OnDestroy {
   }
 
   onFileSelected(event: Event) {
-    if (this.imageFiles.length + this.images.length >5) {
+    if (this.imageFiles.length + this.images.length > 5) {
       alert("🚨Vous avez depassez le seuil d'image requis !!!🚨")
       return;
     }
@@ -158,21 +179,37 @@ export class FormProduct implements OnInit, OnDestroy {
     // Validation du formulaire
     if (this.productForm.invalid) {
       this.markAllFieldsAsTouched();
+      this.errorMessage.set('Please fill in all required fields correctly.');
       return;
     }
+
+    this.isLoading.set(true);
+    this.errorMessage.set('');
+    this.successMessage.set('');
 
     try {
       // Préparation des données
       const formData = await this.prepareFormData();
 
       // Exécution des actions en fonction du contexte
-      await this.executeFormActions(formData);
+      const result: any = await this.executeFormActions(formData);
 
-      // Redirection après succès
-      this.router.navigate(['/products/myproduct']);
-    } catch (error) {
-      console.error('Erreur lors de la soumission:', error);
-      // Gestion d'erreur à adapter selon vos besoins
+      if (result.success) {
+        this.successMessage.set(result.message || 'Operation completed successfully!');
+
+        // Petit délai pour que l'utilisateur voie le message de succès
+        setTimeout(() => {
+          this.router.navigate(['/products/myproduct']);
+        }, 1500);
+      } else {
+        this.errorMessage.set(result.error || 'Operation failed. Please try again.');
+      }
+
+    } catch (error: any) {
+      // Gestion spécifique des erreurs
+     this.errorMessage.set(handleHttpError(error).message)
+    } finally {
+      this.isLoading.set(false);
     }
   }
 
@@ -202,41 +239,114 @@ export class FormProduct implements OnInit, OnDestroy {
     return formData;
   }
 
-  private async executeFormActions(formData: FormData): Promise<void> {
-    // Gestion des actions de mise à jour
-    if (this.IsUpdate() && this.updateProductfield != null) {
-      if (this.field_management()) {
-        console.log("id product",this.currentProduct!.id)
-        this.productService.updateProduct(this.currentProduct!.id, this.updateProductfield);
-      }
+  private async executeFormActions(formData: FormData): Promise<{ success: boolean, message?: string, error?: string }> {
+    try {
+      // Gestion des actions de mise à jour
+      if (this.IsUpdate() && this.updateProductfield != null) {
 
-      if (this.media_management()) {
-        if (this.imageFiles.length > 0) {
-          await this.productService.addImageInProduct(this.currentProduct!.id, this.imageFiles);
+        if (this.field_management()) {
+          console.log("id product", this.currentProduct!.id);
+          const updateResult: any = await this.productService.updateProduct(
+            this.currentProduct!.id,
+            this.updateProductfield
+          );
+
+          if (!updateResult.success) {
+            return { success: false, error: updateResult.error || 'Failed to update product information.' };
+          }
         }
 
-        // Suppression des images marquées pour suppression
-        await this.deleteMarkedImages();
+        if (this.media_management()) {
+          // Ajout d'images
+          if (this.imageFiles.length > 0) {
+            const addImagesResult: any = await this.productService.addImageInProduct(
+              this.currentProduct!.id,
+              this.imageFiles
+            );
+
+            if (!addImagesResult.success) {
+              return { success: false, error: addImagesResult.error || 'Failed to add images.' };
+            }
+          }
+
+          // Suppression des images marquées pour suppression
+          const deleteResult: any = await this.deleteMarkedImages();
+          if (!deleteResult.success) {
+            return { success: false, error: deleteResult.error || 'Failed to delete some images.' };
+          }
+        }
+
+        return { success: true, message: 'Product updated successfully!' };
+
+      } else {
+        // Création d'un nouveau produit
+        const createResult: any = await this.productService.addProduct(formData);
+
+        if (!createResult.success) {
+          return { success: false, error: createResult.error || 'Failed to create product.' };
+        }
+
+        return { success: true, message: 'Product created successfully!' };
       }
-    } else {
-      // Création d'un nouveau produit
-      this.productService.addProduct(formData);
+
+    } catch (error: any) {
+      console.error('Error in executeFormActions:', error);
+      return {
+        success: false,
+        error:  handleHttpError(error).message || 'An error occurred while processing your request.'
+      };
     }
   }
 
-  private async deleteMarkedImages(): Promise<void> {
-    if (this.imageDelete.length === 0) return;
+  private async deleteMarkedImages(): Promise<{ success: boolean, error?: string }> {
+    if (this.imageDelete.length === 0) {
+      return { success: true };
+    }
 
-    const deleteRequests = this.imageDelete.map(imageId =>
-      this.productService.deleteImageInProduct(imageId)
-    );
+    try {
+      const deleteResults = [];
 
-    // Exécution en parallèle avec un délai minimal entre chaque requête
-    for (const request of deleteRequests) {
-      await request;
-      await new Promise(resolve => setTimeout(resolve, 100)); // Délai anti-spam
+      // Exécution séquentielle avec gestion d'erreur pour chaque image
+      for (const imageId of this.imageDelete) {
+        try {
+          const result = await this.productService.deleteImageInProduct(imageId);
+          deleteResults.push(result);
+
+          // Délai anti-spam
+          await new Promise(resolve => setTimeout(resolve, 100));
+        } catch (error) {
+          console.error(`Failed to delete image ${imageId}:`, error);
+          deleteResults.push({ success: false, error: `Failed to delete image ${imageId}` });
+        }
+      }
+
+      // Vérifier si toutes les suppressions ont réussi
+      const failedDeletes = deleteResults.filter((result: any) => !result.success);
+
+      if (failedDeletes.length > 0) {
+        return {
+          success: false,
+          error: `Failed to delete ${failedDeletes.length} image(s). Some images may still be present.`
+        };
+      }
+
+      return { success: true };
+
+    } catch (error: any) {
+      console.error('Error in deleteMarkedImages:', error);
+      if (error.status == 200){
+         return {
+        success: true,
+        error: handleHttpError(error).message || 'Failed to delete images.'
+      };
+      }
+      return {
+        success: false,
+        error: error?.message || 'Failed to delete images.'
+      };
     }
   }
+
 
   // Marquer tous les champs comme touchés pour afficher les erreurs
   private markAllFieldsAsTouched(): void {
@@ -271,6 +381,15 @@ export class FormProduct implements OnInit, OnDestroy {
       }
     }
   }
+
+  // Méthode pour nettoyer les messages après un certain temps
+  private clearMessages(delay: number = 5000): void {
+    setTimeout(() => {
+      this.errorMessage.set('');
+      this.successMessage.set('');
+    }, delay);
+  }
+
 
   // Méthodes du carrousel
   nextSlide() {

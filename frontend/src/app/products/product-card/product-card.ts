@@ -16,9 +16,15 @@ export class ProductCard {
   @Input() product!: Product;
   @Output() viewDetails = new EventEmitter<string>();
   @Output() addToCartEvent = new EventEmitter<Product>();
+  @Output() productIdEvent = new EventEmitter<string>();
   imageurls: string[] = [];
 
   constructor(private datasharedService: DataService, private router: Router) { }
+
+  deleteImage(id: string) {
+    console.log("emission du product id ",id)
+    this.productIdEvent.emit(this.product.id);
+  }
 
   get badgeText(): string {
     const daysSinceCreation = Math.floor(

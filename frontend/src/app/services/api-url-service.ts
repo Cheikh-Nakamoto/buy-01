@@ -15,7 +15,7 @@ export class ApiUrlService {
   readonly DELETE_USER = (id: number) => `${this.baseUrl}/api/admin/users/del/${id}`;
 
   // User Endpoints
-  readonly UPDATE_USER = (id: number) => `${this.baseUrl}/api/users/update/${id}`;
+  readonly UPDATE_USER = (id: string) => `${this.baseUrl}/api/users/update/${id}`;
   readonly UPDATE_AVATAR = `${this.baseUrl}/api/users/update/avatar`;
   readonly GET_USER_BY_ID = (id: number) => `${this.baseUrl}/api/users/profile/${id}`;
   readonly GET_USER_BY_NAME = (userId: string) => `${this.baseUrl}/api/users/name/${userId}`;
@@ -29,6 +29,8 @@ export class ApiUrlService {
   readonly GET_ALL_PRODUCTS = `${this.baseUrl}/api/products/all`;
   readonly GET_MY_ALL_PRODUCT = `${this.baseUrl}/api/products/myproducts`
   readonly DELETE_IMG_BY_Media_ID = (id: string) => `${this.baseUrl}/api/media/delete/${id}`
+  readonly DELETE_PRODUCT_BY_ID = (id: string) => `${this.baseUrl}/api/products/delete/${id}`
+
   readonly ADD_IMG_BY_PRODUCT_ID = (id : string) => `${this.baseUrl}/api/media/add/${id}`
   constructor() { }
 }

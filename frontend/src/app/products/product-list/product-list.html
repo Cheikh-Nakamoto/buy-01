@@ -8,6 +8,7 @@
     <p>Découvrez {{ totalProducts }} produits dans {{ totalCategories }} catégories</p>
   </div>
   }
+  <app-toast-error [currentNotification]="messageStatus"></app-toast-error>
 
   <!-- Controls -->
   <div class="controls">
@@ -53,7 +54,7 @@
   <!-- Products Grid View -->
   <div class="products-grid" *ngIf="viewMode === 'grid'">
     @for (product of filteredProducts; track product.id) {
-    <app-product-card [product]="product">
+    <app-product-card [product]="product" (productIdEvent)="deleteProduct($event)" >
     </app-product-card>
     }
   </div>

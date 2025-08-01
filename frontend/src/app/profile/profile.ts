@@ -5,6 +5,9 @@ import { UserService } from '../services/user-service';
 import { UpdateForm } from './update-form/update-form';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
+import { handleHttpError } from '../utils/utils';
+import { computed } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-profile',
@@ -16,6 +19,14 @@ import { HttpClient } from '@angular/common/http';
 })
 export class Profile implements OnInit {
   user = signal<User | null>(null);
+  isLoading = signal(false);
+  errorMessage = signal('');
+  successMessage = signal('');
+
+  messageStatus = computed(() => ({
+    error: this.errorMessage(),
+    success: this.successMessage()
+  }));
 
   constructor(private userService: UserService, private dialog: MatDialog) { }
 
@@ -116,70 +127,88 @@ export class Profile implements OnInit {
       data: { user: this.user() }
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result: any) => {
       console.log('Dialog closed with result:', result);
       if (result) {
         this.handleSave(result);
       }
     });
   }
+ async handleSave(updatedData: FormData) {
+    this.isLoading.set(true);
+    this.errorMessage.set('');
+    this.successMessage.set('');
 
-  /**
-   * Gère la sauvegarde avec vérification des changements
-   */
-  async handleSave(updatedData: FormData) {
-    console.log('🔄 Données reçues:', updatedData);
-    
-    const currentUser = this.user();
-    if (!currentUser) {
-      console.error('❌ Utilisateur actuel non disponible');
-      alert('Erreur: utilisateur non chargé');
-      return;
+    try {
+      const currentUser = this.user();
+      if (!currentUser) throw new Error('User data not available');
+
+      const [avatarResult, profileResult] = await Promise.allSettled([
+        this.processAvatarUpdate(updatedData),
+        this.processProfileUpdate(updatedData, currentUser)
+      ]);
+
+      this.handleUpdateResults(avatarResult, profileResult);
+    } catch (error) {
+      this.handleSaveError(error);
+    } finally {
+      this.isLoading.set(false);
+      this.clearMessagesAfterDelay();
     }
+  }
 
-    let hasAvatarUpdate = false;
-    let hasProfileUpdate = false;
-
-    // === GESTION AVATAR ===
+  private async processAvatarUpdate(updatedData: FormData): Promise<void> {
     const avatarFile = updatedData.get('avatar') as File;
-    if (avatarFile && avatarFile.size > 0) {
-      console.log('🖼️ Nouveau fichier avatar détecté:', avatarFile.name);
-      hasAvatarUpdate = true;
-      this.updateAvatar(avatarFile);
-    }
+    if (!avatarFile?.size) return;
 
-    // === GESTION PROFIL ===
-    if (updatedData.get('data')) {
-      const data = updatedData.get('data') as Blob;
-      
-      try {
-        const userData = JSON.parse(await data.text());
-        console.log('📝 Données reçues du formulaire:', userData);
-        
-        // Vérifier les changements
-        const changes = this.getUserChanges(currentUser, userData);
-        
-        if (changes && Object.keys(changes).length > 0) {
-          console.log('🔄 Changements détectés:', changes);
-          console.log(`📊 ${Object.keys(changes).length} champ(s) modifié(s):`, Object.keys(changes));
-          hasProfileUpdate = true;
-          this.updateProfile(changes);
-        } else {
-          console.log('👍 Aucun changement dans le profil - Mise à jour évitée');
-        }
-        
-      } catch (error) {
-        console.error('❌ Erreur parsing JSON:', error);
-        alert('Erreur lors du traitement des données : ' + error);
-        return;
-      }
-    }
+    const result = await this.userService.updateAvatar(avatarFile);
+    if (!result.success) throw new Error(result.error);
+  }
 
-    // Message si aucune mise à jour nécessaire
-    if (!hasAvatarUpdate && !hasProfileUpdate) {
-      console.log('✅ Aucune modification détectée - Aucune requête envoyée');
-      alert('Aucune modification à sauvegarder');
+  private async processProfileUpdate(updatedData: FormData, currentUser: User): Promise<void> {
+    if (!updatedData.get('data')) return;
+
+    const data = updatedData.get('data') as Blob;
+    const userData = JSON.parse(await data.text());
+    const changes = this.getUserChanges(currentUser, userData);
+
+    if (!changes || !Object.keys(changes).length) return;
+
+    const result : any = await this.userService.updateProfile(changes);
+    if (!result.success) throw new Error(result.error);
+    
+    this.user.set(result.data);
+  }
+
+  private handleUpdateResults(...results: PromiseSettledResult<void>[]): void {
+    const errors = results
+      .filter(r => r.status === 'rejected')
+      .map(r => (r as PromiseRejectedResult).reason?.message || 'Unknown error');
+
+    if (errors.length) {
+      this.errorMessage.set(`Update failed: ${errors.join(' | ')}`);
+    } else {
+      this.successMessage.set('Profile updated successfully');
+      this.loadUserProfile(); // Refresh data
     }
+  }
+
+  private handleSaveError(error: unknown): void {
+    const errorObj = error instanceof Error ? error : new Error(String(error));
+    const formattedError = handleHttpError(
+      errorObj instanceof HttpErrorResponse 
+        ? errorObj 
+        : new HttpErrorResponse({ error: errorObj })
+    );
+    
+    this.errorMessage.set(formattedError.message);
+  }
+
+  private clearMessagesAfterDelay(delay = 5000): void {
+    setTimeout(() => {
+      this.errorMessage.set('');
+      this.successMessage.set('');
+    }, delay);
   }
 
   /**
@@ -191,7 +220,7 @@ export class Profile implements OnInit {
 
     // Champs à comparer (ajustez selon votre interface User)
     const fieldsToCompare: (keyof User)[] = [
-      'name', 'email',  
+      'name', 'email',
       'role'
     ];
 
@@ -218,55 +247,44 @@ export class Profile implements OnInit {
     if (value === null || value === undefined) {
       return '';
     }
-    
+
     if (typeof value === 'string') {
       return value.trim();
     }
-    
+
     return String(value);
   }
 
-  /**
-   * Met à jour l'avatar
-   */
-  private updateAvatar(file: File): void {
-    console.log('🖼️ Mise à jour de l\'avatar...');
-    
-    this.userService.updateAvatar(file).subscribe({
-      next: () => {
-        console.log('✅ Avatar mis à jour avec succès');
-        // Recharger le profil pour obtenir la nouvelle URL d'avatar
-        this.loadUserProfile();
-        alert('Avatar mis à jour avec succès!');
-      },
-      error: (error) => {
-        console.error('❌ Erreur avatar:', error);
-        alert('Erreur lors de la mise à jour de l\'avatar : ' + error.message);
-      }
-    });
-  }
+  // /**
+  //  * Met à jour l'avatar
+  //  */
+  // private async updateAvatar(file: File): Promise<void> {
+  //   console.log('🖼️ Mise à jour de l\'avatar...');
+  //   try {
+  //     await this.userService.updateAvatar(file)
+  //   } catch (error: any) {
+  //     console.error('❌ Erreur avatar:', error);
+  //     handleHttpError(error)
+  //   }
+  // }
 
-  /**
-   * Met à jour le profil utilisateur
-   */
-  private updateProfile(changes: Partial<User>): void {
-    console.log('📝 Mise à jour du profil avec les changements:', changes);
-    
-    this.userService.updateProfile(changes).subscribe({
-      next: (response) => {
-        this.user.set(response);
-        console.log('✅ Profil mis à jour avec succès', response);
-        
-        // Message de succès avec détails
-        const updatedFields = Object.keys(changes).join(', ');
-        alert(`Profil mis à jour avec succès!\nChamps modifiés: ${updatedFields}`);
-      },
-      error: (error) => {
-        console.error('❌ Erreur profil:', error);
-        alert('Échec de la mise à jour du profil : ' + error.message);
-      }
-    });
-  }
+  // /**
+  //  * Met à jour le profil utilisateur
+  //  */
+  // private async updateProfile(changes: Partial<User>): void {
+  //   console.log('📝 Mise à jour du profil avec les changements:', changes);
+  //   try {
+  //     let response = await this.userService.updateProfile(changes)
+  //     this.user.set(response);
+  //     console.log('✅ Profil mis à jour avec succès', response);
+  //     // Message de succès avec détails
+  //     const updatedFields = Object.keys(changes).join(', ');
+  //   } catch (error) {
+  //     console.error('❌ Erreur profil:', error);
+
+  //   }
+
+  // }
 
   handleCancel() {
     console.log('❌ Annulation par l\'utilisateur');

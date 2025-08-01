@@ -4,15 +4,26 @@ import { FormsModule } from '@angular/forms';
 import { Product } from '../../models/interfaces';
 import { ProductService } from '../../services/product-service';
 import { ProductCard } from "../product-card/product-card";
+import { OnInit, signal } from '@angular/core';
+import { computed } from '@angular/core';
+import { effect } from '@angular/core';
+import { handleHttpError } from '../../utils/utils';
+import { ToastError } from "../../error/toast-error/toast-error";
 
 @Component({
   selector: 'app-product-list',
-  imports: [CommonModule, FormsModule, ProductCard],
+  imports: [CommonModule, FormsModule, ProductCard, ToastError],
   templateUrl: './product-list.html',
   styleUrl: './product-list.css'
 })
-export class ProductList {
+export class ProductList implements OnInit {
+
   trackByProductId: TrackByFunction<Product> = (index: number, product: Product) => product.id;
+
+  // Nouvelles propriétés pour la gestion d'état
+  errorMessage = signal<string>('');
+  successMessage = signal<string>('');
+
   resetFilters() {
     this.searchTerm = '';
     this.selectedCategory = 'all';
@@ -35,11 +46,21 @@ export class ProductList {
   sortBy: 'name' | 'price' | 'date' = 'name';
   sortOrder: 'asc' | 'desc' = 'asc';
   isLoading: boolean = false;
+  messageStatus = computed(() => ({
+    error: this.errorMessage(),
+    success: this.successMessage()
+  }));
 
+  private messageLoggerEffect = effect(() => {
+    console.log('DEBUG - Nouveau statut des messages :', this.messageStatus());
+    // Ici, vous pourriez intégrer une logique de logging externe,
+    // ou envoyer ces messages à un service de toasts/notifications
+  });
   constructor(private productService: ProductService) { }
 
- async ngOnInit() {
+  async ngOnInit() {
     //this.loadProducts();
+
     this.extractCategories();
     this.applyFilters();
     console.log('ProductList component initialized');
@@ -49,32 +70,41 @@ export class ProductList {
           this.products = products;
           this.filteredProducts = products; // Initialiser les produits filtrés
           this.extractCategories(); // Extraire les catégories après chargement des produits
-          console.log('Products loaded:', this.products);
         },
-        error: (error) => {
-          console.error('Error fetching products:', error);
-          alert('Failed to load products. Please try again later.');
+        error: (error: any) => {
+          const err = handleHttpError(error);
+          this.errorMessage.set(err.message)
         }
       });
-    }else{
-      console.log("mes produit")
+    } else {
       this.productService.getMyProduct().subscribe({
         next: (products) => {
           this.products = products;
           this.filteredProducts = products; // Initialiser les produits filtrés
           this.extractCategories(); // Extraire les catégories après chargement des produits
-          console.log('Products loaded:', this.products);
         },
-        error: (error) => {
-          console.error('Error fetching products:', error);
-          alert('Failed to load products. Please try again later.');
+        error: (error: any) => {
+          const err = handleHttpError(error);
+          this.errorMessage.set(err.message)
         }
       });
     }
-    console.log('Fetched products:', this.products);
   }
 
-  canHide():boolean {
+  async deleteProduct($event: string) {
+    try {
+      console.log("arrivage du event ",$event);
+      let respons : any = await this.productService.deleteProduct($event);
+      if (respons.status) {
+        this.successMessage.set("Product  delete successfuly")
+        location.reload()
+      }
+    } catch (error: any) {
+      this.errorMessage.set(handleHttpError(error).message)
+    }
+  }
+
+  canHide(): boolean {
     return location.pathname === "/products/myproduct";
   }
 
@@ -163,11 +193,11 @@ export class ProductList {
   }
 
 
-  
+
 
   // Extraire les catégories uniques
   extractCategories() {
-    const uniqueCategories = [...new Set(this.products.map(product => product.category != undefined ? product.category : 'Autre'))]; ;
+    const uniqueCategories = [...new Set(this.products.map(product => product.category != undefined ? product.category : 'Autre'))];;
     this.categories = ['all', ...uniqueCategories];
   }
 

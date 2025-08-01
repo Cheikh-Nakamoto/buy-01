@@ -2,21 +2,23 @@
   <!-- Product Image -->
   <div class="product-image">
     @if (product.imageUrls && product.imageUrls.length > 0) {
-      @if (product.imageUrls.length > 1) {
-        <div class="carousel-container">
-          <app-circular-image [productimg]="productImageUrls"></app-circular-image>
-        </div>
-      } @else if (product.imageUrls.length === 1) {
-        <img [src]="product.imageUrls[0].imagePath" [alt]="product.name" loading="lazy">
-      }
+    @if (product.imageUrls.length > 1) {
+    <!-- <div class="carousel-container"> -->
+    <app-circular-image [productimg]="productImageUrls"></app-circular-image>
+    <!-- </div> -->
+    } @else if (product.imageUrls.length === 1) {
+    <img [src]="product.imageUrls[0].imagePath" [alt]="product.name" loading="lazy">
+    }
     } @else {
-      <img src="https://st5.depositphotos.com/46049492/71013/i/450/depositphotos_710136088-stock-photo-magnifying-glass-shopping-cart-illustration.jpg"
-           alt="Placeholder image for product">
+    <img
+      src="https://st5.depositphotos.com/46049492/71013/i/450/depositphotos_710136088-stock-photo-magnifying-glass-shopping-cart-illustration.jpg"
+      alt="Placeholder image for product">
     }
     <div class="product-badge" [ngClass]="badgeClass" *ngIf="badgeText">
       {{ badgeText }}
     </div>
   </div>
+
 
   <!-- Product Info -->
   <div class="product-info">
@@ -39,14 +41,18 @@
     <div class="product-footer">
       <div class="product-price">{{ productPrice }}</div>
       @if (!canHide()) {
-        <button class="add-to-cart" [disabled]="product.quantity === 0" (click)="addToCart($event)">
-          <span *ngIf="product.quantity > 0">Ajouter</span>
-          <span *ngIf="product.quantity === 0">Indisponible</span>
-        </button>
+      <button class="add-to-cart" [disabled]="product.quantity === 0" (click)="addToCart($event)">
+        <span *ngIf="product.quantity > 0">Ajouter</span>
+        <span *ngIf="product.quantity === 0">Indisponible</span>
+      </button>
       } @else {
-        <button class="add-to-cart" [disabled]="product.quantity === 0" (click)="goToUpdateProduct($event)">
-          <span>View</span>
-        </button>
+      <button class="add-to-cart" [disabled]="product.quantity === 0" (click)="goToUpdateProduct($event)">
+        <span>View</span>
+      </button>
+      <button class="delete-cart"  (click)="deleteImage(product.id)">
+        <span>Delete</span>
+      </button>
+
       }
     </div>
   </div>

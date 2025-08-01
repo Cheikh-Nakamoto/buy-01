@@ -1,3 +1,5 @@
+import { Signal } from "@angular/core";
+
 export interface User {
   id: string;
   email: string;
@@ -75,4 +77,16 @@ export interface UploadProgress {
 export interface AuthResponse {
   user?: User;
   token: string;
+}
+
+export interface ServiceResponse<T = any> {
+  success: boolean;
+  data?: T;
+  message?: string;
+  error?: string;
+}
+
+export interface ErrorMessage{
+  error : string;
+  success : string;
 }

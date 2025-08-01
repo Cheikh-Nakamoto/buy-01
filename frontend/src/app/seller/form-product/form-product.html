@@ -6,6 +6,7 @@
     <h2 class="form-title">Update Produit</h2>
 
     }
+  <app-toast-error [currentNotification]="messageStatus"></app-toast-error>
     @if (action_button()) {
     <div class="toggle-group-container">
       <div class="toggle-header">
@@ -122,7 +123,7 @@
         <path d="M5 12l5 5L20 7" />
       </svg>
       @if (!IsUpdate()) {
-      Cree le Produit
+      Creer le Produit
       }@else {
       Update le Produit
       }

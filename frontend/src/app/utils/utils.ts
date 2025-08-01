@@ -1,0 +1,47 @@
+import { HttpErrorResponse } from "@angular/common/http";
+
+export function handleHttpError(error: HttpErrorResponse): Error {
+    let errorMessage = 'An unexpected error occurred';
+
+    if (error.error instanceof ErrorEvent) {
+        // Erreur côté client
+        errorMessage = `Client error: ${error.error.message}`;
+    } else {
+        // Erreur côté serveur
+        const serverMessage = error.error?.message ? `\n\nDetails: ${error.error.message}` : '';
+
+        switch (error.status) {
+            case 400:
+                errorMessage = `Bad request. Please check your data.${serverMessage}`;
+                break;
+            case 401:
+                errorMessage = `Unauthorized. Please log in again.${serverMessage}`;
+                break;
+            case 403:
+                errorMessage = `Forbidden. You don't have permission to perform this action.${serverMessage}`;
+                break;
+            case 404:
+                errorMessage = `Resource not found.${serverMessage}`;
+                break;
+            case 409:
+                errorMessage = `Conflict. The resource already exists.${serverMessage}`;
+                break;
+            case 413:
+                errorMessage = `File too large. Please select smaller files.${serverMessage}`;
+                break;
+            case 422:
+                errorMessage = `Invalid data format. Please check your inputs.${serverMessage}`;
+                break;
+            case 500:
+                errorMessage = `Server error. Please try again later.${serverMessage}`;
+                break;
+            case 0:
+                errorMessage = `Network error. Please check your connection.${serverMessage}`;
+                break;
+            default:
+                errorMessage = error.error?.message || `Server error (${error.status})${serverMessage}`;
+        }
+    }
+
+    return new Error(errorMessage);
+}

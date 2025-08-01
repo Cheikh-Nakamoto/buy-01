@@ -123,6 +123,18 @@
   cursor: pointer;
   transition: all 0.2s;
 }
+
+.delete-cart {
+  background: #dd1313;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
 .espace {
   padding: 52px;
 }
@@ -134,4 +146,21 @@
 .add-to-cart:disabled {
   background: #cbd5e1;
   cursor: not-allowed;
+}
+
+.delete-image-btn {
+  position: absolute;
+  
+  top: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  width: 28px;
+  height: 28px imo !important;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }

@@ -12,6 +12,8 @@
 .header {
   text-align: center;
   margin-bottom: 3rem;
+  background-color: transparent !important;
+  border: 0 !important;
 }
 
 .header h1 {
@@ -696,6 +698,27 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 1px;
+}
+
+.delete-image-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 10; /* Assure qu'il est au-dessus des autres éléments */
+}
+app-product-card {
+  position: relative; /* Nécessaire pour positionner correctement le bouton absolu */
+  display: block; /* Si ce n'est pas déjà le cas */
 }
 
 /* Animations */

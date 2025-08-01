@@ -1,0 +1,16 @@
+<c-toaster [placement]="position" class="p-3" position="fixed">
+  <c-toast
+    (timer)="onTimerChange($event)"
+    (visibleChange)="onVisibleChange($event)"
+    [visible]="hasMessage()"
+  >
+    <c-toast-header>
+      <toast-sample-icon />
+        {{toastTitle()}}
+    </c-toast-header>
+    <c-toast-body>
+      <p>{{toastDetail()}}</p>
+      <c-progress thin [value]="percentage()" />
+    </c-toast-body>
+  </c-toast>
+</c-toaster>
