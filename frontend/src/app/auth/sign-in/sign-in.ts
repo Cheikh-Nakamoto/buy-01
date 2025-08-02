@@ -1,22 +1,43 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, computed, effect } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
+import { ToastError } from "../../error/toast-error/toast-error";
 
 @Component({
   selector: 'app-sign-in',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ToastError],
   templateUrl: './sign-in.html',
   styleUrl: './sign-in.css'
 })
+/**
+ * Component for user sign-in and sign-up.
+ * Manages authentication forms, user input, and interaction with the authentication service.
+ */
 export class SignIn implements OnInit {
   authForm: FormGroup;
   isSignUp = signal(false);
   loading = signal(false);
-  errorMessage = '';
   avatarPreview: string | ArrayBuffer | null = null;
   selectedAvatarFile!: File;
+  canHide = signal<boolean>(true);
+
+  // Nouvelles propriétés pour la gestion d'état des messages
+  errorMessage = signal<string>('');
+  successMessage = signal<string>('');
+
+  // Computed pour créer l'objet de statut des messages
+  messageStatus = computed(() => ({
+    error: this.errorMessage(),
+    success: this.successMessage()
+  }));
+
+  // Effect pour logger les changements de messages (optionnel)
+  private messageLoggerEffect = effect(() => {
+    console.log('DEBUG - Nouveau statut des messages d\'authentification :', this.messageStatus());
+  });
+
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
@@ -24,6 +45,7 @@ export class SignIn implements OnInit {
   ) {
     this.authForm = this.createForm();
   }
+
   async ngOnInit(): Promise<void> {
     // If the user is already signed in, redirect to home page
     await this.authService.checkAuth();
@@ -32,20 +54,28 @@ export class SignIn implements OnInit {
       return;
     }
   }
+
+  /**
+   * Handles the selection of an avatar file.
+   * Performs client-side validation and displays a preview of the selected image.
+   * @param event The DOM event triggered by the file input change.
+   */
   onAvatarSelected(event: any) {
     const file = event.target.files[0];
-    
+
     if (file && file instanceof File) {
       console.log('Avatar input changed:', file);
-      
+
       // Validation
       if (file.size > 5 * 1024 * 1024) { // 5MB max
-        console.error('File too large');
+        this.errorMessage.set('File too large. Maximum size is 5MB.');
+        this.clearMessages(3000);
         return;
       }
 
       if (!file.type.startsWith('image/')) {
-        console.error('Not an image file');
+        this.errorMessage.set('Please select a valid image file.');
+        this.clearMessages(3000);
         return;
       }
 
@@ -63,6 +93,11 @@ export class SignIn implements OnInit {
       this.authForm.get('avatar')?.markAsTouched();
     }
   }
+
+  /**
+   * Initializes and returns the authentication form with its controls and validators.
+   * @returns The initialized FormGroup for the authentication form.
+   */
   private createForm(): FormGroup {
     return this.fb.group({
       name: [''],
@@ -74,9 +109,51 @@ export class SignIn implements OnInit {
     });
   }
 
+  /**
+   * Nettoie complètement l'avatar input et remet à zéro tous les états liés
+   */
+  private cleanAvatarInput(): void {
+    // Réinitialiser la valeur du FormControl
+    this.authForm.get('avatar')?.setValue(null);
+    this.authForm.get('avatar')?.markAsUntouched();
+    this.authForm.get('avatar')?.markAsPristine();
+
+    // Nettoyer les propriétés de prévisualisation
+    this.avatarPreview = null;
+    this.selectedAvatarFile = null as any;
+
+    // Optionnel : Nettoyer physiquement l'input file dans le DOM
+    const avatarInput = document.querySelector('input[type="file"][formControlName="avatar"]') as HTMLInputElement;
+    if (avatarInput) {
+      avatarInput.value = '';
+    }
+
+    console.log('Avatar input cleaned');
+  }
+
+  /**
+   * Toggles the visibility of the avatar input based on the selected role.
+   * Cleans the avatar input if switching to a role that doesn't require it (e.g., CLIENT).
+   * @param even Optional string indicating the role to toggle to.
+   */
+  toggle(even?: string) {
+    if (even != "SELLER") {
+      this.canHide.set(true);
+      return;
+    }
+    // Nettoyer l'avatar quand on passe en mode CLIENT
+    this.canHide.set(false);
+    this.cleanAvatarInput();
+  }
+
+  /**
+   * Toggles between sign-in and sign-up modes.
+   * Adjusts form validators and clears messages accordingly.
+   */
   toggleMode(): void {
     this.isSignUp.set(!this.isSignUp());
-    this.errorMessage = '';
+    // Nettoyer les messages lors du changement de mode
+    this.clearMessages(0);
 
     if (this.isSignUp()) {
       this.authForm.get('name')?.setValidators([Validators.required]);
@@ -90,6 +167,11 @@ export class SignIn implements OnInit {
     this.authForm.get('confirmPassword')?.updateValueAndValidity();
   }
 
+  /**
+   * Custom validator to check if the 'password' and 'confirmPassword' fields match.
+   * @param control The FormControl for 'confirmPassword'.
+   * @returns A validation error object if passwords do not match, otherwise null.
+   */
   private passwordMatchValidator(control: any): any {
     const password = this.authForm?.get('password')?.value;
     const confirmPassword = control.value;
@@ -100,21 +182,121 @@ export class SignIn implements OnInit {
     return null;
   }
 
+  /**
+   * Handles the form submission for both sign-in and sign-up.
+   * Validates the form, interacts with the authentication service, and manages UI state.
+   */
   async onSubmit(): Promise<void> {
-    if (this.authForm.invalid) return;
+    // Validation du formulaire
+    if (this.authForm.invalid) {
+      this.markAllFieldsAsTouched();
+      this.errorMessage.set('Please fill in all required fields correctly.');
+      return;
+    }
 
     this.loading.set(true);
-    this.errorMessage = '';
+    this.errorMessage.set('');
+    this.successMessage.set('');
 
-    const formData = this.authForm.value;
+    try {
+      const formData = this.authForm.value;
 
-    if (this.isSignUp()) {
-      await this.authService.signUp(formData, this.selectedAvatarFile);
-      this.toggleMode();
-    } else {
-      await this.authService.signIn(formData);
-      this.router.navigate(['/']);
+      if (this.isSignUp()) {
+        // Inscription
+        await this.authService.signUp(formData, this.selectedAvatarFile);
+        
+        // Si on arrive ici, c'est que l'inscription a réussi
+        this.successMessage.set('Account created successfully! Please sign in.');
+        
+        // Petit délai pour que l'utilisateur voie le message de succès
+        setTimeout(() => {
+          this.toggleMode();
+          this.successMessage.set('');
+        }, 1500);
+
+      } else {
+        // Connexion
+        await this.authService.signIn(formData);
+        
+        // Si on arrive ici, c'est que la connexion a réussi
+        this.successMessage.set('Sign in successful! Redirecting...');
+        
+        // Petit délai pour que l'utilisateur voie le message de succès
+        setTimeout(() => {
+          this.router.navigate(['/']);
+        }, 1000);
+      }
+    } catch (error: any) {
+      console.error('Authentication error:', error);
+      
+      // Gestion spécifique des erreurs d'authentification
+      this.handleAuthError(error);
+      
+    } finally {
+      this.loading.set(false);
     }
-    this.loading.set(false);
+  }
+
+  /**
+   * Handles authentication errors by setting appropriate error messages based on the error status.
+   * @param error The error object received from the authentication service.
+   */
+  private handleAuthError(error: any): void {
+    console.log("Error structure:", error);
+    
+    // Gestion spécifique des erreurs selon le code de statut
+    if (error.status === 400) {
+      this.errorMessage.set('Invalid credentials provided. Please check your information.');
+    } else if (error.status === 401) {
+      this.errorMessage.set('Invalid email or password. Please try again.');
+    } else if (error.status === 403) {
+      this.errorMessage.set('Account access denied. Please contact support.');
+    } else if (error.status === 409) {
+      this.errorMessage.set('An account with this email already exists.');
+    } else if (error.status === 413) {
+      this.errorMessage.set('Avatar file is too large. Please select a smaller image.');
+    } else if (error.status === 422) {
+      this.errorMessage.set('Invalid file format. Please use JPG, PNG, or WebP images.');
+    } else if (error.status === 500) {
+      this.errorMessage.set('Server error. Please try again later.');
+    } else if (error.name === 'NetworkError' || !error.status) {
+      this.errorMessage.set('Network error. Please check your connection and try again.');
+    } else {
+      // Message d'erreur générique ou spécifique du serveur
+      this.errorMessage.set(
+        error?.error?.message || 
+        error?.message || 
+        'An unexpected error occurred. Please try again.'
+      );
+    }
+
+    // Auto-clear du message d'erreur après 5 secondes
+    this.clearMessages(5000);
+  }
+
+  /**
+   * Marks all form fields as touched to trigger validation messages.
+   */
+  private markAllFieldsAsTouched(): void {
+    Object.keys(this.authForm.controls).forEach(key => {
+      this.authForm.get(key)?.markAsTouched();
+    });
+  }
+
+  /**
+   * Clears success and error messages after a specified delay.
+   * If delay is 0, messages are cleared immediately.
+   * @param delay The time in milliseconds after which to clear the messages. Defaults to 0.
+   */
+  private clearMessages(delay: number = 0): void {
+    if (delay === 0) {
+      this.errorMessage.set('');
+      this.successMessage.set('');
+    } else {
+      setTimeout(() => {
+        this.errorMessage.set('');
+        this.successMessage.set('');
+      }, delay);
+    }
   }
 }

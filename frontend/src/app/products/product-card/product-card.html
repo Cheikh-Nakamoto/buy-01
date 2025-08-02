@@ -3,11 +3,9 @@
   <div class="product-image">
     @if (product.imageUrls && product.imageUrls.length > 0) {
     @if (product.imageUrls.length > 1) {
-    <div class="product-image">
-
-      <app-circular-image [productimg]="productImageUrls"></app-circular-image>
-
-    </div>
+    <!-- <div class="carousel-container"> -->
+    <app-circular-image [productimg]="productImageUrls"></app-circular-image>
+    <!-- </div> -->
     } @else if (product.imageUrls.length === 1) {
     <img [src]="product.imageUrls[0].imagePath" [alt]="product.name" loading="lazy">
     }
@@ -20,6 +18,7 @@
       {{ badgeText }}
     </div>
   </div>
+
 
   <!-- Product Info -->
   <div class="product-info">
@@ -41,10 +40,20 @@
     <!-- Product Footer -->
     <div class="product-footer">
       <div class="product-price">{{ productPrice }}</div>
+      @if (!canHide()) {
       <button class="add-to-cart" [disabled]="product.quantity === 0" (click)="addToCart($event)">
         <span *ngIf="product.quantity > 0">Ajouter</span>
         <span *ngIf="product.quantity === 0">Indisponible</span>
       </button>
+      } @else {
+      <button class="add-to-cart" [disabled]="product.quantity === 0" (click)="goToUpdateProduct($event)">
+        <span>View</span>
+      </button>
+      <button class="delete-cart"  (click)="deleteImage(product.id)">
+        <span>Delete</span>
+      </button>
+
+      }
     </div>
   </div>
 </div>

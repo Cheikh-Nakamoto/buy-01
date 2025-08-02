@@ -1,0 +1,2309 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>e-comerce documentation</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="icon" type="image/x-icon" href="../images/favicon.ico">
+	   <link rel="stylesheet" href="../styles/style.css">
+        <link rel="stylesheet" href="../styles/dark.css">
+    </head>
+    <body>
+          <script>
+               // Blocking script to avoid flickering dark mode
+               // Dark mode toggle button
+               var useDark = window.matchMedia('(prefers-color-scheme: dark)');
+               var darkModeState = useDark.matches;
+               var $darkModeToggleSwitchers = document.querySelectorAll('.dark-mode-switch input');
+               var $darkModeToggles = document.querySelectorAll('.dark-mode-switch');
+               var darkModeStateLocal = localStorage.getItem('compodoc_darkmode-state');
+
+               function checkToggle(check) {
+                    for (var i = 0; i < $darkModeToggleSwitchers.length; i++) {
+                         $darkModeToggleSwitchers[i].checked = check;
+                    }
+               }
+
+               function toggleDarkMode(state) {
+                    if (window.localStorage) {
+                         localStorage.setItem('compodoc_darkmode-state', state);
+                    }
+
+                    checkToggle(state);
+
+                    const hasClass = document.body.classList.contains('dark');
+
+                    if (state) {
+                         for (var i = 0; i < $darkModeToggles.length; i++) {
+                              $darkModeToggles[i].classList.add('dark');
+                         }
+                         if (!hasClass) {
+                              document.body.classList.add('dark');
+                         }
+                    } else {
+                         for (var i = 0; i < $darkModeToggles.length; i++) {
+                              $darkModeToggles[i].classList.remove('dark');
+                         }
+                         if (hasClass) {
+                              document.body.classList.remove('dark');
+                         }
+                    }
+               }
+
+               useDark.addEventListener('change', function (evt) {
+                    toggleDarkMode(evt.matches);
+               });
+               if (darkModeStateLocal) {
+                    darkModeState = darkModeStateLocal === 'true';
+               }
+               toggleDarkMode(darkModeState);
+          </script>
+
+        <div class="navbar navbar-default navbar-fixed-top d-md-none p-0">
+               <div class="d-flex">
+                    <a href="../" class="navbar-brand">e-comerce documentation</a>
+                    <button type="button" class="btn btn-default btn-menu ion-ios-menu" id="btn-menu"></button>
+               </div>
+        </div>
+
+        <div class="xs-menu menu" id="mobile-menu">
+                <div id="book-search-input" role="search"><input type="text" placeholder="Type to search"></div>            <compodoc-menu></compodoc-menu>
+        </div>
+
+        <div class="container-fluid main">
+           <div class="row main">
+               <div class="d-none d-md-block menu">
+                   <compodoc-menu mode="normal"></compodoc-menu>
+               </div>
+               <!-- START CONTENT -->
+               <div class="content component">
+                   <div class="content-data">
+
+
+
+
+<ol class="breadcrumb">
+  <li class="breadcrumb-item">Components</li>
+  <li class="breadcrumb-item"
+  >
+  Profile</li>
+</ol>
+
+<ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item">
+            <a href="#info" class="nav-link active"
+                role="tab" id="info-tab" data-bs-toggle="tab" data-link="info">Info</a>
+        </li>
+        <li class="nav-item">
+            <a href="#source" class="nav-link"
+                role="tab" id="source-tab" data-bs-toggle="tab" data-link="source">Source</a>
+        </li>
+        <li class="nav-item">
+            <a href="#templateData" class="nav-link"
+                role="tab" id="templateData-tab" data-bs-toggle="tab" data-link="template">Template</a>
+        </li>
+        <li class="nav-item">
+            <a href="#tree" class="nav-link"
+                role="tab" id="tree-tab" data-bs-toggle="tab" data-link="dom-tree">DOM Tree</a>
+        </li>
+</ul>
+
+<div class="tab-content">
+    <div class="tab-pane fade active in" id="info"><p class="comment">
+    <h3>File</h3>
+</p>
+<p class="comment">
+    <code>src/app/profile/profile.ts</code>
+</p>
+
+
+
+
+    <p class="comment">
+        <h3>Implements</h3>
+    </p>
+    <p class="comment">
+                <code>OnInit</code>
+    </p>
+
+
+<section data-compodoc="block-metadata">
+    <h3>Metadata</h3>
+    <table class="table table-sm table-hover metadata">
+        <tbody>
+
+
+
+
+
+
+
+
+
+
+            <tr>
+                <td class="col-md-3">providers</td>
+                <td class="col-md-9">
+                            <code>HttpClient</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-3">selector</td>
+                <td class="col-md-9"><code>app-profile</code></td>
+            </tr>
+
+            <tr>
+                <td class="col-md-3">standalone</td>
+                <td class="col-md-9"><code>true</code></td>
+            </tr>
+
+            <tr>
+                <td class="col-md-3">imports</td>
+                <td class="col-md-9">
+                            <code>MatDialogModule</code>
+                            <code>MatIconModule</code>
+                </td>
+            </tr>
+
+
+
+
+            <tr>
+                <td class="col-md-3">templateUrl</td>
+                <td class="col-md-9"><code>./profile.html</code></td>
+            </tr>
+
+
+
+            <tr>
+                <td class="col-md-3">styleUrl</td>
+                <td class="col-md-9"><code>./profile.css</code></td>
+            </tr>
+
+
+
+
+
+        </tbody>
+    </table>
+</section>
+
+    <section data-compodoc="block-index">
+    <h3 id="index">Index</h3>
+    <table class="table table-sm table-bordered index-table">
+        <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <h6><b>Properties</b></h6>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <ul class="index-list">
+                            <li>
+                                <a href="#errorMessage" >errorMessage</a>
+                            </li>
+                            <li>
+                                <a href="#isLoading" >isLoading</a>
+                            </li>
+                            <li>
+                                <a href="#messageStatus" >messageStatus</a>
+                            </li>
+                            <li>
+                                <a href="#successMessage" >successMessage</a>
+                            </li>
+                            <li>
+                                <a href="#user" >user</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <h6><b>Methods</b></h6>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <ul class="index-list">
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#clearMessagesAfterDelay" >clearMessagesAfterDelay</a>
+                            </li>
+                            <li>
+                                <a href="#getAccountAge" >getAccountAge</a>
+                            </li>
+                            <li>
+                                <a href="#getBackgroundImage" >getBackgroundImage</a>
+                            </li>
+                            <li>
+                                <a href="#getFormattedDate" >getFormattedDate</a>
+                            </li>
+                            <li>
+                                <a href="#getInitials" >getInitials</a>
+                            </li>
+                            <li>
+                                <a href="#getRoleLabel" >getRoleLabel</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#getUserChanges" >getUserChanges</a>
+                            </li>
+                            <li>
+                                <a href="#handleCancel" >handleCancel</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#handleSave" >handleSave</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#handleSaveError" >handleSaveError</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#handleUpdateResults" >handleUpdateResults</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#loadUserProfile" >loadUserProfile</a>
+                            </li>
+                            <li>
+                                <a href="#ngOnInit" >ngOnInit</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#normalizeValue" >normalizeValue</a>
+                            </li>
+                            <li>
+                                <a href="#onEditProfile" >onEditProfile</a>
+                            </li>
+                            <li>
+                                <a href="#openUploadDialog" >openUploadDialog</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
+                                    <span class="modifier">Async</span>
+                                <a href="#processAvatarUpdate" >processAvatarUpdate</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
+                                    <span class="modifier">Async</span>
+                                <a href="#processProfileUpdate" >processProfileUpdate</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+
+
+
+
+
+        </tbody>
+    </table>
+</section>
+
+    <section data-compodoc="block-constructor">
+    <h3 id="constructor">Constructor</h3>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+<code>constructor(userService: <a href="../injectables/UserService.html" target="_self">UserService</a>, dialog: MatDialog)</code>
+                    </td>
+                </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="33" class="link-to-prism">src/app/profile/profile.ts:33</a></div>
+                            </td>
+                        </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                            <div>
+                                    <b>Parameters :</b>
+                                    <table class="params">
+                                        <thead>
+                                            <tr>
+                                                <td>Name</td>
+                                                    <td>Type</td>
+                                                <td>Optional</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                                <tr>
+                                                        <td>userService</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../injectables/UserService.html" target="_self" >UserService</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>dialog</td>
+                                                  
+                                                        <td>
+                                                                    <code>MatDialog</code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                        </tbody>
+                                    </table>
+                            </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+</section>
+
+
+
+
+
+    <section data-compodoc="block-methods">
+    
+    <h3 id="methods">
+        Methods
+    </h3>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="clearMessagesAfterDelay"></a>
+                    <span class="name">
+                            <span class="modifier">Private</span>
+                        <span ><b>clearMessagesAfterDelay</b></span>
+                        <a href="#clearMessagesAfterDelay"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                        <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>clearMessagesAfterDelay(delay: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank">number</a>)</code>
+                </td>
+            </tr>
+
+
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="263"
+                                    class="link-to-prism">src/app/profile/profile.ts:263</a></div>
+                        </td>
+                    </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                        <div class="io-description"><p>Clears success and error messages after a specified delay.</p>
+</div>
+
+                            <div class="io-description">
+                                <b>Parameters :</b>
+                                
+                                <table class="params">
+                                    <thead>
+                                        <tr>
+                                            <td>Name</td>
+                                                <td>Type</td>
+                                            <td>Optional</td>
+                                                <td>Default value</td>
+                                                <td>Description</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                                <td>delay</td>
+                                            <td>
+                                                            <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+                                            </td>
+
+                                            <td>
+                                                    No
+                                            </td>
+
+                                            <td>
+                                                    <code>5000</code>
+                                            </td>
+
+                                            <td>
+                                                    <p>The time in milliseconds after which to clear the messages. Defaults to 5000ms.</p>
+
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <div class="io-description">
+                            <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                        </div>
+                            <div class="io-description">
+                                
+                            </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getAccountAge"></a>
+                    <span class="name">
+                        <span ><b>getAccountAge</b></span>
+                        <a href="#getAccountAge"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>getAccountAge(createdAt: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date" target="_blank">Date</a>)</code>
+                </td>
+            </tr>
+
+
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="115"
+                                    class="link-to-prism">src/app/profile/profile.ts:115</a></div>
+                        </td>
+                    </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                        <div class="io-description"><p>Calculates the age of the account based on the creation date.</p>
+</div>
+
+                            <div class="io-description">
+                                <b>Parameters :</b>
+                                
+                                <table class="params">
+                                    <thead>
+                                        <tr>
+                                            <td>Name</td>
+                                                <td>Type</td>
+                                            <td>Optional</td>
+                                                <td>Description</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                                <td>createdAt</td>
+                                            <td>
+                                                            <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date" target="_blank" >Date</a></code>
+                                            </td>
+
+                                            <td>
+                                                    No
+                                            </td>
+
+
+                                            <td>
+                                                    <p>The creation date of the account.</p>
+
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <div class="io-description">
+                            <b>Returns : </b>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+
+                        </div>
+                            <div class="io-description">
+                                <p>A string representing the account&#39;s age (e.g., &#39;X jours&#39;, &#39;Y mois&#39;, &#39;Z ans&#39;).</p>
+
+                            </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getBackgroundImage"></a>
+                    <span class="name">
+                        <span ><b>getBackgroundImage</b></span>
+                        <a href="#getBackgroundImage"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>getBackgroundImage()</code>
+                </td>
+            </tr>
+
+
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="62"
+                                    class="link-to-prism">src/app/profile/profile.ts:62</a></div>
+                        </td>
+                    </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                        <div class="io-description"><p>Returns the CSS background-image URL for the user&#39;s avatar, if available.</p>
+</div>
+
+                        <div class="io-description">
+                            <b>Returns : </b>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+
+                        </div>
+                            <div class="io-description">
+                                <p>A string representing the CSS background-image URL, or an empty string if no avatar.</p>
+
+                            </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getFormattedDate"></a>
+                    <span class="name">
+                        <span ><b>getFormattedDate</b></span>
+                        <a href="#getFormattedDate"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>getFormattedDate(date: Date | string | null | undefined)</code>
+                </td>
+            </tr>
+
+
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="98"
+                                    class="link-to-prism">src/app/profile/profile.ts:98</a></div>
+                        </td>
+                    </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                        <div class="io-description"><p>Formats a date into a localized string (French locale).</p>
+</div>
+
+                            <div class="io-description">
+                                <b>Parameters :</b>
+                                
+                                <table class="params">
+                                    <thead>
+                                        <tr>
+                                            <td>Name</td>
+                                                <td>Type</td>
+                                            <td>Optional</td>
+                                                <td>Description</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                                <td>date</td>
+                                            <td>
+                                                        <code>Date | string | null | undefined</code>
+                                            </td>
+
+                                            <td>
+                                                    No
+                                            </td>
+
+
+                                            <td>
+                                                    <p>The date to format, can be a Date object, string, null, or undefined.</p>
+
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <div class="io-description">
+                            <b>Returns : </b>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+
+                        </div>
+                            <div class="io-description">
+                                <p>The formatted date string, or &#39;Date non disponible&#39; if the date is invalid.</p>
+
+                            </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getInitials"></a>
+                    <span class="name">
+                        <span ><b>getInitials</b></span>
+                        <a href="#getInitials"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>getInitials(name: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>)</code>
+                </td>
+            </tr>
+
+
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="75"
+                                    class="link-to-prism">src/app/profile/profile.ts:75</a></div>
+                        </td>
+                    </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                        <div class="io-description"><p>Generates initials from a full name.
+Takes the first two characters of the first two words, converts to uppercase.</p>
+</div>
+
+                            <div class="io-description">
+                                <b>Parameters :</b>
+                                
+                                <table class="params">
+                                    <thead>
+                                        <tr>
+                                            <td>Name</td>
+                                                <td>Type</td>
+                                            <td>Optional</td>
+                                                <td>Description</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                                <td>name</td>
+                                            <td>
+                                                            <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+                                            </td>
+
+                                            <td>
+                                                    No
+                                            </td>
+
+
+                                            <td>
+                                                    <p>The full name of the user.</p>
+
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <div class="io-description">
+                            <b>Returns : </b>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+
+                        </div>
+                            <div class="io-description">
+                                <p>A string representing the user&#39;s initials.</p>
+
+                            </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getRoleLabel"></a>
+                    <span class="name">
+                        <span ><b>getRoleLabel</b></span>
+                        <a href="#getRoleLabel"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>getRoleLabel(role: "CLIENT" | "SELLER")</code>
+                </td>
+            </tr>
+
+
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="89"
+                                    class="link-to-prism">src/app/profile/profile.ts:89</a></div>
+                        </td>
+                    </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                        <div class="io-description"><p>Returns the French label for a given user role.</p>
+</div>
+
+                            <div class="io-description">
+                                <b>Parameters :</b>
+                                
+                                <table class="params">
+                                    <thead>
+                                        <tr>
+                                            <td>Name</td>
+                                                <td>Type</td>
+                                            <td>Optional</td>
+                                                <td>Description</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                                <td>role</td>
+                                            <td>
+                                                        <code>&quot;CLIENT&quot; | &quot;SELLER&quot;</code>
+                                            </td>
+
+                                            <td>
+                                                    No
+                                            </td>
+
+
+                                            <td>
+                                                    <p>The user&#39;s role (&#39;CLIENT&#39; or &#39;SELLER&#39;).</p>
+
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <div class="io-description">
+                            <b>Returns : </b>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+
+                        </div>
+                            <div class="io-description">
+                                <p>The localized role label (&#39;Acheteur&#39; or &#39;Vendeur&#39;).</p>
+
+                            </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getUserChanges"></a>
+                    <span class="name">
+                            <span class="modifier">Private</span>
+                        <span ><b>getUserChanges</b></span>
+                        <a href="#getUserChanges"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                        <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>getUserChanges(originalUser: <a href="../interfaces/User.html" target="_self">User</a>, updatedUser: <a href="../interfaces/User.html" target="_self">Partial&lt;User&gt;</a>)</code>
+                </td>
+            </tr>
+
+
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="277"
+                                    class="link-to-prism">src/app/profile/profile.ts:277</a></div>
+                        </td>
+                    </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                        <div class="io-description"><p>Compares the original user data with updated user data and returns an object
+containing only the fields that have changed.</p>
+</div>
+
+                            <div class="io-description">
+                                <b>Parameters :</b>
+                                
+                                <table class="params">
+                                    <thead>
+                                        <tr>
+                                            <td>Name</td>
+                                                <td>Type</td>
+                                            <td>Optional</td>
+                                                <td>Description</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                                <td>originalUser</td>
+                                            <td>
+                                                            <code><a href="../interfaces/User.html" target="_self" >User</a></code>
+                                            </td>
+
+                                            <td>
+                                                    No
+                                            </td>
+
+
+                                            <td>
+                                                    <p>The original User object.</p>
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                                <td>updatedUser</td>
+                                            <td>
+                                                            <code><a href="../interfaces/User.html" target="_self" >Partial&lt;User&gt;</a></code>
+                                            </td>
+
+                                            <td>
+                                                    No
+                                            </td>
+
+
+                                            <td>
+                                                    <p>A partial User object with potentially updated fields.</p>
+
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <div class="io-description">
+                            <b>Returns : </b>    <code>Partial | null</code>
+
+                        </div>
+                            <div class="io-description">
+                                <p>A Partial<User> object containing only the changed fields, or null if no changes.</p>
+
+                            </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="handleCancel"></a>
+                    <span class="name">
+                        <span ><b>handleCancel</b></span>
+                        <a href="#handleCancel"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>handleCancel()</code>
+                </td>
+            </tr>
+
+
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="356"
+                                    class="link-to-prism">src/app/profile/profile.ts:356</a></div>
+                        </td>
+                    </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                        <div class="io-description"><p>Handles the cancellation of an operation, typically from a dialog.
+Logs a message to the console.</p>
+</div>
+
+                        <div class="io-description">
+                            <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                        </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="handleSave"></a>
+                    <span class="name">
+                            <span class="modifier">Async</span>
+                        <span ><b>handleSave</b></span>
+                        <a href="#handleSave"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                        <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>handleSave(updatedData: FormData)</code>
+                </td>
+            </tr>
+
+
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="164"
+                                    class="link-to-prism">src/app/profile/profile.ts:164</a></div>
+                        </td>
+                    </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                        <div class="io-description"><p>Handles the saving of updated user data, including avatar and profile information.
+Orchestrates the update process, manages loading states, and handles success/error messages.</p>
+</div>
+
+                            <div class="io-description">
+                                <b>Parameters :</b>
+                                
+                                <table class="params">
+                                    <thead>
+                                        <tr>
+                                            <td>Name</td>
+                                                <td>Type</td>
+                                            <td>Optional</td>
+                                                <td>Description</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                                <td>updatedData</td>
+                                            <td>
+                                                        <code>FormData</code>
+                                            </td>
+
+                                            <td>
+                                                    No
+                                            </td>
+
+
+                                            <td>
+                                                    <p>The FormData object containing the updated user and/or avatar data.</p>
+
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <div class="io-description">
+                            <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                        </div>
+                            <div class="io-description">
+                                
+                            </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="handleSaveError"></a>
+                    <span class="name">
+                            <span class="modifier">Private</span>
+                        <span ><b>handleSaveError</b></span>
+                        <a href="#handleSaveError"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                        <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>handleSaveError(error)</code>
+                </td>
+            </tr>
+
+
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="248"
+                                    class="link-to-prism">src/app/profile/profile.ts:248</a></div>
+                        </td>
+                    </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                        <div class="io-description"><p>Handles errors that occur during the save operation.
+Formats the error message using <code>handleHttpError</code> and sets the <code>errorMessage</code> signal.</p>
+</div>
+
+                            <div class="io-description">
+                                <b>Parameters :</b>
+                                
+                                <table class="params">
+                                    <thead>
+                                        <tr>
+                                            <td>Name</td>
+                                            <td>Optional</td>
+                                                <td>Description</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                                <td>error</td>
+
+                                            <td>
+                                                    No
+                                            </td>
+
+
+                                            <td>
+                                                    <p>The error object caught during the save process.</p>
+
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <div class="io-description">
+                            <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                        </div>
+                            <div class="io-description">
+                                
+                            </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="handleUpdateResults"></a>
+                    <span class="name">
+                            <span class="modifier">Private</span>
+                        <span ><b>handleUpdateResults</b></span>
+                        <a href="#handleUpdateResults"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                        <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>handleUpdateResults(...results: PromiseSettledResult<void>[])</code>
+                </td>
+            </tr>
+
+
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="230"
+                                    class="link-to-prism">src/app/profile/profile.ts:230</a></div>
+                        </td>
+                    </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                        <div class="io-description"><p>Handles the results of multiple update operations (avatar and profile).
+Sets success or error messages based on the outcomes and refreshes the user profile on success.</p>
+</div>
+
+                            <div class="io-description">
+                                <b>Parameters :</b>
+                                
+                                <table class="params">
+                                    <thead>
+                                        <tr>
+                                            <td>Name</td>
+                                                <td>Type</td>
+                                            <td>Optional</td>
+                                                <td>Description</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                                <td>results</td>
+                                            <td>
+                                                        <code>PromiseSettledResult&lt;void&gt;[]</code>
+                                            </td>
+
+                                            <td>
+                                                    No
+                                            </td>
+
+
+                                            <td>
+                                                    <p>An array of PromiseSettledResult objects from the update operations.</p>
+
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <div class="io-description">
+                            <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                        </div>
+                            <div class="io-description">
+                                
+                            </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="loadUserProfile"></a>
+                    <span class="name">
+                            <span class="modifier">Private</span>
+                        <span ><b>loadUserProfile</b></span>
+                        <a href="#loadUserProfile"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                        <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>loadUserProfile()</code>
+                </td>
+            </tr>
+
+
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="44"
+                                    class="link-to-prism">src/app/profile/profile.ts:44</a></div>
+                        </td>
+                    </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                        <div class="io-description"><p>Charge le profil utilisateur</p>
+</div>
+
+                        <div class="io-description">
+                            <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                        </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="ngOnInit"></a>
+                    <span class="name">
+                        <span ><b>ngOnInit</b></span>
+                        <a href="#ngOnInit"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>ngOnInit()</code>
+                </td>
+            </tr>
+
+
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="37"
+                                    class="link-to-prism">src/app/profile/profile.ts:37</a></div>
+                        </td>
+                    </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                        <div class="io-description">
+                            <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                        </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="normalizeValue"></a>
+                    <span class="name">
+                            <span class="modifier">Private</span>
+                        <span ><b>normalizeValue</b></span>
+                        <a href="#normalizeValue"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                        <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>normalizeValue(value: <a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank">any</a>)</code>
+                </td>
+            </tr>
+
+
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="309"
+                                    class="link-to-prism">src/app/profile/profile.ts:309</a></div>
+                        </td>
+                    </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                        <div class="io-description"><p>Normalizes a value for comparison by converting it to a trimmed string.
+Handles null, undefined, and non-string values.</p>
+</div>
+
+                            <div class="io-description">
+                                <b>Parameters :</b>
+                                
+                                <table class="params">
+                                    <thead>
+                                        <tr>
+                                            <td>Name</td>
+                                                <td>Type</td>
+                                            <td>Optional</td>
+                                                <td>Description</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                                <td>value</td>
+                                            <td>
+                                                            <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+                                            </td>
+
+                                            <td>
+                                                    No
+                                            </td>
+
+
+                                            <td>
+                                                    <p>The value to normalize.</p>
+
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <div class="io-description">
+                            <b>Returns : </b>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+
+                        </div>
+                            <div class="io-description">
+                                <p>The normalized string representation of the value.</p>
+
+                            </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="onEditProfile"></a>
+                    <span class="name">
+                        <span ><b>onEditProfile</b></span>
+                        <a href="#onEditProfile"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>onEditProfile()</code>
+                </td>
+            </tr>
+
+
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="136"
+                                    class="link-to-prism">src/app/profile/profile.ts:136</a></div>
+                        </td>
+                    </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                        <div class="io-description"><p>Handles the action to edit the user&#39;s profile.
+Currently logs a message to the console.</p>
+</div>
+
+                        <div class="io-description">
+                            <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                        </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="openUploadDialog"></a>
+                    <span class="name">
+                        <span ><b>openUploadDialog</b></span>
+                        <a href="#openUploadDialog"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>openUploadDialog()</code>
+                </td>
+            </tr>
+
+
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="146"
+                                    class="link-to-prism">src/app/profile/profile.ts:146</a></div>
+                        </td>
+                    </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                        <div class="io-description"><p>Opens the dialog for updating the user&#39;s profile and avatar.
+Subscribes to the dialog&#39;s <code>afterClosed</code> event to handle the result.</p>
+</div>
+
+                        <div class="io-description">
+                            <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                        </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="processAvatarUpdate"></a>
+                    <span class="name">
+                            <span class="modifier">Private</span>
+                            <span class="modifier">Async</span>
+                        <span ><b>processAvatarUpdate</b></span>
+                        <a href="#processAvatarUpdate"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                        <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>processAvatarUpdate(updatedData: FormData)</code>
+                </td>
+            </tr>
+
+
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="194"
+                                    class="link-to-prism">src/app/profile/profile.ts:194</a></div>
+                        </td>
+                    </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                        <div class="io-description"><p>Processes the avatar update if a new avatar file is provided in the FormData.
+Calls the <code>userService</code> to update the avatar.</p>
+</div>
+
+                            <div class="io-description">
+                                <b>Parameters :</b>
+                                
+                                <table class="params">
+                                    <thead>
+                                        <tr>
+                                            <td>Name</td>
+                                                <td>Type</td>
+                                            <td>Optional</td>
+                                                <td>Description</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                                <td>updatedData</td>
+                                            <td>
+                                                        <code>FormData</code>
+                                            </td>
+
+                                            <td>
+                                                    No
+                                            </td>
+
+
+                                            <td>
+                                                    <p>The FormData object potentially containing the new avatar file.</p>
+
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <div class="io-description">
+                            <b>Returns : </b>    <code>Promise&lt;void&gt;</code>
+
+                        </div>
+                            <div class="io-description">
+                                <p>A Promise that resolves when the avatar update is complete.</p>
+
+                            </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="processProfileUpdate"></a>
+                    <span class="name">
+                            <span class="modifier">Private</span>
+                            <span class="modifier">Async</span>
+                        <span ><b>processProfileUpdate</b></span>
+                        <a href="#processProfileUpdate"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                        <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>processProfileUpdate(updatedData: FormData, currentUser: <a href="../interfaces/User.html" target="_self">User</a>)</code>
+                </td>
+            </tr>
+
+
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="210"
+                                    class="link-to-prism">src/app/profile/profile.ts:210</a></div>
+                        </td>
+                    </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                        <div class="io-description"><p>Processes the profile data update if changes are detected.
+Parses user data from FormData, compares with current user, and calls <code>userService</code> to update.</p>
+</div>
+
+                            <div class="io-description">
+                                <b>Parameters :</b>
+                                
+                                <table class="params">
+                                    <thead>
+                                        <tr>
+                                            <td>Name</td>
+                                                <td>Type</td>
+                                            <td>Optional</td>
+                                                <td>Description</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                                <td>updatedData</td>
+                                            <td>
+                                                        <code>FormData</code>
+                                            </td>
+
+                                            <td>
+                                                    No
+                                            </td>
+
+
+                                            <td>
+                                                    <p>The FormData object potentially containing updated user data.</p>
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                                <td>currentUser</td>
+                                            <td>
+                                                            <code><a href="../interfaces/User.html" target="_self" >User</a></code>
+                                            </td>
+
+                                            <td>
+                                                    No
+                                            </td>
+
+
+                                            <td>
+                                                    <p>The current User object for comparison.</p>
+
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <div class="io-description">
+                            <b>Returns : </b>    <code>Promise&lt;void&gt;</code>
+
+                        </div>
+                            <div class="io-description">
+                                <p>A Promise that resolves when the profile update is complete.</p>
+
+                            </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+    <section data-compodoc="block-properties">
+    
+    <h3 id="inputs">
+        Properties
+    </h3>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="errorMessage"></a>
+                    <span class="name">
+                        <span ><b>errorMessage</b></span>
+                        <a href="#errorMessage"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Default value : </i><code>signal(&#x27;&#x27;)</code>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="27" class="link-to-prism">src/app/profile/profile.ts:27</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="isLoading"></a>
+                    <span class="name">
+                        <span ><b>isLoading</b></span>
+                        <a href="#isLoading"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Default value : </i><code>signal(false)</code>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="26" class="link-to-prism">src/app/profile/profile.ts:26</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="messageStatus"></a>
+                    <span class="name">
+                        <span ><b>messageStatus</b></span>
+                        <a href="#messageStatus"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Default value : </i><code>computed(() &#x3D;&gt; ({
+    error: this.errorMessage(),
+    success: this.successMessage()
+  }))</code>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="30" class="link-to-prism">src/app/profile/profile.ts:30</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="successMessage"></a>
+                    <span class="name">
+                        <span ><b>successMessage</b></span>
+                        <a href="#successMessage"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Default value : </i><code>signal(&#x27;&#x27;)</code>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="28" class="link-to-prism">src/app/profile/profile.ts:28</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="user"></a>
+                    <span class="name">
+                        <span ><b>user</b></span>
+                        <a href="#user"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Default value : </i><code>signal&lt;User | null&gt;(null)</code>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="25" class="link-to-prism">src/app/profile/profile.ts:25</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+</section>
+
+</div>
+
+
+    <div class="tab-pane fade  tab-source-code" id="source">
+        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { Component, signal, OnInit } from &#x27;@angular/core&#x27;;
+import { MatIconModule } from &#x27;@angular/material/icon&#x27;;
+import { User } from &#x27;../models/interfaces&#x27;;
+import { UserService } from &#x27;../services/user-service&#x27;;
+import { UpdateForm } from &#x27;./update-form/update-form&#x27;;
+import { MatDialog, MatDialogModule } from &#x27;@angular/material/dialog&#x27;;
+import { HttpClient } from &#x27;@angular/common/http&#x27;;
+import { handleHttpError } from &#x27;../utils/utils&#x27;;
+import { computed } from &#x27;@angular/core&#x27;;
+import { HttpErrorResponse } from &#x27;@angular/common/http&#x27;;
+
+@Component({
+  selector: &#x27;app-profile&#x27;,
+  standalone: true,
+  imports: [MatDialogModule, MatIconModule],
+  providers: [HttpClient],
+  templateUrl: &#x27;./profile.html&#x27;,
+  styleUrl: &#x27;./profile.css&#x27;
+})
+/**
+ * Component for displaying and managing the user&#x27;s profile.
+ * Allows users to view their details, update their profile information, and change their avatar.
+ */
+export class Profile implements OnInit {
+  user &#x3D; signal&lt;User | null&gt;(null);
+  isLoading &#x3D; signal(false);
+  errorMessage &#x3D; signal(&#x27;&#x27;);
+  successMessage &#x3D; signal(&#x27;&#x27;);
+
+  messageStatus &#x3D; computed(() &#x3D;&gt; ({
+    error: this.errorMessage(),
+    success: this.successMessage()
+  }));
+
+  constructor(private userService: UserService, private dialog: MatDialog) { }
+
+  ngOnInit() {
+    this.loadUserProfile();
+  }
+
+  /**
+   * Charge le profil utilisateur
+   */
+  private loadUserProfile(): void {
+    this.userService.getProfile().subscribe({
+      next: (user) &#x3D;&gt; {
+        this.user.set(user);
+        console.log(&#x27;User profile loaded:&#x27;, user);
+      },
+      error: (error) &#x3D;&gt; {
+        console.error(&#x27;Error loading user profile:&#x27;, error);
+        alert(&#x27;Failed to load user profile: &#x27; + error.message);
+      }
+    });
+    console.log(&#x27;Profile component initialized&#x27;);
+  }
+
+  /**
+   * Returns the CSS background-image URL for the user&#x27;s avatar, if available.
+   * @returns A string representing the CSS background-image URL, or an empty string if no avatar.
+   */
+  getBackgroundImage(): string {
+    if (this.user()?.avatar) {
+      return &#x60;url(${this.user()!.avatar})&#x60;;
+    }
+    return &#x27;&#x27;; // Utilisera le gradient CSS par défaut
+  }
+
+  /**
+   * Generates initials from a full name.
+   * Takes the first two characters of the first two words, converts to uppercase.
+   * @param name The full name of the user.
+   * @returns A string representing the user&#x27;s initials.
+   */
+  getInitials(name: string): string {
+    return name
+      .split(&#x27; &#x27;)
+      .map(word &#x3D;&gt; word.charAt(0))
+      .join(&#x27;&#x27;)
+      .toUpperCase()
+      .substring(0, 2);
+  }
+
+  /**
+   * Returns the French label for a given user role.
+   * @param role The user&#x27;s role (&#x27;CLIENT&#x27; or &#x27;SELLER&#x27;).
+   * @returns The localized role label (&#x27;Acheteur&#x27; or &#x27;Vendeur&#x27;).
+   */
+  getRoleLabel(role: &#x27;CLIENT&#x27; | &#x27;SELLER&#x27;): string {
+    return role &#x3D;&#x3D;&#x3D; &#x27;CLIENT&#x27; ? &#x27;Acheteur&#x27; : &#x27;Vendeur&#x27;;
+  }
+
+  /**
+   * Formats a date into a localized string (French locale).
+   * @param date The date to format, can be a Date object, string, null, or undefined.
+   * @returns The formatted date string, or &#x27;Date non disponible&#x27; if the date is invalid.
+   */
+  getFormattedDate(date: Date | string | null | undefined): string {
+    if (!date || isNaN(new Date(date).getTime())) {
+      return &#x27;Date non disponible&#x27;;
+    }
+
+    return new Intl.DateTimeFormat(&#x27;fr-FR&#x27;, {
+      year: &#x27;numeric&#x27;,
+      month: &#x27;long&#x27;,
+      day: &#x27;numeric&#x27;
+    }).format(new Date(date));
+  }
+
+  /**
+   * Calculates the age of the account based on the creation date.
+   * @param createdAt The creation date of the account.
+   * @returns A string representing the account&#x27;s age (e.g., &#x27;X jours&#x27;, &#x27;Y mois&#x27;, &#x27;Z ans&#x27;).
+   */
+  getAccountAge(createdAt: Date): string {
+    const now &#x3D; new Date();
+    const created &#x3D; new Date(createdAt);
+    const diffTime &#x3D; Math.abs(now.getTime() - created.getTime());
+    const diffDays &#x3D; Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays &lt; 30) {
+      return &#x60;${diffDays} jour${diffDays &gt; 1 ? &#x27;s&#x27; : &#x27;&#x27;}&#x60;;
+    } else if (diffDays &lt; 365) {
+      const months &#x3D; Math.floor(diffDays / 30);
+      return &#x60;${months} mois&#x60;;
+    } else {
+      const years &#x3D; Math.floor(diffDays / 365);
+      return &#x60;${years} an${years &gt; 1 ? &#x27;s&#x27; : &#x27;&#x27;}&#x60;;
+    }
+  }
+
+  /**
+   * Handles the action to edit the user&#x27;s profile.
+   * Currently logs a message to the console.
+   */
+  onEditProfile(): void {
+    console.log(&#x27;Édition du profil&#x27;);
+    // Implémenter la navigation vers la page d&#x27;édition
+    // this.router.navigate([&#x27;/profile/edit&#x27;]);
+  }
+
+  /**
+   * Opens the dialog for updating the user&#x27;s profile and avatar.
+   * Subscribes to the dialog&#x27;s &#x60;afterClosed&#x60; event to handle the result.
+   */
+  openUploadDialog(): void {
+    const dialogRef &#x3D; this.dialog.open(UpdateForm, {
+      width: &#x27;800px&#x27;,
+      data: { user: this.user() }
+    });
+
+    dialogRef.afterClosed().subscribe((result: any) &#x3D;&gt; {
+      console.log(&#x27;Dialog closed with result:&#x27;, result);
+      if (result) {
+        this.handleSave(result);
+      }
+    });
+  }
+  /**
+   * Handles the saving of updated user data, including avatar and profile information.
+   * Orchestrates the update process, manages loading states, and handles success/error messages.
+   * @param updatedData The FormData object containing the updated user and/or avatar data.
+   */
+  async handleSave(updatedData: FormData) {
+    this.isLoading.set(true);
+    this.errorMessage.set(&#x27;&#x27;);
+    this.successMessage.set(&#x27;&#x27;);
+
+    try {
+      const currentUser &#x3D; this.user();
+      if (!currentUser) throw new Error(&#x27;User data not available&#x27;);
+
+      const [avatarResult, profileResult] &#x3D; await Promise.allSettled([
+        this.processAvatarUpdate(updatedData),
+        this.processProfileUpdate(updatedData, currentUser)
+      ]);
+
+      this.handleUpdateResults(avatarResult, profileResult);
+    } catch (error) {
+      this.handleSaveError(error);
+    } finally {
+      this.isLoading.set(false);
+      this.clearMessagesAfterDelay();
+    }
+  }
+
+  /**
+   * Processes the avatar update if a new avatar file is provided in the FormData.
+   * Calls the &#x60;userService&#x60; to update the avatar.
+   * @param updatedData The FormData object potentially containing the new avatar file.
+   * @returns A Promise that resolves when the avatar update is complete.
+   * @throws Error if the avatar update fails.
+   */
+  private async processAvatarUpdate(updatedData: FormData): Promise&lt;void&gt; {
+    const avatarFile &#x3D; updatedData.get(&#x27;avatar&#x27;) as File;
+    if (!avatarFile?.size) return;
+
+    const result &#x3D; await this.userService.updateAvatar(avatarFile);
+    if (!result.success) throw new Error(result.error);
+  }
+
+  /**
+   * Processes the profile data update if changes are detected.
+   * Parses user data from FormData, compares with current user, and calls &#x60;userService&#x60; to update.
+   * @param updatedData The FormData object potentially containing updated user data.
+   * @param currentUser The current User object for comparison.
+   * @returns A Promise that resolves when the profile update is complete.
+   * @throws Error if the profile update fails.
+   */
+  private async processProfileUpdate(updatedData: FormData, currentUser: User): Promise&lt;void&gt; {
+    if (!updatedData.get(&#x27;data&#x27;)) return;
+
+    const data &#x3D; updatedData.get(&#x27;data&#x27;) as Blob;
+    const userData &#x3D; JSON.parse(await data.text());
+    const changes &#x3D; this.getUserChanges(currentUser, userData);
+
+    if (!changes || !Object.keys(changes).length) return;
+
+    const result : any &#x3D; await this.userService.updateProfile(changes);
+    if (!result.success) throw new Error(result.error);
+    
+    this.user.set(result.data);
+  }
+
+  /**
+   * Handles the results of multiple update operations (avatar and profile).
+   * Sets success or error messages based on the outcomes and refreshes the user profile on success.
+   * @param results An array of PromiseSettledResult objects from the update operations.
+   */
+  private handleUpdateResults(...results: PromiseSettledResult&lt;void&gt;[]): void {
+    const errors &#x3D; results
+      .filter(r &#x3D;&gt; r.status &#x3D;&#x3D;&#x3D; &#x27;rejected&#x27;)
+      .map(r &#x3D;&gt; (r as PromiseRejectedResult).reason?.message || &#x27;Unknown error&#x27;);
+
+    if (errors.length) {
+      this.errorMessage.set(&#x60;Update failed: ${errors.join(&#x27; | &#x27;)}&#x60;);
+    } else {
+      this.successMessage.set(&#x27;Profile updated successfully&#x27;);
+      this.loadUserProfile(); // Refresh data
+    }
+  }
+
+  /**
+   * Handles errors that occur during the save operation.
+   * Formats the error message using &#x60;handleHttpError&#x60; and sets the &#x60;errorMessage&#x60; signal.
+   * @param error The error object caught during the save process.
+   */
+  private handleSaveError(error: unknown): void {
+    const errorObj &#x3D; error instanceof Error ? error : new Error(String(error));
+    const formattedError &#x3D; handleHttpError(
+      errorObj instanceof HttpErrorResponse 
+        ? errorObj 
+        : new HttpErrorResponse({ error: errorObj })
+    );
+    
+    this.errorMessage.set(formattedError.message);
+  }
+
+  /**
+   * Clears success and error messages after a specified delay.
+   * @param delay The time in milliseconds after which to clear the messages. Defaults to 5000ms.
+   */
+  private clearMessagesAfterDelay(delay &#x3D; 5000): void {
+    setTimeout(() &#x3D;&gt; {
+      this.errorMessage.set(&#x27;&#x27;);
+      this.successMessage.set(&#x27;&#x27;);
+    }, delay);
+  }
+
+  /**
+   * Compares the original user data with updated user data and returns an object
+   * containing only the fields that have changed.
+   * @param originalUser The original User object.
+   * @param updatedUser A partial User object with potentially updated fields.
+   * @returns A Partial&lt;User&gt; object containing only the changed fields, or null if no changes.
+   */
+  private getUserChanges(originalUser: User, updatedUser: Partial&lt;User&gt;): Partial&lt;User&gt; | null {
+    const changes: Partial&lt;User&gt; &#x3D; {};
+    let hasChanges &#x3D; false;
+
+    // Champs à comparer (ajustez selon votre interface User)
+    const fieldsToCompare: (keyof User)[] &#x3D; [
+      &#x27;name&#x27;, &#x27;email&#x27;,
+      &#x27;role&#x27;
+    ];
+
+    fieldsToCompare.forEach(field &#x3D;&gt; {
+      if (updatedUser.hasOwnProperty(field)) {
+        const originalValue &#x3D; this.normalizeValue(originalUser[field]);
+        const updatedValue &#x3D; this.normalizeValue(updatedUser[field]);
+
+        if (originalValue !&#x3D;&#x3D; updatedValue) {
+          changes[field] &#x3D; updatedUser[field] as any;
+          hasChanges &#x3D; true;
+          console.log(&#x60;🔄 Changement détecté - ${field}: &quot;${originalValue}&quot; → &quot;${updatedValue}&quot;&#x60;);
+        }
+      }
+    });
+
+    return hasChanges ? changes : null;
+  }
+
+  /**
+   * Normalizes a value for comparison by converting it to a trimmed string.
+   * Handles null, undefined, and non-string values.
+   * @param value The value to normalize.
+   * @returns The normalized string representation of the value.
+   */
+  private normalizeValue(value: any): string {
+    if (value &#x3D;&#x3D;&#x3D; null || value &#x3D;&#x3D;&#x3D; undefined) {
+      return &#x27;&#x27;;
+    }
+
+    if (typeof value &#x3D;&#x3D;&#x3D; &#x27;string&#x27;) {
+      return value.trim();
+    }
+
+    return String(value);
+  }
+
+  // /**
+  //  * Met à jour l&#x27;avatar
+  //  */
+  // private async updateAvatar(file: File): Promise&lt;void&gt; {
+  //   console.log(&#x27;🖼️ Mise à jour de l\&#x27;avatar...&#x27;);
+  //   try {
+  //     await this.userService.updateAvatar(file)
+  //   } catch (error: any) {
+  //     console.error(&#x27;❌ Erreur avatar:&#x27;, error);
+  //     handleHttpError(error)
+  //   }
+  // }
+
+  // /**
+  //  * Met à jour le profil utilisateur
+  //  */
+  // private async updateProfile(changes: Partial&lt;User&gt;): void {
+  //   console.log(&#x27;📝 Mise à jour du profil avec les changements:&#x27;, changes);
+  //   try {
+  //     let response &#x3D; await this.userService.updateProfile(changes)
+  //     this.user.set(response);
+  //     console.log(&#x27;✅ Profil mis à jour avec succès&#x27;, response);
+  //     // Message de succès avec détails
+  //     const updatedFields &#x3D; Object.keys(changes).join(&#x27;, &#x27;);
+  //   } catch (error) {
+  //     console.error(&#x27;❌ Erreur profil:&#x27;, error);
+
+  //   }
+
+  // }
+
+  /**
+   * Handles the cancellation of an operation, typically from a dialog.
+   * Logs a message to the console.
+   */
+  handleCancel() {
+    console.log(&#x27;❌ Annulation par l\&#x27;utilisateur&#x27;);
+  }
+}</code></pre>
+    </div>
+
+    <div class="tab-pane fade " id="templateData">
+        <pre class="line-numbers"><code class="language-html">&lt;div class&#x3D;&quot;profile-container&quot;&gt;
+  @if (user()) {
+  &lt;!-- Header avec image de fond et avatar --&gt;
+  &lt;div class&#x3D;&quot;profile-header&quot; [style.background-image]&#x3D;&quot;getBackgroundImage()&quot;&gt;
+    &lt;div class&#x3D;&quot;profile-header-overlay&quot;&gt;&lt;/div&gt;
+    &lt;div class&#x3D;&quot;profile-avatar&quot;&gt;
+      @if (user()!.avatar) {
+      &lt;img [src]&#x3D;&quot;user()!.avatar&quot; [alt]&#x3D;&quot;user()!.name + &#x27; avatar&#x27;&quot;&gt;
+      } @else {
+      &lt;span&gt;{{ getInitials(user()!.name) }}&lt;/span&gt;
+      }
+      &lt;div class&#x3D;&quot;status-badge online&quot;&gt;&lt;/div&gt;
+      &lt;button mat-icon-button (click)&#x3D;&quot;openUploadDialog()&quot;&gt;
+        &lt;mat-icon&gt;photo_camera&lt;/mat-icon&gt;
+      &lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;!-- Informations principales --&gt;
+  &lt;div class&#x3D;&quot;profile-info&quot;&gt;
+    &lt;h1 class&#x3D;&quot;profile-name&quot;&gt;{{ user()!.name }}&lt;/h1&gt;
+    &lt;p class&#x3D;&quot;profile-role&quot;&gt;{{ getRoleLabel(user()!.role) }}&lt;/p&gt;
+    &lt;p class&#x3D;&quot;profile-member-since&quot;&gt;Membre depuis {{ getFormattedDate(user()!.createdAt) }}&lt;/p&gt;
+  &lt;/div&gt;
+
+  &lt;!-- Contenu principal --&gt;
+  &lt;div class&#x3D;&quot;profile-content&quot;&gt;
+    &lt;!-- Colonne gauche - Détails --&gt;
+    &lt;div class&#x3D;&quot;profile-details&quot;&gt;
+      &lt;!-- Informations de base --&gt;
+      &lt;div class&#x3D;&quot;detail-section&quot;&gt;
+        &lt;h3 class&#x3D;&quot;section-title&quot;&gt;
+          &lt;span&gt;👤&lt;/span&gt;
+          Informations
+        &lt;/h3&gt;
+        &lt;div class&#x3D;&quot;section-content&quot;&gt;
+          &lt;div class&#x3D;&quot;info-grid&quot;&gt;
+            &lt;div class&#x3D;&quot;info-item&quot;&gt;
+              &lt;span class&#x3D;&quot;info-label&quot;&gt;Email :&lt;/span&gt;
+              &lt;span class&#x3D;&quot;info-value&quot;&gt;{{ user()!.email }}&lt;/span&gt;
+            &lt;/div&gt;
+            &lt;div class&#x3D;&quot;info-item&quot;&gt;
+              &lt;span class&#x3D;&quot;info-label&quot;&gt;Rôle :&lt;/span&gt;
+              &lt;span class&#x3D;&quot;info-value role-badge&quot; [class]&#x3D;&quot;user()!.role&quot;&gt;
+                {{ getRoleLabel(user()!.role) }}
+              &lt;/span&gt;
+            &lt;/div&gt;
+           
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;!-- Activité --&gt;
+      &lt;div class&#x3D;&quot;detail-section&quot;&gt;
+        &lt;h3 class&#x3D;&quot;section-title&quot;&gt;
+          &lt;span&gt;📊&lt;/span&gt;
+          Activité
+        &lt;/h3&gt;
+        &lt;div class&#x3D;&quot;section-content&quot;&gt;
+          &lt;div class&#x3D;&quot;activity-item&quot;&gt;
+            &lt;span class&#x3D;&quot;activity-label&quot;&gt;Inscription :&lt;/span&gt;
+            &lt;span class&#x3D;&quot;activity-value&quot;&gt;{{ getFormattedDate(user()!.createdAt) }}&lt;/span&gt;
+          &lt;/div&gt;
+          &lt;div class&#x3D;&quot;activity-item&quot;&gt;
+            &lt;span class&#x3D;&quot;activity-label&quot;&gt;Dernière connexion :&lt;/span&gt;
+            &lt;span class&#x3D;&quot;activity-value&quot;&gt;Aujourd&#x27;hui&lt;/span&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;!-- Colonne droite - Actions --&gt;
+    &lt;div class&#x3D;&quot;profile-stats&quot;&gt;
+      &lt;!-- Actions rapides --&gt;
+      &lt;div class&#x3D;&quot;profile-actions&quot;&gt;
+        &lt;button class&#x3D;&quot;action-btn btn-primary&quot; (click)&#x3D;&quot;openUploadDialog()&quot;&gt;
+          &lt;span&gt;✏️&lt;/span&gt;
+          Modifier le profil
+        &lt;/button&gt;
+
+      &lt;/div&gt;
+
+      &lt;!-- Informations complémentaires --&gt;
+      &lt;div class&#x3D;&quot;profile-summary&quot;&gt;
+        &lt;div class&#x3D;&quot;summary-card&quot;&gt;
+          &lt;div class&#x3D;&quot;summary-icon&quot;&gt;🎯&lt;/div&gt;
+          &lt;div class&#x3D;&quot;summary-content&quot;&gt;
+            &lt;h4&gt;Statut du compte&lt;/h4&gt;
+            &lt;p&gt;Compte {{ user()!.role &#x3D;&#x3D;&#x3D; &#x27;SELLER&#x27; ? &#x27;vendeur&#x27; : &#x27;acheteur&#x27; }} actif&lt;/p&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;div class&#x3D;&quot;summary-card&quot;&gt;
+          &lt;div class&#x3D;&quot;summary-icon&quot;&gt;⏰&lt;/div&gt;
+          &lt;div class&#x3D;&quot;summary-content&quot;&gt;
+            &lt;h4&gt;Ancienneté&lt;/h4&gt;
+            &lt;p&gt;{{ getAccountAge(user()!.createdAt) }}&lt;/p&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  } @else {
+  &lt;!-- Loading state --&gt;
+  &lt;div class&#x3D;&quot;loading-container&quot;&gt;
+    &lt;div class&#x3D;&quot;loading-spinner&quot;&gt;&lt;/div&gt;
+    &lt;p&gt;Chargement du profil...&lt;/p&gt;
+  &lt;/div&gt;
+  }
+&lt;/div&gt;</code></pre>
+    </div>
+
+
+    <div class="tab-pane fade " id="tree">
+        <div id="tree-container"></div>
+        <div class="tree-legend">
+            <div class="title">
+                <b>Legend</b>
+            </div>
+            <div>
+                <div class="color htmlelement"></div><span>Html element</span>
+            </div>
+            <div>
+                <div class="color component"></div><span>Component</span>
+            </div>
+            <div>
+                <div class="color directive"></div><span>Html element with directive</span>
+            </div>
+        </div>
+    </div>
+
+    
+</div>
+
+<script src="../js/libs/vis.min.js"></script>
+<script src="../js/libs/htmlparser.js"></script>
+<script src="../js/libs/deep-iterator.js"></script>
+<script>
+        var COMPONENT_TEMPLATE = '<div><div class="profile-container">  @if (user()) {  <!-- Header avec image de fond et avatar -->  <div class="profile-header" [style.background-image]="getBackgroundImage()">    <div class="profile-header-overlay"></div>    <div class="profile-avatar">      @if (user()!.avatar) {      <img [src]="user()!.avatar" [alt]="user()!.name + \' avatar\'">      } @else {      <span>{{ getInitials(user()!.name) }}</span>      }      <div class="status-badge online"></div>      <button mat-icon-button (click)="openUploadDialog()">        <mat-icon>photo_camera</mat-icon>      </button>    </div>  </div>  <!-- Informations principales -->  <div class="profile-info">    <h1 class="profile-name">{{ user()!.name }}</h1>    <p class="profile-role">{{ getRoleLabel(user()!.role) }}</p>    <p class="profile-member-since">Membre depuis {{ getFormattedDate(user()!.createdAt) }}</p>  </div>  <!-- Contenu principal -->  <div class="profile-content">    <!-- Colonne gauche - Détails -->    <div class="profile-details">      <!-- Informations de base -->      <div class="detail-section">        <h3 class="section-title">          <span>👤</span>          Informations        </h3>        <div class="section-content">          <div class="info-grid">            <div class="info-item">              <span class="info-label">Email :</span>              <span class="info-value">{{ user()!.email }}</span>            </div>            <div class="info-item">              <span class="info-label">Rôle :</span>              <span class="info-value role-badge" [class]="user()!.role">                {{ getRoleLabel(user()!.role) }}              </span>            </div>                     </div>        </div>      </div>      <!-- Activité -->      <div class="detail-section">        <h3 class="section-title">          <span>📊</span>          Activité        </h3>        <div class="section-content">          <div class="activity-item">            <span class="activity-label">Inscription :</span>            <span class="activity-value">{{ getFormattedDate(user()!.createdAt) }}</span>          </div>          <div class="activity-item">            <span class="activity-label">Dernière connexion :</span>            <span class="activity-value">Aujourd\'hui</span>          </div>        </div>      </div>    </div>    <!-- Colonne droite - Actions -->    <div class="profile-stats">      <!-- Actions rapides -->      <div class="profile-actions">        <button class="action-btn btn-primary" (click)="openUploadDialog()">          <span>✏️</span>          Modifier le profil        </button>      </div>      <!-- Informations complémentaires -->      <div class="profile-summary">        <div class="summary-card">          <div class="summary-icon">🎯</div>          <div class="summary-content">            <h4>Statut du compte</h4>            <p>Compte {{ user()!.role === \'SELLER\' ? \'vendeur\' : \'acheteur\' }} actif</p>          </div>        </div>        <div class="summary-card">          <div class="summary-icon">⏰</div>          <div class="summary-content">            <h4>Ancienneté</h4>            <p>{{ getAccountAge(user()!.createdAt) }}</p>          </div>        </div>      </div>    </div>  </div>  } @else {  <!-- Loading state -->  <div class="loading-container">    <div class="loading-spinner"></div>    <p>Chargement du profil...</p>  </div>  }</div></div>'
+    var COMPONENTS = [{'name': 'App', 'selector': 'app-root'},{'name': 'CircularImage', 'selector': 'app-circular-image'},{'name': 'Dashboard', 'selector': 'app-dashboard'},{'name': 'FormProduct', 'selector': 'app-form-product'},{'name': 'Navbar', 'selector': 'app-navbar'},{'name': 'ProductCard', 'selector': 'app-product-card'},{'name': 'ProductList', 'selector': 'app-product-list'},{'name': 'ProductManagement', 'selector': 'app-product-management'},{'name': 'Profile', 'selector': 'app-profile'},{'name': 'SignIn', 'selector': 'app-sign-in'},{'name': 'ToastError', 'selector': 'app-toast-error'},{'name': 'ToastSampleIconComponent', 'selector': 'toast-sample-icon'},{'name': 'UpdateForm', 'selector': 'app-update-form'}];
+    var DIRECTIVES = [];
+    var ACTUAL_COMPONENT = {'name': 'Profile'};
+</script>
+<script src="../js/tree.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                   </div><div class="search-results">
+    <div class="has-results">
+        <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+        <ul class="search-results-list"></ul>
+    </div>
+    <div class="no-results">
+        <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+    </div>
+</div>
+</div>
+               <!-- END CONTENT -->
+           </div>
+       </div>
+
+          <label class="dark-mode-switch">
+               <input type="checkbox">
+               <span class="slider">
+                    <svg class="slider-icon" viewBox="0 0 24 24" fill="none" height="20" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" width="20" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
+                    </svg>
+               </span>
+          </label>
+
+       <script>
+            var COMPODOC_CURRENT_PAGE_DEPTH = 1;
+            var COMPODOC_CURRENT_PAGE_CONTEXT = 'component';
+            var COMPODOC_CURRENT_PAGE_URL = 'Profile.html';
+            var MAX_SEARCH_RESULTS = 15;
+       </script>
+
+       <script>
+               $darkModeToggleSwitchers = document.querySelectorAll('.dark-mode-switch input');
+               checkToggle(darkModeState);
+               if ($darkModeToggleSwitchers.length > 0) {
+                    for (var i = 0; i < $darkModeToggleSwitchers.length; i++) {
+                         $darkModeToggleSwitchers[i].addEventListener('change', function (event) {
+                              darkModeState = !darkModeState;
+                              toggleDarkMode(darkModeState);
+                         });
+                    }
+               }
+          </script>
+
+       <script src="../js/libs/custom-elements.min.js"></script>
+       <script src="../js/libs/lit-html.js"></script>
+
+       <script src="../js/menu-wc.js" defer></script>
+       <script nomodule src="../js/menu-wc_es5.js" defer></script>
+
+       <script src="../js/libs/bootstrap-native.js"></script>
+
+       <script src="../js/libs/es6-shim.min.js"></script>
+       <script src="../js/libs/EventDispatcher.js"></script>
+       <script src="../js/libs/promise.min.js"></script>
+
+       <script src="../js/compodoc.js"></script>
+
+       <script src="../js/tabs.js"></script>
+       <script src="../js/menu.js"></script>
+       <script src="../js/libs/clipboard.min.js"></script>
+       <script src="../js/libs/prism.js"></script>
+       <script src="../js/sourceCode.js"></script>
+          <script src="../js/search/search.js"></script>
+          <script src="../js/search/lunr.min.js"></script>
+          <script src="../js/search/search-lunr.js"></script>
+          <script src="../js/search/search_index.js"></script>
+       <script src="../js/lazy-load-graphs.js"></script>
+
+
+    </body>
+</html>

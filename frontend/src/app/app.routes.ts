@@ -12,4 +12,7 @@ export const routes: Routes = [
     { path: 'dashboard', component: Dashboard, canActivate: [GuardService] },
     { path: 'profil', component: Profile, canActivate: [GuardService] },
     { path: 'products/new', component: FormProduct, canActivate: [GuardService] },
+    { path: 'products/update', component: FormProduct, canActivate: [GuardService] },
+    { path: 'products/myproduct', component: ProductList, canActivate: [GuardService] },
+
 ];

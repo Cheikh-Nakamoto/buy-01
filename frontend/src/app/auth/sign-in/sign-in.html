@@ -1,5 +1,8 @@
 <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
   <div class="w-full max-w-md">
+    <!-- Component Toast Error pour afficher les messages -->
+    <app-toast-error [currentNotification]="messageStatus"></app-toast-error>
+
     <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
       <!-- Header avec onglets -->
       <div class="flex border-b border-gray-200">
@@ -32,7 +35,7 @@
         <!-- Formulaire -->
         <form [formGroup]="authForm" (ngSubmit)="onSubmit()" class="space-y-5" enctype="multipart/form-data">
           <!-- Avatar field (only for sign up) -->
-          @if(isSignUp()) {
+          @if(isSignUp() && !canHide()) {
           <div class="space-y-2">
             <label class="block text-sm font-medium text-gray-700 text-center">Profile Picture</label>
             <div class="flex justify-center">
@@ -172,7 +175,7 @@
             <label class="block text-sm font-medium text-gray-700">Account Type</label>
             <div class="grid grid-cols-2 gap-3">
               <label class="cursor-pointer">
-                <input type="radio" formControlName="role" value="CLIENT" class="sr-only">
+                <input type="radio" formControlName="role" value="CLIENT" class="sr-only" (click)="toggle('CLIENT')">
                 <div class="border-2 rounded-lg p-4 text-center transition-all hover:border-primary-300"
                   [class.border-primary-500]="authForm.get('role')?.value === 'CLIENT'"
                   [class.bg-primary-50]="authForm.get('role')?.value === 'CLIENT'"
@@ -187,7 +190,7 @@
                 </div>
               </label>
               <label class="cursor-pointer">
-                <input type="radio" formControlName="role" value="SELLER" class="sr-only">
+                <input type="radio" formControlName="role" value="SELLER" class="sr-only" (click)="toggle('SELLER')">
                 <div class="border-2 rounded-lg p-4 text-center transition-all hover:border-primary-300"
                   [class.border-primary-500]="authForm.get('role')?.value === 'SELLER'"
                   [class.bg-primary-50]="authForm.get('role')?.value === 'SELLER'"
@@ -221,13 +224,6 @@
                 Forgot password?
               </a>
             </div>
-          </div>
-          }
-
-          <!-- Error message -->
-          @if(errorMessage) {
-          <div class="bg-red-50 border border-red-200 rounded-lg p-3">
-            <p class="text-sm text-red-600">{{errorMessage}}</p>
           </div>
           }
 

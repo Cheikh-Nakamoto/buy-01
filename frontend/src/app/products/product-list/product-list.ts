@@ -1,18 +1,43 @@
 import { CommonModule } from '@angular/common';
-import { Component, TrackByFunction } from '@angular/core';
+import { Component, Signal, TrackByFunction } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Product } from '../../models/interfaces';
 import { ProductService } from '../../services/product-service';
 import { ProductCard } from "../product-card/product-card";
+import { OnInit, signal } from '@angular/core';
+import { computed } from '@angular/core';
+import { effect } from '@angular/core';
+import { handleHttpError } from '../../utils/utils';
+import { ToastError } from "../../error/toast-error/toast-error";
 
 @Component({
   selector: 'app-product-list',
-  imports: [CommonModule, FormsModule, ProductCard],
+  imports: [CommonModule, FormsModule, ProductCard, ToastError],
   templateUrl: './product-list.html',
   styleUrl: './product-list.css'
 })
-export class ProductList {
+/**
+ * Component for displaying a list of products.
+ * Handles product filtering, sorting, and interaction with the product service.
+ */
+export class ProductList implements OnInit {
+
+  /**
+   * TrackBy function for optimizing Angular's change detection when rendering product lists.
+   * @param index The index of the item in the array.
+   * @param product The current product object.
+   * @returns The unique ID of the product.
+   */
   trackByProductId: TrackByFunction<Product> = (index: number, product: Product) => product.id;
+
+  // Nouvelles propriétés pour la gestion d'état
+  errorMessage = signal<string>('');
+  successMessage = signal<string>('');
+
+  /**
+   * Resets all filters (search term, category, sort by, sort order) to their default values
+   * and re-applies the filters to the product list.
+   */
   resetFilters() {
     this.searchTerm = '';
     this.selectedCategory = 'all';
@@ -22,8 +47,8 @@ export class ProductList {
   }
 
   // Propriétés pour les données
-  products: Product[] = [];
-  filteredProducts: Product[] = [];
+  products = signal<Product[]>([]);
+  filteredProducts = signal<Product[]>([]);
   categories: string[] = [];
 
   // Propriétés pour les filtres et la recherche
@@ -35,27 +60,88 @@ export class ProductList {
   sortBy: 'name' | 'price' | 'date' = 'name';
   sortOrder: 'asc' | 'desc' = 'asc';
   isLoading: boolean = false;
+  messageStatus = computed(() => ({
+    error: this.errorMessage(),
+    success: this.successMessage()
+  }));
 
+  private messageLoggerEffect = effect(() => {
+    console.log('DEBUG - Nouveau statut des messages :', this.messageStatus());
+    // Ici, vous pourriez intégrer une logique de logging externe,
+    // ou envoyer ces messages à un service de toasts/notifications
+  });
   constructor(private productService: ProductService) { }
 
- async ngOnInit() {
+  async ngOnInit() {
     //this.loadProducts();
+
     this.extractCategories();
     this.applyFilters();
     console.log('ProductList component initialized');
-    this.productService.getProducts().subscribe({
-      next: (products) => {
-        this.products = products;
-        this.filteredProducts = products; // Initialiser les produits filtrés
-        this.extractCategories(); // Extraire les catégories après chargement des produits
-        console.log('Products loaded:', this.products);
-      },
-      error: (error) => {
-        console.error('Error fetching products:', error);
-        alert('Failed to load products. Please try again later.');
+    if (location.pathname != "/products/myproduct") {
+      this.productService.getProducts().subscribe({
+        next: (products) => {
+          this.products.set(products);
+          this.filteredProducts.set(products); // Initialiser les produits filtrés
+          this.extractCategories(); // Extraire les catégories après chargement des produits
+        },
+        error: (error: any) => {
+          this.errorMessage.set(error.message)
+        }
+      });
+    } else {
+      this.productService.getMyProduct().subscribe({
+        next: (products) => {
+          if (products) {
+            this.products.set(products);
+            this.filteredProducts.set(products); // Initialiser les produits filtrés
+            this.extractCategories(); // Ext}raire les catégories après chargement des produits
+          }
+        },
+        error: (error: any) => {
+          this.errorMessage.set(error.message)
+        }
+      });
+    }
+  }
+
+  /**
+   * Deletes a product by its ID.
+   * @param $event The ID of the product to be deleted.
+   */
+  async deleteProduct($event: string) {
+    try {
+      console.log("arrivage du event ", $event);
+      let respons: any = await this.productService.deleteProduct($event);
+      if (respons.success) {
+        this.successMessage.set(respons.message)
+        this.filteredProducts.set([]);
+        // Délai anti-spam
+        await new Promise(resolve => setTimeout(resolve, 100));
+        this.productService.getMyProduct().subscribe({
+          next: (products) => {
+            if (products) {
+              this.products.set(products);
+              this.filteredProducts.set(products); // Initialiser les produits filtrés
+              this.extractCategories(); // Ext}raire les catégories après chargement des produits
+            }
+          },
+          error: (error: any) => {
+            this.errorMessage.set(error.message)
+          }
+        });
       }
-    });
-    console.log('Fetched products:', this.products);
+    } catch (error: any) {
+      this.errorMessage.set(error.message)
+    }
+  }
+
+  /**
+   * Determines if certain elements should be hidden based on the current route.
+   * @returns True if the current path is '/products/myproduct', false otherwise.
+   */
+  canHide(): boolean {
+    return location.pathname === "/products/myproduct";
   }
 
   // Simulation de chargement des produits (à remplacer par votre service)
@@ -143,17 +229,23 @@ export class ProductList {
   }
 
 
-  
 
-  // Extraire les catégories uniques
+
+  /**
+   * Extracts unique categories from the current list of products and updates the categories array.
+   * Adds an 'all' option for filtering.
+   */
   extractCategories() {
-    const uniqueCategories = [...new Set(this.products.map(product => product.category != undefined ? product.category : 'Autre'))]; ;
+    const uniqueCategories = [...new Set(this.products().map(product => product.category != undefined ? product.category : 'Autre'))];;
     this.categories = ['all', ...uniqueCategories];
   }
 
-  // Appliquer les filtres
+  /**
+   * Applies filters (category, search term) and sorting to the product list.
+   * Updates the `filteredProducts` signal with the results.
+   */
   applyFilters() {
-    let filtered = [...this.products];
+    let filtered = [...this.products()];
 
     // Filtrage par catégorie
     if (this.selectedCategory !== 'all') {
@@ -190,23 +282,42 @@ export class ProductList {
       return this.sortOrder === 'asc' ? comparison : -comparison;
     });
 
-    this.filteredProducts = filtered;
+    this.filteredProducts.set(filtered);
   }
 
   // Méthodes pour les filtres
+  /**
+   * Handles changes in the search term input.
+   * Triggers the application of filters.
+   */
   onSearchChange() {
     this.applyFilters();
   }
 
+  /**
+   * Handles changes in the selected category.
+   * Updates the `selectedCategory` and triggers the application of filters.
+   * @param category The selected category string.
+   */
   onCategoryChange(category: string) {
     this.selectedCategory = category;
     this.applyFilters();
   }
 
+  /**
+   * Changes the display mode of the product list (grid or list).
+   * @param mode The desired view mode ('grid' or 'list').
+   */
   onViewModeChange(mode: 'grid' | 'list') {
     this.viewMode = mode;
   }
 
+  /**
+   * Handles changes in the sorting criteria.
+   * Toggles sort order if the same criteria is selected again, otherwise sets to ascending.
+   * Triggers the application of filters.
+   * @param sortBy The criteria to sort by ('name', 'price', or 'date').
+   */
   onSortChange(sortBy: 'name' | 'price' | 'date') {
     if (this.sortBy === sortBy) {
       this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
@@ -230,6 +341,11 @@ export class ProductList {
     return '';
   }
 
+  /**
+   * Returns the CSS class name corresponding to a given product badge.
+   * @param badge The badge string (e.g., 'Nouveau', 'Stock Limité').
+   * @returns The CSS class name for styling the badge.
+   */
   getBadgeClass(badge: string): string {
     switch (badge) {
       case 'Nouveau': return 'badge-new';
@@ -240,61 +356,86 @@ export class ProductList {
     }
   }
 
+  /**
+   * Returns a string indicating the stock status of a product based on its quantity.
+   * @param quantity The quantity of the product in stock.
+   * @returns A string describing the stock status.
+   */
   getStockStatus(quantity: number): string {
     if (quantity === 0) return 'Rupture de quantity';
     if (quantity <= 5) return `Plus que ${quantity} en quantity`;
     return 'En quantity';
   }
 
+  /**
+   * Returns the CSS class name for styling the stock status based on quantity.
+   * @param quantity The quantity of the product in stock.
+   * @returns The CSS class name for stock status.
+   */
   getStockClass(quantity: number): string {
     if (quantity === 0) return 'quantity-out';
     if (quantity <= 5) return 'quantity-low';
     return 'quantity-ok';
   }
 
-  // Actions sur les produits
 
-   // Méthodes simplifiées
-  addToCart(product: Product) {
-    console.log('Product added to cart:', product);
-    // Appeler le service de panier ici
-  }
-
-  viewProductDetails(productId: string) {
-    console.log('View product details:', productId);
-    // Navigation vers la page de détails
-  }
-
+  /**
+   * Initiates the process to contact a seller.
+   * @param sellerId The ID of the seller to contact.
+   */
   contactSeller(sellerId: string) {
     console.log('Contacter le vendeur:', sellerId);
     // Logique pour contacter le vendeur
   }
 
+  /**
+   * Displays a notification message (e.g., a toast).
+   * @param message The message to display.
+   */
   private showNotification(message: string) {
     // Implémentation d'une notification toast
     console.log('Notification:', message);
   }
 
-  // Getters pour les statistiques
+  /**
+   * Gets the total number of products currently loaded.
+   * @returns The total count of products.
+   */
   get totalProducts(): number {
     return this.products.length;
   }
 
+  /**
+   * Gets the total number of unique categories (excluding 'all').
+   * @returns The count of unique categories.
+   */
   get totalCategories(): number {
     return this.categories.length - 1; // -1 pour exclure 'all'
   }
 
+  /**
+   * Calculates the average price of all loaded products.
+   * @returns The average price, rounded to the nearest integer. Returns 0 if no products.
+   */
   get averagePrice(): number {
-    if (this.products.length === 0) return 0;
-    const total = this.products.reduce((sum, product) => sum + product.price, 0);
+    if (this.products().length === 0) return 0;
+    const total = this.products().reduce((sum, product) => sum + product.price, 0);
     return Math.round(total / this.products.length);
   }
 
+  /**
+   * Gets the number of products currently displayed after filtering.
+   * @returns The count of filtered products.
+   */
   get filteredProductsCount(): number {
     return this.filteredProducts.length;
   }
 
-  // Méthode pour formater le prix
+  /**
+   * Formats a numeric price into a currency string (EUR, French locale).
+   * @param price The price to format.
+   * @returns The formatted price string.
+   */
   formatPrice(price: number): string {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
@@ -302,7 +443,11 @@ export class ProductList {
     }).format(price);
   }
 
-  // Méthode pour formater la date
+  /**
+   * Formats a Date object into a localized date string (French locale).
+   * @param date The Date object to format.
+   * @returns The formatted date string.
+   */
   formatDate(date: Date): string {
     return new Intl.DateTimeFormat('fr-FR', {
       day: 'numeric',

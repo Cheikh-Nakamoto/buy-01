@@ -5,6 +5,9 @@ import { UserService } from '../services/user-service';
 import { UpdateForm } from './update-form/update-form';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
+import { handleHttpError } from '../utils/utils';
+import { computed } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-profile',
@@ -14,8 +17,20 @@ import { HttpClient } from '@angular/common/http';
   templateUrl: './profile.html',
   styleUrl: './profile.css'
 })
+/**
+ * Component for displaying and managing the user's profile.
+ * Allows users to view their details, update their profile information, and change their avatar.
+ */
 export class Profile implements OnInit {
   user = signal<User | null>(null);
+  isLoading = signal(false);
+  errorMessage = signal('');
+  successMessage = signal('');
+
+  messageStatus = computed(() => ({
+    error: this.errorMessage(),
+    success: this.successMessage()
+  }));
 
   constructor(private userService: UserService, private dialog: MatDialog) { }
 
@@ -40,6 +55,10 @@ export class Profile implements OnInit {
     console.log('Profile component initialized');
   }
 
+  /**
+   * Returns the CSS background-image URL for the user's avatar, if available.
+   * @returns A string representing the CSS background-image URL, or an empty string if no avatar.
+   */
   getBackgroundImage(): string {
     if (this.user()?.avatar) {
       return `url(${this.user()!.avatar})`;
@@ -48,7 +67,10 @@ export class Profile implements OnInit {
   }
 
   /**
-   * Génère les initiales à partir du nom complet
+   * Generates initials from a full name.
+   * Takes the first two characters of the first two words, converts to uppercase.
+   * @param name The full name of the user.
+   * @returns A string representing the user's initials.
    */
   getInitials(name: string): string {
     return name
@@ -60,14 +82,18 @@ export class Profile implements OnInit {
   }
 
   /**
-   * Retourne le libellé du rôle en français
+   * Returns the French label for a given user role.
+   * @param role The user's role ('CLIENT' or 'SELLER').
+   * @returns The localized role label ('Acheteur' or 'Vendeur').
    */
   getRoleLabel(role: 'CLIENT' | 'SELLER'): string {
     return role === 'CLIENT' ? 'Acheteur' : 'Vendeur';
   }
 
   /**
-   * Formate la date de création du compte
+   * Formats a date into a localized string (French locale).
+   * @param date The date to format, can be a Date object, string, null, or undefined.
+   * @returns The formatted date string, or 'Date non disponible' if the date is invalid.
    */
   getFormattedDate(date: Date | string | null | undefined): string {
     if (!date || isNaN(new Date(date).getTime())) {
@@ -82,7 +108,9 @@ export class Profile implements OnInit {
   }
 
   /**
-   * Calcule l'ancienneté du compte
+   * Calculates the age of the account based on the creation date.
+   * @param createdAt The creation date of the account.
+   * @returns A string representing the account's age (e.g., 'X jours', 'Y mois', 'Z ans').
    */
   getAccountAge(createdAt: Date): string {
     const now = new Date();
@@ -102,7 +130,8 @@ export class Profile implements OnInit {
   }
 
   /**
-   * Modifier le profil
+   * Handles the action to edit the user's profile.
+   * Currently logs a message to the console.
    */
   onEditProfile(): void {
     console.log('Édition du profil');
@@ -110,80 +139,140 @@ export class Profile implements OnInit {
     // this.router.navigate(['/profile/edit']);
   }
 
+  /**
+   * Opens the dialog for updating the user's profile and avatar.
+   * Subscribes to the dialog's `afterClosed` event to handle the result.
+   */
   openUploadDialog(): void {
     const dialogRef = this.dialog.open(UpdateForm, {
       width: '800px',
       data: { user: this.user() }
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result: any) => {
       console.log('Dialog closed with result:', result);
       if (result) {
         this.handleSave(result);
       }
     });
   }
-
   /**
-   * Gère la sauvegarde avec vérification des changements
+   * Handles the saving of updated user data, including avatar and profile information.
+   * Orchestrates the update process, manages loading states, and handles success/error messages.
+   * @param updatedData The FormData object containing the updated user and/or avatar data.
    */
   async handleSave(updatedData: FormData) {
-    console.log('🔄 Données reçues:', updatedData);
-    
-    const currentUser = this.user();
-    if (!currentUser) {
-      console.error('❌ Utilisateur actuel non disponible');
-      alert('Erreur: utilisateur non chargé');
-      return;
-    }
+    this.isLoading.set(true);
+    this.errorMessage.set('');
+    this.successMessage.set('');
 
-    let hasAvatarUpdate = false;
-    let hasProfileUpdate = false;
+    try {
+      const currentUser = this.user();
+      if (!currentUser) throw new Error('User data not available');
 
-    // === GESTION AVATAR ===
-    const avatarFile = updatedData.get('avatar') as File;
-    if (avatarFile && avatarFile.size > 0) {
-      console.log('🖼️ Nouveau fichier avatar détecté:', avatarFile.name);
-      hasAvatarUpdate = true;
-      this.updateAvatar(avatarFile);
-    }
+      const [avatarResult, profileResult] = await Promise.allSettled([
+        this.processAvatarUpdate(updatedData),
+        this.processProfileUpdate(updatedData, currentUser)
+      ]);
 
-    // === GESTION PROFIL ===
-    if (updatedData.get('data')) {
-      const data = updatedData.get('data') as Blob;
-      
-      try {
-        const userData = JSON.parse(await data.text());
-        console.log('📝 Données reçues du formulaire:', userData);
-        
-        // Vérifier les changements
-        const changes = this.getUserChanges(currentUser, userData);
-        
-        if (changes && Object.keys(changes).length > 0) {
-          console.log('🔄 Changements détectés:', changes);
-          console.log(`📊 ${Object.keys(changes).length} champ(s) modifié(s):`, Object.keys(changes));
-          hasProfileUpdate = true;
-          this.updateProfile(changes);
-        } else {
-          console.log('👍 Aucun changement dans le profil - Mise à jour évitée');
-        }
-        
-      } catch (error) {
-        console.error('❌ Erreur parsing JSON:', error);
-        alert('Erreur lors du traitement des données : ' + error);
-        return;
-      }
-    }
-
-    // Message si aucune mise à jour nécessaire
-    if (!hasAvatarUpdate && !hasProfileUpdate) {
-      console.log('✅ Aucune modification détectée - Aucune requête envoyée');
-      alert('Aucune modification à sauvegarder');
+      this.handleUpdateResults(avatarResult, profileResult);
+    } catch (error) {
+      this.handleSaveError(error);
+    } finally {
+      this.isLoading.set(false);
+      this.clearMessagesAfterDelay();
     }
   }
 
   /**
-   * Compare les données utilisateur et retourne les changements
+   * Processes the avatar update if a new avatar file is provided in the FormData.
+   * Calls the `userService` to update the avatar.
+   * @param updatedData The FormData object potentially containing the new avatar file.
+   * @returns A Promise that resolves when the avatar update is complete.
+   * @throws Error if the avatar update fails.
+   */
+  private async processAvatarUpdate(updatedData: FormData): Promise<void> {
+    const avatarFile = updatedData.get('avatar') as File;
+    if (!avatarFile?.size) return;
+
+    const result = await this.userService.updateAvatar(avatarFile);
+    if (!result.success) throw new Error(result.error);
+  }
+
+  /**
+   * Processes the profile data update if changes are detected.
+   * Parses user data from FormData, compares with current user, and calls `userService` to update.
+   * @param updatedData The FormData object potentially containing updated user data.
+   * @param currentUser The current User object for comparison.
+   * @returns A Promise that resolves when the profile update is complete.
+   * @throws Error if the profile update fails.
+   */
+  private async processProfileUpdate(updatedData: FormData, currentUser: User): Promise<void> {
+    if (!updatedData.get('data')) return;
+
+    const data = updatedData.get('data') as Blob;
+    const userData = JSON.parse(await data.text());
+    const changes = this.getUserChanges(currentUser, userData);
+
+    if (!changes || !Object.keys(changes).length) return;
+
+    const result : any = await this.userService.updateProfile(changes);
+    if (!result.success) throw new Error(result.error);
+    
+    this.user.set(result.data);
+  }
+
+  /**
+   * Handles the results of multiple update operations (avatar and profile).
+   * Sets success or error messages based on the outcomes and refreshes the user profile on success.
+   * @param results An array of PromiseSettledResult objects from the update operations.
+   */
+  private handleUpdateResults(...results: PromiseSettledResult<void>[]): void {
+    const errors = results
+      .filter(r => r.status === 'rejected')
+      .map(r => (r as PromiseRejectedResult).reason?.message || 'Unknown error');
+
+    if (errors.length) {
+      this.errorMessage.set(`Update failed: ${errors.join(' | ')}`);
+    } else {
+      this.successMessage.set('Profile updated successfully');
+      this.loadUserProfile(); // Refresh data
+    }
+  }
+
+  /**
+   * Handles errors that occur during the save operation.
+   * Formats the error message using `handleHttpError` and sets the `errorMessage` signal.
+   * @param error The error object caught during the save process.
+   */
+  private handleSaveError(error: unknown): void {
+    const errorObj = error instanceof Error ? error : new Error(String(error));
+    const formattedError = handleHttpError(
+      errorObj instanceof HttpErrorResponse 
+        ? errorObj 
+        : new HttpErrorResponse({ error: errorObj })
+    );
+    
+    this.errorMessage.set(formattedError.message);
+  }
+
+  /**
+   * Clears success and error messages after a specified delay.
+   * @param delay The time in milliseconds after which to clear the messages. Defaults to 5000ms.
+   */
+  private clearMessagesAfterDelay(delay = 5000): void {
+    setTimeout(() => {
+      this.errorMessage.set('');
+      this.successMessage.set('');
+    }, delay);
+  }
+
+  /**
+   * Compares the original user data with updated user data and returns an object
+   * containing only the fields that have changed.
+   * @param originalUser The original User object.
+   * @param updatedUser A partial User object with potentially updated fields.
+   * @returns A Partial<User> object containing only the changed fields, or null if no changes.
    */
   private getUserChanges(originalUser: User, updatedUser: Partial<User>): Partial<User> | null {
     const changes: Partial<User> = {};
@@ -191,7 +280,7 @@ export class Profile implements OnInit {
 
     // Champs à comparer (ajustez selon votre interface User)
     const fieldsToCompare: (keyof User)[] = [
-      'name', 'email',  
+      'name', 'email',
       'role'
     ];
 
@@ -212,62 +301,58 @@ export class Profile implements OnInit {
   }
 
   /**
-   * Normalise une valeur pour la comparaison
+   * Normalizes a value for comparison by converting it to a trimmed string.
+   * Handles null, undefined, and non-string values.
+   * @param value The value to normalize.
+   * @returns The normalized string representation of the value.
    */
   private normalizeValue(value: any): string {
     if (value === null || value === undefined) {
       return '';
     }
-    
+
     if (typeof value === 'string') {
       return value.trim();
     }
-    
+
     return String(value);
   }
 
-  /**
-   * Met à jour l'avatar
-   */
-  private updateAvatar(file: File): void {
-    console.log('🖼️ Mise à jour de l\'avatar...');
-    
-    this.userService.updateAvatar(file).subscribe({
-      next: () => {
-        console.log('✅ Avatar mis à jour avec succès');
-        // Recharger le profil pour obtenir la nouvelle URL d'avatar
-        this.loadUserProfile();
-        alert('Avatar mis à jour avec succès!');
-      },
-      error: (error) => {
-        console.error('❌ Erreur avatar:', error);
-        alert('Erreur lors de la mise à jour de l\'avatar : ' + error.message);
-      }
-    });
-  }
+  // /**
+  //  * Met à jour l'avatar
+  //  */
+  // private async updateAvatar(file: File): Promise<void> {
+  //   console.log('🖼️ Mise à jour de l\'avatar...');
+  //   try {
+  //     await this.userService.updateAvatar(file)
+  //   } catch (error: any) {
+  //     console.error('❌ Erreur avatar:', error);
+  //     handleHttpError(error)
+  //   }
+  // }
+
+  // /**
+  //  * Met à jour le profil utilisateur
+  //  */
+  // private async updateProfile(changes: Partial<User>): void {
+  //   console.log('📝 Mise à jour du profil avec les changements:', changes);
+  //   try {
+  //     let response = await this.userService.updateProfile(changes)
+  //     this.user.set(response);
+  //     console.log('✅ Profil mis à jour avec succès', response);
+  //     // Message de succès avec détails
+  //     const updatedFields = Object.keys(changes).join(', ');
+  //   } catch (error) {
+  //     console.error('❌ Erreur profil:', error);
+
+  //   }
+
+  // }
 
   /**
-   * Met à jour le profil utilisateur
+   * Handles the cancellation of an operation, typically from a dialog.
+   * Logs a message to the console.
    */
-  private updateProfile(changes: Partial<User>): void {
-    console.log('📝 Mise à jour du profil avec les changements:', changes);
-    
-    this.userService.updateProfile(changes).subscribe({
-      next: (response) => {
-        this.user.set(response);
-        console.log('✅ Profil mis à jour avec succès', response);
-        
-        // Message de succès avec détails
-        const updatedFields = Object.keys(changes).join(', ');
-        alert(`Profil mis à jour avec succès!\nChamps modifiés: ${updatedFields}`);
-      },
-      error: (error) => {
-        console.error('❌ Erreur profil:', error);
-        alert('Échec de la mise à jour du profil : ' + error.message);
-      }
-    });
-  }
-
   handleCancel() {
     console.log('❌ Annulation par l\'utilisateur');
   }

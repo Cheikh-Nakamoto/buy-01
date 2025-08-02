@@ -14,6 +14,7 @@
 - [Tests](#tests)
 - [Dépannage](#dépannage)
 - [Variables d'environnement](#variables-denvironnement)
+- [Frontend (Angular)](#frontend-angular)
 
 ## 🎯 Vue d'ensemble
 
@@ -75,6 +76,9 @@ Buy01 est une plateforme e-commerce complète construite avec une architecture m
 - **Java 17** (pour développement local)
 - **Maven 3.6+** (pour build des services)
 - **mkcert** (pour certificats SSL en développement)
+- **Node.js** (LTS version, e.g., 18.x or 20.x)
+- **npm** (Node Package Manager, usually comes with Node.js)
+- **Angular CLI** (`npm install -g @angular/cli`)
 
 ## 🚀 Installation et Démarrage
 
@@ -138,6 +142,7 @@ cd backend/api/gateway-service
 ```bash
 cd frontend
 npm install
+compodoc -s
 ng serve
 ```
 
@@ -433,6 +438,68 @@ curl http://localhost:8083/actuator/health # Media
 Ce projet est sous licence MIT - voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
 ---
+
+## 🌐 Frontend (Angular)
+
+Le frontend de Buy01 est une application web réactive construite avec Angular, offrant une interface utilisateur intuitive pour les clients et les vendeurs.
+
+### Technologies Clés
+- **Angular** (dernière version stable)
+- **TypeScript**
+- **RxJS** pour la gestion des flux de données asynchrones
+- **Angular Material** pour les composants UI (utilisé pour `MatButtonToggleModule`, `MatIconModule`, `MatDialogModule`)
+- **HTML5 & CSS3** (avec SCSS pour le style)
+
+### Fonctionnalités Principales
+- **Authentification** : Inscription et connexion sécurisées avec gestion des rôles (Client/Vendeur).
+- **Gestion de Profil** : Les utilisateurs peuvent consulter et mettre à jour leurs informations de profil, y compris l'avatar.
+- **Liste de Produits** : Affichage des produits avec options de filtrage par catégorie, recherche et tri (par nom, prix, date).
+- **Détails du Produit** : Vue détaillée de chaque produit avec images, description et informations sur le vendeur.
+- **Gestion des Produits (Vendeur)** : Les vendeurs peuvent ajouter, modifier et supprimer leurs propres produits, y compris la gestion des images associées.
+- **Notifications** : Système de messages (toasts) pour informer l'utilisateur des succès et des erreurs.
+
+### Structure du Projet Frontend
+```
+frontend/
+├── src/
+│   ├── app/
+│   │   ├── auth/                 # Composants d'authentification (sign-in, sign-up)
+│   │   ├── error/                # Composants de gestion d'erreurs (toast-error)
+│   │   ├── models/               # Interfaces TypeScript pour les données (User, Product, etc.)
+│   │   ├── navbar/               # Composant de navigation
+│   │   ├── products/             # Composants liés aux produits (list, card, circular-image)
+│   │   ├── profile/              # Composants de gestion de profil (profile, update-form)
+│   │   ├── seller/               # Composants spécifiques aux vendeurs (dashboard, form-product, product-management)
+│   │   ├── services/             # Services Angular pour l'interaction avec les APIs (auth, user, product, api-url, guard, data)
+│   │   ├── utils/                # Fonctions utilitaires (handleHttpError)
+│   │   └── app.component.ts      # Composant racine de l'application
+│   ├── assets/                   # Fichiers statiques (images, icônes)
+│   ├── environments/             # Configurations d'environnement (dev, prod)
+│   ├── styles.css                # Styles globaux de l'application
+│   └── main.ts                   # Point d'entrée de l'application Angular
+└── ... (autres fichiers de configuration Angular)
+```
+
+### Démarrage du Frontend
+Assurez-vous d'avoir Node.js, npm et Angular CLI installés (voir [Prérequis](#prérequis)).
+
+1.  **Naviguer vers le répertoire frontend**
+    ```bash
+    cd frontend
+    ```
+2.  **Installer les dépendances**
+    ```bash
+    npm install
+    ```
+3.  **Démarrer le serveur de développement**
+    ```bash
+    ng serve --open
+    ```
+    L'application sera accessible à `http://localhost:4200`. Elle se connectera automatiquement au Gateway Service sur `https://localhost:8443`.
+
+### Configuration Spécifique
+- **API Endpoint**: Le frontend est configuré pour communiquer avec le Gateway Service sur `https://localhost:8443`. Cette URL est définie dans `frontend/src/app/services/api-url-service.ts` et devrait être remplacée par une URL de production via les fichiers d'environnement (`environments/environment.prod.ts`) pour les déploiements en production.
+- **Gestion des Images**: Les images d'avatar et de produits sont gérées via le Media Service. Les chemins d'accès aux images sont construits dynamiquement.
 
 ## 🚦 Status des Services
 
