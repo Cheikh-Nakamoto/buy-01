@@ -53,7 +53,7 @@
 
   <!-- Products Grid View -->
   <div class="products-grid" *ngIf="viewMode === 'grid'">
-    @for (product of filteredProducts; track product.id) {
+    @for (product of filteredProducts(); track product.id) {
     <app-product-card [product]="product" (productIdEvent)="deleteProduct($event)" >
     </app-product-card>
     }
@@ -61,7 +61,7 @@
 
   <!-- Products List View -->
   <div class="products-list" *ngIf="viewMode === 'list'">
-    <div class="product-list-item" *ngFor="let product of filteredProducts; trackBy: trackByProductId">
+    <div class="product-list-item" *ngFor="let product of filteredProducts(); trackBy: trackByProductId">
       <img [src]="product.imageUrls[0]" [alt]="product.name" class="list-image" loading="lazy">
 
       <div class="list-info">

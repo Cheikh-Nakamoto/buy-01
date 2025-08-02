@@ -9,6 +9,10 @@ import { handleHttpError } from '../utils/utils';
 @Injectable({
   providedIn: 'root'
 })
+/**
+ * Service for managing user-related operations, including profile management,
+ * authentication status, and avatar updates.
+ */
 export class UserService {
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
@@ -165,12 +169,15 @@ export class UserService {
   }
 
   /**
-   * Change le mot de passe de l'utilisateur
-   * @param currentPassword - Mot de passe actuel
-   * @param newPassword - Nouveau mot de passe
-   * @returns Promise<ServiceResponse>
+   * Changes the user's password.
+   * @param currentPassword The user's current password.
+   * @param newPassword The new password to set.
+   * @returns A Promise that resolves to a ServiceResponse indicating success or failure.
    */
-  
+  // This method is commented out in the original file, so I will keep it commented out.
+  // async changePassword(currentPassword: string, newPassword: string): Promise<ServiceResponse> {
+  //   // Implementation for changing password
+  // }
 
   // /**
   //  * Supprime le compte utilisateur

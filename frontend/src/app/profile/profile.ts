@@ -17,6 +17,10 @@ import { HttpErrorResponse } from '@angular/common/http';
   templateUrl: './profile.html',
   styleUrl: './profile.css'
 })
+/**
+ * Component for displaying and managing the user's profile.
+ * Allows users to view their details, update their profile information, and change their avatar.
+ */
 export class Profile implements OnInit {
   user = signal<User | null>(null);
   isLoading = signal(false);
@@ -51,6 +55,10 @@ export class Profile implements OnInit {
     console.log('Profile component initialized');
   }
 
+  /**
+   * Returns the CSS background-image URL for the user's avatar, if available.
+   * @returns A string representing the CSS background-image URL, or an empty string if no avatar.
+   */
   getBackgroundImage(): string {
     if (this.user()?.avatar) {
       return `url(${this.user()!.avatar})`;
@@ -59,7 +67,10 @@ export class Profile implements OnInit {
   }
 
   /**
-   * Génère les initiales à partir du nom complet
+   * Generates initials from a full name.
+   * Takes the first two characters of the first two words, converts to uppercase.
+   * @param name The full name of the user.
+   * @returns A string representing the user's initials.
    */
   getInitials(name: string): string {
     return name
@@ -71,14 +82,18 @@ export class Profile implements OnInit {
   }
 
   /**
-   * Retourne le libellé du rôle en français
+   * Returns the French label for a given user role.
+   * @param role The user's role ('CLIENT' or 'SELLER').
+   * @returns The localized role label ('Acheteur' or 'Vendeur').
    */
   getRoleLabel(role: 'CLIENT' | 'SELLER'): string {
     return role === 'CLIENT' ? 'Acheteur' : 'Vendeur';
   }
 
   /**
-   * Formate la date de création du compte
+   * Formats a date into a localized string (French locale).
+   * @param date The date to format, can be a Date object, string, null, or undefined.
+   * @returns The formatted date string, or 'Date non disponible' if the date is invalid.
    */
   getFormattedDate(date: Date | string | null | undefined): string {
     if (!date || isNaN(new Date(date).getTime())) {
@@ -93,7 +108,9 @@ export class Profile implements OnInit {
   }
 
   /**
-   * Calcule l'ancienneté du compte
+   * Calculates the age of the account based on the creation date.
+   * @param createdAt The creation date of the account.
+   * @returns A string representing the account's age (e.g., 'X jours', 'Y mois', 'Z ans').
    */
   getAccountAge(createdAt: Date): string {
     const now = new Date();
@@ -113,7 +130,8 @@ export class Profile implements OnInit {
   }
 
   /**
-   * Modifier le profil
+   * Handles the action to edit the user's profile.
+   * Currently logs a message to the console.
    */
   onEditProfile(): void {
     console.log('Édition du profil');
@@ -121,6 +139,10 @@ export class Profile implements OnInit {
     // this.router.navigate(['/profile/edit']);
   }
 
+  /**
+   * Opens the dialog for updating the user's profile and avatar.
+   * Subscribes to the dialog's `afterClosed` event to handle the result.
+   */
   openUploadDialog(): void {
     const dialogRef = this.dialog.open(UpdateForm, {
       width: '800px',
@@ -134,7 +156,12 @@ export class Profile implements OnInit {
       }
     });
   }
- async handleSave(updatedData: FormData) {
+  /**
+   * Handles the saving of updated user data, including avatar and profile information.
+   * Orchestrates the update process, manages loading states, and handles success/error messages.
+   * @param updatedData The FormData object containing the updated user and/or avatar data.
+   */
+  async handleSave(updatedData: FormData) {
     this.isLoading.set(true);
     this.errorMessage.set('');
     this.successMessage.set('');
@@ -157,6 +184,13 @@ export class Profile implements OnInit {
     }
   }
 
+  /**
+   * Processes the avatar update if a new avatar file is provided in the FormData.
+   * Calls the `userService` to update the avatar.
+   * @param updatedData The FormData object potentially containing the new avatar file.
+   * @returns A Promise that resolves when the avatar update is complete.
+   * @throws Error if the avatar update fails.
+   */
   private async processAvatarUpdate(updatedData: FormData): Promise<void> {
     const avatarFile = updatedData.get('avatar') as File;
     if (!avatarFile?.size) return;
@@ -165,6 +199,14 @@ export class Profile implements OnInit {
     if (!result.success) throw new Error(result.error);
   }
 
+  /**
+   * Processes the profile data update if changes are detected.
+   * Parses user data from FormData, compares with current user, and calls `userService` to update.
+   * @param updatedData The FormData object potentially containing updated user data.
+   * @param currentUser The current User object for comparison.
+   * @returns A Promise that resolves when the profile update is complete.
+   * @throws Error if the profile update fails.
+   */
   private async processProfileUpdate(updatedData: FormData, currentUser: User): Promise<void> {
     if (!updatedData.get('data')) return;
 
@@ -180,6 +222,11 @@ export class Profile implements OnInit {
     this.user.set(result.data);
   }
 
+  /**
+   * Handles the results of multiple update operations (avatar and profile).
+   * Sets success or error messages based on the outcomes and refreshes the user profile on success.
+   * @param results An array of PromiseSettledResult objects from the update operations.
+   */
   private handleUpdateResults(...results: PromiseSettledResult<void>[]): void {
     const errors = results
       .filter(r => r.status === 'rejected')
@@ -193,6 +240,11 @@ export class Profile implements OnInit {
     }
   }
 
+  /**
+   * Handles errors that occur during the save operation.
+   * Formats the error message using `handleHttpError` and sets the `errorMessage` signal.
+   * @param error The error object caught during the save process.
+   */
   private handleSaveError(error: unknown): void {
     const errorObj = error instanceof Error ? error : new Error(String(error));
     const formattedError = handleHttpError(
@@ -204,6 +256,10 @@ export class Profile implements OnInit {
     this.errorMessage.set(formattedError.message);
   }
 
+  /**
+   * Clears success and error messages after a specified delay.
+   * @param delay The time in milliseconds after which to clear the messages. Defaults to 5000ms.
+   */
   private clearMessagesAfterDelay(delay = 5000): void {
     setTimeout(() => {
       this.errorMessage.set('');
@@ -212,7 +268,11 @@ export class Profile implements OnInit {
   }
 
   /**
-   * Compare les données utilisateur et retourne les changements
+   * Compares the original user data with updated user data and returns an object
+   * containing only the fields that have changed.
+   * @param originalUser The original User object.
+   * @param updatedUser A partial User object with potentially updated fields.
+   * @returns A Partial<User> object containing only the changed fields, or null if no changes.
    */
   private getUserChanges(originalUser: User, updatedUser: Partial<User>): Partial<User> | null {
     const changes: Partial<User> = {};
@@ -241,7 +301,10 @@ export class Profile implements OnInit {
   }
 
   /**
-   * Normalise une valeur pour la comparaison
+   * Normalizes a value for comparison by converting it to a trimmed string.
+   * Handles null, undefined, and non-string values.
+   * @param value The value to normalize.
+   * @returns The normalized string representation of the value.
    */
   private normalizeValue(value: any): string {
     if (value === null || value === undefined) {
@@ -286,6 +349,10 @@ export class Profile implements OnInit {
 
   // }
 
+  /**
+   * Handles the cancellation of an operation, typically from a dialog.
+   * Logs a message to the console.
+   */
   handleCancel() {
     console.log('❌ Annulation par l\'utilisateur');
   }

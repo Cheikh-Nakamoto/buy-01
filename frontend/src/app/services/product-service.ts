@@ -11,10 +11,18 @@ import { handleHttpError } from '../utils/utils';
 @Injectable({
   providedIn: 'root'
 })
+/**
+ * Service for managing product-related operations, including fetching, adding, updating,
+ * and deleting products and their associated images.
+ */
 export class ProductService {
 
   constructor(private apiUrl: ApiUrlService, private http: HttpClient) { }
 
+  /**
+   * Fetches all products from the backend.
+   * @returns An Observable that emits an array of Product objects.
+   */
   getProducts(): Observable<Product[]> {
     console.log('Fetching products from:', this.apiUrl.GET_ALL_PRODUCTS);
     return this.http.get<Product[]>(this.apiUrl.GET_ALL_PRODUCTS).pipe(
@@ -25,6 +33,11 @@ export class ProductService {
     );
   }
 
+  /**
+   * Fetches products owned by the current authenticated user from the backend.
+   * Requires an authentication token.
+   * @returns An Observable that emits an array of Product objects.
+   */
   getMyProduct(): Observable<Product[]> {
     console.log('Fetching products from:', this.apiUrl.GET_MY_ALL_PRODUCT);
     return this.http.get<Product[]>(this.apiUrl.GET_MY_ALL_PRODUCT, {
@@ -33,17 +46,28 @@ export class ProductService {
       }
     }).pipe(
       catchError((error: HttpErrorResponse) => {
-        console.error('Error fetching my products:', error);
+        // const err  = error.error;
+        console.error('Test Error fetching my products:', error);
         return throwError(() => handleHttpError(error));
       })
     );
   }
 
+  /**
+   * Retrieves a product by its ID.
+   * @param id The ID of the product to retrieve.
+   * @returns A string representing the product (TODO: Implement actual logic to return Product object).
+   */
   getProductById(id: number): string {
     // TODO: Implémenter la vraie logique
     return `Product ${id}`;
   }
 
+  /**
+   * Retrieves the authentication token from local storage and formats it for HTTP headers.
+   * @returns The formatted authorization header string.
+   * @throws Error if no authentication token is found.
+   */
   private getHeaderToken(): string {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -52,7 +76,11 @@ export class ProductService {
     return `Bearer ${token}`;
   }
 
-  // ✅ Version améliorée - retourne une Promise avec ServiceResponse
+  /**
+   * Adds a new product to the backend.
+   * @param product The FormData object containing product details and images.
+   * @returns A Promise that resolves to a ServiceResponse indicating success or failure.
+   */
   async addProduct(product: FormData): Promise<ServiceResponse> {
     try {
       const response = await firstValueFrom(
@@ -84,7 +112,12 @@ export class ProductService {
     }
   }
 
-  // ✅ Version améliorée - retourne une Promise avec ServiceResponse
+  /**
+   * Updates an existing product on the backend.
+   * @param id The ID of the product to update.
+   * @param product The Product object containing the updated details.
+   * @returns A Promise that resolves to a ServiceResponse indicating success or failure.
+   */
   async updateProduct(id: string, product: Product): Promise<ServiceResponse> {
     try {
       const response = await firstValueFrom(
@@ -116,7 +149,11 @@ export class ProductService {
     }
   }
 
-  // ✅ Version améliorée - retourne une Promise avec ServiceResponse
+  /**
+   * Deletes an image associated with a product from the backend.
+   * @param id The ID of the image to delete.
+   * @returns A Promise that resolves to a ServiceResponse indicating success or failure.
+   */
   async deleteImageInProduct(id: string): Promise<ServiceResponse> {
     try {
       console.log('Deleting image:', this.apiUrl.DELETE_IMG_BY_Media_ID(id));
@@ -175,7 +212,14 @@ export class ProductService {
     }
   }
 
-  // ✅ Version améliorée - retourne une Promise avec ServiceResponse
+  /**
+   * Adds one or more images to an existing product on the backend.
+   * Processes files sequentially and reports individual and overall success/failure.
+   * @param id The ID of the product to add images to.
+   * @param formdata An array of File objects representing the images to upload.
+   * @returns A Promise that resolves to a ServiceResponse indicating success or failure,
+   *          including details about uploaded and failed images.
+   */
   async addImageInProduct(id: string, formdata: File[]): Promise<ServiceResponse> {
     try {
       console.log('Adding images to product:', this.apiUrl.ADD_IMG_BY_PRODUCT_ID(id));
@@ -250,7 +294,11 @@ export class ProductService {
 
 
 
-  // ✅ Version améliorée - retourne une Promise avec ServiceResponse
+  /**
+   * Deletes a product from the backend.
+   * @param id The ID of the product to delete.
+   * @returns A Promise that resolves to a ServiceResponse indicating success or failure.
+   */
   async deleteProduct(id: string): Promise<ServiceResponse> {
     try {
       console.log('Deleting image:', this.apiUrl.DELETE_PRODUCT_BY_ID(id));
@@ -311,7 +359,15 @@ export class ProductService {
 
 
 
-  // ✅ Méthode utilitaire pour retry avec backoff exponentiel
+  /**
+   * Utility method to retry an asynchronous operation with exponential backoff.
+   * @template T The return type of the operation.
+   * @param operation The asynchronous function to retry.
+   * @param maxRetries The maximum number of retry attempts. Defaults to 3.
+   * @param baseDelay The base delay in milliseconds before the first retry. Defaults to 1000ms.
+   * @returns A Promise that resolves with the result of the operation if successful,
+   *          or rejects with the last error after all retries are exhausted.
+   */
   async retryOperation<T>(
     operation: () => Promise<T>,
     maxRetries: number = 3,

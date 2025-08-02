@@ -16,6 +16,10 @@ import { handleHttpError } from '../../utils/utils';
   templateUrl: './form-product.html',
   styleUrl: './form-product.css'
 })
+/**
+ * Component for creating and updating product information.
+ * Handles form submission, image management, and interaction with the product service.
+ */
 export class FormProduct implements OnInit, OnDestroy {
   images: Array<{ preview: string, id: string }> = [];
   private imageFiles: File[] = [];
@@ -65,6 +69,10 @@ export class FormProduct implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Toggles between media management and field management sections of the form.
+   * @param event The change event from the MatButtonToggle.
+   */
   modify_Switch(event: MatButtonToggleChange) {
     if (event.value != "field") {
       this.media_management.set(true);
@@ -95,6 +103,10 @@ export class FormProduct implements OnInit, OnDestroy {
 
   }
 
+  /**
+   * Checks if the current operation is an update (i.e., if a product ID is present and the route is for updating).
+   * @returns True if it's an update operation, false otherwise.
+   */
   IsUpdate(): boolean {
     return this.currentProduct?.id != "" && location.pathname == "/products/update";
   }
@@ -107,7 +119,11 @@ export class FormProduct implements OnInit, OnDestroy {
     this.currentProduct = null;
   }
 
-  // Pré-remplir le formulaire avec les données du produit
+  /**
+   * Populates the product form with data from an existing product object.
+   * Also loads existing images if available.
+   * @param product The product object to use for populating the form.
+   */
   private populateForm(product: Product): void {
     this.productForm.patchValue({
       name: product.name || '',
@@ -123,7 +139,10 @@ export class FormProduct implements OnInit, OnDestroy {
     }
   }
 
-  // Charger les images existantes du produit
+  /**
+   * Loads existing product images into the component's `images` array for display.
+   * @param imageUrls An array of `productImage` objects containing image paths and IDs.
+   */
   private loadExistingImages(imageUrls: productImage[]): void {
     this.images = imageUrls.map((url, index) => ({
       preview: url.imagePath,
@@ -131,6 +150,12 @@ export class FormProduct implements OnInit, OnDestroy {
     }));
   }
 
+  /**
+   * Handles the selection of new image files from the input.
+   * Adds selected files to the `imageFiles` array and creates previews.
+   * Enforces a maximum of 5 images.
+   * @param event The DOM event triggered by the file input change.
+   */
   onFileSelected(event: Event) {
     if (this.imageFiles.length + this.images.length > 5) {
       alert("🚨Vous avez depassez le seuil d'image requis !!!🚨")
@@ -155,6 +180,11 @@ export class FormProduct implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Deletes an image from the preview list and marks it for deletion from the backend if it's an existing image.
+   * Adjusts carousel position if necessary.
+   * @param id The ID of the image to delete (can be a temporary ID for new images or a backend ID for existing ones).
+   */
   deleteImage(id: string) {
     const index = this.images.findIndex(img => img.id === id);
     const idnumber = parseInt(id);
@@ -175,6 +205,10 @@ export class FormProduct implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Handles the form submission for both creating and updating products.
+   * Validates the form, prepares data, executes API calls, and manages UI messages and navigation.
+   */
   async onSubmit() {
     // Validation du formulaire
     if (this.productForm.invalid) {
@@ -213,6 +247,11 @@ export class FormProduct implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Prepares the FormData object for product creation or update.
+   * Includes product data and new image files.
+   * @returns A Promise that resolves to the prepared FormData object.
+   */
   private async prepareFormData(): Promise<FormData> {
     const formData = new FormData();
     const productData = {
@@ -239,6 +278,11 @@ export class FormProduct implements OnInit, OnDestroy {
     return formData;
   }
 
+  /**
+   * Executes the appropriate form actions (create or update product, add/delete images) based on the current context.
+   * @param formData The FormData object containing product data and files.
+   * @returns A Promise that resolves to an object indicating success, message, or error.
+   */
   private async executeFormActions(formData: FormData): Promise<{ success: boolean, message?: string, error?: string }> {
     try {
       // Gestion des actions de mise à jour
@@ -298,6 +342,11 @@ export class FormProduct implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Deletes images that have been marked for deletion from the backend.
+   * Iterates through `imageDelete` array and calls the product service for each image.
+   * @returns A Promise that resolves to an object indicating success or error.
+   */
   private async deleteMarkedImages(): Promise<{ success: boolean, error?: string }> {
     if (this.imageDelete.length === 0) {
       return { success: true };
@@ -329,15 +378,13 @@ export class FormProduct implements OnInit, OnDestroy {
           error: `Failed to delete ${failedDeletes.length} image(s). Some images may still be present.`
         };
       }
-
       return { success: true };
 
     } catch (error: any) {
-      console.error('Error in deleteMarkedImages:', error);
       if (error.status == 200){
          return {
         success: true,
-        error: handleHttpError(error).message || 'Failed to delete images.'
+        error: handleHttpError(error).message || 'Image delete successfuly.'
       };
       }
       return {
@@ -348,13 +395,18 @@ export class FormProduct implements OnInit, OnDestroy {
   }
 
 
-  // Marquer tous les champs comme touchés pour afficher les erreurs
+  /**
+   * Marks all form fields as touched to trigger validation messages.
+   */
   private markAllFieldsAsTouched(): void {
     Object.keys(this.productForm.controls).forEach(key => {
       this.productForm.get(key)?.markAsTouched();
     });
   }
 
+  /**
+   * Resets the product form and clears all image-related states.
+   */
   private resetForm() {
     // Réinitialiser le formulaire
     this.productForm.reset();
@@ -366,7 +418,10 @@ export class FormProduct implements OnInit, OnDestroy {
     this.currentTranslate = 0;
   }
 
-  // Méthode utilitaire pour voir le contenu du FormData
+  /**
+   * Logs the content of a FormData object to the console for debugging purposes.
+   * @param formData The FormData object to log.
+   */
   private logFormData(formData: FormData) {
     console.log('=== Contenu du FormData ===');
     for (let [key, value] of formData.entries()) {
@@ -382,7 +437,10 @@ export class FormProduct implements OnInit, OnDestroy {
     }
   }
 
-  // Méthode pour nettoyer les messages après un certain temps
+  /**
+   * Clears success and error messages after a specified delay.
+   * @param delay The time in milliseconds after which to clear the messages. Defaults to 5000ms.
+   */
   private clearMessages(delay: number = 5000): void {
     setTimeout(() => {
       this.errorMessage.set('');
@@ -391,7 +449,9 @@ export class FormProduct implements OnInit, OnDestroy {
   }
 
 
-  // Méthodes du carrousel
+  /**
+   * Moves the image carousel to the next slide if possible.
+   */
   nextSlide() {
     if (this.canGoNext) {
       this.currentIndex++;
@@ -399,6 +459,9 @@ export class FormProduct implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Moves the image carousel to the previous slide if possible.
+   */
   previousSlide() {
     if (this.canGoPrevious) {
       this.currentIndex--;
@@ -406,18 +469,33 @@ export class FormProduct implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Updates the CSS transform property to visually move the carousel slides.
+   */
   private updateTranslate() {
     this.currentTranslate = -this.currentIndex * this.slideWidth;
   }
 
+  /**
+   * Determines if the carousel can move to the next slide.
+   * @returns True if there are more slides to show, false otherwise.
+   */
   get canGoNext(): boolean {
     return this.currentIndex < this.images.length - this.visibleSlides && this.images.length > this.visibleSlides;
   }
 
+  /**
+   * Determines if the carousel can move to the previous slide.
+   * @returns True if there are previous slides, false otherwise.
+   */
   get canGoPrevious(): boolean {
     return this.currentIndex > 0;
   }
 
+  /**
+   * Determines if carousel navigation buttons should be shown.
+   * @returns True if the number of images exceeds the visible slides, false otherwise.
+   */
   get showNavigation(): boolean {
     return this.images.length > this.visibleSlides;
   }

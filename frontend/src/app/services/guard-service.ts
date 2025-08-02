@@ -7,9 +7,20 @@ import { Observable, of, switchMap } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
+/**
+ * Guard service to protect routes based on user authentication status and role.
+ * Implements the `CanActivate` interface to control access to routes.
+ */
 export class GuardService {
   constructor(private authService: AuthService, private router: Router) { }
 
+  /**
+   * Determines if a route can be activated.
+   * Checks user authentication and role-based access.
+   * @param route The activated route snapshot.
+   * @param state The router state snapshot.
+   * @returns A boolean, UrlTree, Observable, or Promise indicating if the route can be activated.
+   */
   canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot

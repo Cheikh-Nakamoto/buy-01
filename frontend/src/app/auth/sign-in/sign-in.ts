@@ -11,6 +11,10 @@ import { ToastError } from "../../error/toast-error/toast-error";
   templateUrl: './sign-in.html',
   styleUrl: './sign-in.css'
 })
+/**
+ * Component for user sign-in and sign-up.
+ * Manages authentication forms, user input, and interaction with the authentication service.
+ */
 export class SignIn implements OnInit {
   authForm: FormGroup;
   isSignUp = signal(false);
@@ -51,6 +55,11 @@ export class SignIn implements OnInit {
     }
   }
 
+  /**
+   * Handles the selection of an avatar file.
+   * Performs client-side validation and displays a preview of the selected image.
+   * @param event The DOM event triggered by the file input change.
+   */
   onAvatarSelected(event: any) {
     const file = event.target.files[0];
 
@@ -85,6 +94,10 @@ export class SignIn implements OnInit {
     }
   }
 
+  /**
+   * Initializes and returns the authentication form with its controls and validators.
+   * @returns The initialized FormGroup for the authentication form.
+   */
   private createForm(): FormGroup {
     return this.fb.group({
       name: [''],
@@ -118,6 +131,11 @@ export class SignIn implements OnInit {
     console.log('Avatar input cleaned');
   }
 
+  /**
+   * Toggles the visibility of the avatar input based on the selected role.
+   * Cleans the avatar input if switching to a role that doesn't require it (e.g., CLIENT).
+   * @param even Optional string indicating the role to toggle to.
+   */
   toggle(even?: string) {
     if (even != "SELLER") {
       this.canHide.set(true);
@@ -128,6 +146,10 @@ export class SignIn implements OnInit {
     this.cleanAvatarInput();
   }
 
+  /**
+   * Toggles between sign-in and sign-up modes.
+   * Adjusts form validators and clears messages accordingly.
+   */
   toggleMode(): void {
     this.isSignUp.set(!this.isSignUp());
     // Nettoyer les messages lors du changement de mode
@@ -145,6 +167,11 @@ export class SignIn implements OnInit {
     this.authForm.get('confirmPassword')?.updateValueAndValidity();
   }
 
+  /**
+   * Custom validator to check if the 'password' and 'confirmPassword' fields match.
+   * @param control The FormControl for 'confirmPassword'.
+   * @returns A validation error object if passwords do not match, otherwise null.
+   */
   private passwordMatchValidator(control: any): any {
     const password = this.authForm?.get('password')?.value;
     const confirmPassword = control.value;
@@ -155,6 +182,10 @@ export class SignIn implements OnInit {
     return null;
   }
 
+  /**
+   * Handles the form submission for both sign-in and sign-up.
+   * Validates the form, interacts with the authentication service, and manages UI state.
+   */
   async onSubmit(): Promise<void> {
     // Validation du formulaire
     if (this.authForm.invalid) {
@@ -206,6 +237,10 @@ export class SignIn implements OnInit {
     }
   }
 
+  /**
+   * Handles authentication errors by setting appropriate error messages based on the error status.
+   * @param error The error object received from the authentication service.
+   */
   private handleAuthError(error: any): void {
     console.log("Error structure:", error);
     
@@ -239,14 +274,20 @@ export class SignIn implements OnInit {
     this.clearMessages(5000);
   }
 
-  // Marquer tous les champs comme touchés pour afficher les erreurs
+  /**
+   * Marks all form fields as touched to trigger validation messages.
+   */
   private markAllFieldsAsTouched(): void {
     Object.keys(this.authForm.controls).forEach(key => {
       this.authForm.get(key)?.markAsTouched();
     });
   }
 
-  // Méthode pour nettoyer les messages après un certain temps
+  /**
+   * Clears success and error messages after a specified delay.
+   * If delay is 0, messages are cleared immediately.
+   * @param delay The time in milliseconds after which to clear the messages. Defaults to 0.
+   */
   private clearMessages(delay: number = 0): void {
     if (delay === 0) {
       this.errorMessage.set('');
