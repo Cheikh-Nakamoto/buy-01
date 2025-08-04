@@ -1,15 +1,15 @@
 package com.example.buy01.product.dto;
 
 
-import java.util.List;
-
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class ProductCreateDTO {
     @NotBlank(message = "Product name cannot be empty")
     private String name;
