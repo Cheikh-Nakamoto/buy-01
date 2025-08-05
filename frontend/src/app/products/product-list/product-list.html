@@ -35,7 +35,7 @@
       </select>
     </div>
 
-    <!-- View Toggle -->
+    <!-- View Toggle
     <div class="view-toggle">
       <button class="view-btn" [class.active]="viewMode === 'grid'" (click)="onViewModeChange('grid')">
         🔳
@@ -43,7 +43,7 @@
       <button class="view-btn" [class.active]="viewMode === 'list'" (click)="onViewModeChange('list')">
         📋
       </button>
-    </div>
+    </div> -->
   </div>
 
   <!-- Results Info -->
@@ -60,7 +60,7 @@
   </div>
 
   <!-- Products List View -->
-  <div class="products-list" *ngIf="viewMode === 'list'">
+  <!-- <div class="products-list" *ngIf="viewMode === 'list'">
     <div class="product-list-item" *ngFor="let product of filteredProducts(); trackBy: trackByProductId">
       <img [src]="product.imageUrls[0]" [alt]="product.name" class="list-image" loading="lazy">
 
@@ -104,10 +104,10 @@
         </button>
       </div>
     </div>
-  </div>
-
+  </div> -->
+@if (filteredProducts().length === 0|| products().length === 0) {
   <!-- Empty State -->
-  <div class="empty-state" *ngIf="filteredProducts.length === 0">
+  <div class="empty-state" >
     <div class="empty-icon">🔍</div>
     <h3>Aucun produit trouvé</h3>
     <p>Essayez de modifier vos critères de recherche ou de filtrage.</p>
@@ -115,6 +115,7 @@
       Réinitialiser les filtres
     </button>
   </div>
+}
 
   <!-- Loading State -->
   <div class="loading-state" *ngIf="isLoading">
@@ -124,7 +125,7 @@
 
   @if (!canHide()) {
   <!-- Statistics -->
-  <div class="stats" *ngIf="filteredProducts.length > 0">
+  <div class="stats" *ngIf="filteredProducts().length > 0">
     <div class="stat-item">
       <span class="stat-number">{{ totalProducts }}</span>
       <span class="stat-label">Produits</span>

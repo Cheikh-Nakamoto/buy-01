@@ -7,15 +7,14 @@ import { HttpErrorResponse } from "@angular/common/http";
  */
 export function handleHttpError(error: HttpErrorResponse): Error {
     let errorMessage = 'An unexpected error occurred';
-    console.log(error.error?.message ,error.error?.status)
     if (error.error instanceof ErrorEvent) {
         // Erreur côté client
         errorMessage = `Client error: ${error.error.message}`;
     } else {
         // Erreur côté serveur
-        const serverMessage = error.error?.message ? `\n\nDetails: ${error.error.message}` : '';
-        const status = error.status == undefined ? error.error?.status : 1;
-        console.log("status received :",status)
+        const serverMessage = error.error?.message ? `\n\nDetails: ${error.error.message}` : `\n\nDetails: ${error.message}`;
+        const status = error.status == undefined ? error.error?.status : error.status;
+        console.log("status received :", status , serverMessage);
         switch (status) {
             case 400:
                 errorMessage = `Bad request. Please check your data.${serverMessage}`;

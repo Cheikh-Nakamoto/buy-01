@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { ToastError } from "../../error/toast-error/toast-error";
+import { ServiceResponse } from '../../models/interfaces';
 
 @Component({
   selector: 'app-sign-in',
@@ -109,6 +110,21 @@ export class SignIn implements OnInit {
     });
   }
 
+   /**
+   * Réinitialise complètement le formulaire d'authentification,
+   * nettoie l'avatar et efface les messages.
+   */
+  resetForm(role?: string): void {
+    this.authForm.reset({
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      role: role || 'CLIENT',
+      avatar: null
+    });
+  }
+
   /**
    * Nettoie complètement l'avatar input et remet à zéro tous les états liés
    */
@@ -154,7 +170,7 @@ export class SignIn implements OnInit {
     this.isSignUp.set(!this.isSignUp());
     // Nettoyer les messages lors du changement de mode
     this.clearMessages(0);
-
+    console.log('Toggled sign-up mode:', this.isSignUp());
     if (this.isSignUp()) {
       this.authForm.get('name')?.setValidators([Validators.required]);
       this.authForm.get('confirmPassword')?.setValidators([Validators.required, this.passwordMatchValidator.bind(this)]);
@@ -203,10 +219,12 @@ export class SignIn implements OnInit {
 
       if (this.isSignUp()) {
         // Inscription
-        await this.authService.signUp(formData, this.selectedAvatarFile);
-        
-        // Si on arrive ici, c'est que l'inscription a réussi
-        this.successMessage.set('Account created successfully! Please sign in.');
+       let err: ServiceResponse =  await this.authService.signUp(formData, this.selectedAvatarFile);
+        if (!err.success) {
+          this.errorMessage.set(err.error || 'An error occurred during sign-up.');
+          this.loading.set(false);
+          return;
+        }
         
         // Petit délai pour que l'utilisateur voie le message de succès
         setTimeout(() => {
@@ -216,7 +234,13 @@ export class SignIn implements OnInit {
 
       } else {
         // Connexion
-        await this.authService.signIn(formData);
+       const res = await this.authService.signIn(formData);
+        if (!res.success) {
+          this.errorMessage.set(res.error || 'An error occurred during sign-in.');
+          this.loading.set(false);
+          this.resetForm();
+          return;
+        }
         
         // Si on arrive ici, c'est que la connexion a réussi
         this.successMessage.set('Sign in successful! Redirecting...');
@@ -230,49 +254,13 @@ export class SignIn implements OnInit {
       console.error('Authentication error:', error);
       
       // Gestion spécifique des erreurs d'authentification
-      this.handleAuthError(error);
-      
+      this.errorMessage.set(error?.error || error?.message || 'An unexpected error occurred. Please try again.');
+
     } finally {
       this.loading.set(false);
     }
   }
 
-  /**
-   * Handles authentication errors by setting appropriate error messages based on the error status.
-   * @param error The error object received from the authentication service.
-   */
-  private handleAuthError(error: any): void {
-    console.log("Error structure:", error);
-    
-    // Gestion spécifique des erreurs selon le code de statut
-    if (error.status === 400) {
-      this.errorMessage.set('Invalid credentials provided. Please check your information.');
-    } else if (error.status === 401) {
-      this.errorMessage.set('Invalid email or password. Please try again.');
-    } else if (error.status === 403) {
-      this.errorMessage.set('Account access denied. Please contact support.');
-    } else if (error.status === 409) {
-      this.errorMessage.set('An account with this email already exists.');
-    } else if (error.status === 413) {
-      this.errorMessage.set('Avatar file is too large. Please select a smaller image.');
-    } else if (error.status === 422) {
-      this.errorMessage.set('Invalid file format. Please use JPG, PNG, or WebP images.');
-    } else if (error.status === 500) {
-      this.errorMessage.set('Server error. Please try again later.');
-    } else if (error.name === 'NetworkError' || !error.status) {
-      this.errorMessage.set('Network error. Please check your connection and try again.');
-    } else {
-      // Message d'erreur générique ou spécifique du serveur
-      this.errorMessage.set(
-        error?.error?.message || 
-        error?.message || 
-        'An unexpected error occurred. Please try again.'
-      );
-    }
-
-    // Auto-clear du message d'erreur après 5 secondes
-    this.clearMessages(5000);
-  }
 
   /**
    * Marks all form fields as touched to trigger validation messages.
