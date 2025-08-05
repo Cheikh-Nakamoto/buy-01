@@ -35,7 +35,7 @@
       </select>
     </div>
 
-    <!-- View Toggle -->
+    <!-- View Toggle
     <div class="view-toggle">
       <button class="view-btn" [class.active]="viewMode === 'grid'" (click)="onViewModeChange('grid')">
         🔳
@@ -43,7 +43,7 @@
       <button class="view-btn" [class.active]="viewMode === 'list'" (click)="onViewModeChange('list')">
         📋
       </button>
-    </div>
+    </div> -->
   </div>
 
   <!-- Results Info -->
@@ -60,7 +60,7 @@
   </div>
 
   <!-- Products List View -->
-  <div class="products-list" *ngIf="viewMode === 'list'">
+  <!-- <div class="products-list" *ngIf="viewMode === 'list'">
     <div class="product-list-item" *ngFor="let product of filteredProducts(); trackBy: trackByProductId">
       <img [src]="product.imageUrls[0]" [alt]="product.name" class="list-image" loading="lazy">
 
@@ -104,7 +104,7 @@
         </button>
       </div>
     </div>
-  </div>
+  </div> -->
 @if (filteredProducts().length === 0|| products().length === 0) {
   <!-- Empty State -->
   <div class="empty-state" >
