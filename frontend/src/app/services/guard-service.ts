@@ -33,7 +33,7 @@ export class GuardService {
       }
 
       const user = this.authService.currentUser$(); // Supposons que cette méthode existe
-      const allowedRoutesForClient = ['/', '/profile'];
+      const allowedRoutesForClient = ['/', '/profil'];
 
       if (user?.role === 'CLIENT' && !allowedRoutesForClient.includes(state.url)) {
         // Rediriger vers une page autorisée ou retourner false

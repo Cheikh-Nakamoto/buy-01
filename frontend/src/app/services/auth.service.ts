@@ -1,8 +1,9 @@
 import { Injectable, signal } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { delay, map } from 'rxjs/operators';
-import { User, AuthFormData, AuthResponse } from '../models/interfaces';
+import { User, AuthFormData, AuthResponse, ServiceResponse } from '../models/interfaces';
 import { ApiUrlService } from './api-url-service';
+import { handleHttpError } from '../utils/utils';
 
 @Injectable({
   providedIn: 'root'
@@ -28,7 +29,7 @@ export class AuthService {
    * @param data_form The authentication form data containing email and password.
    * @returns A Promise that resolves to `true` if sign-in is successful, `false` otherwise.
    */
-  async signIn(data_form: AuthFormData): Promise<boolean> {
+  async signIn(data_form: AuthFormData): Promise<ServiceResponse> {
     // Mock authentication - simulate API call
     console.log('Signing in with data:', data_form);
     try {
@@ -40,14 +41,17 @@ export class AuthService {
         body: JSON.stringify(data_form)
       }).then((res) => res.json());
       console.log('Login response:', res);
+      if (!res.token) {
+        console.log('Login error:', handleHttpError(res).message);
+        return { success: false, error: handleHttpError(res).message };
+      }
       this._isSignIn.set(true);
       localStorage.setItem('token', res.token);
       await this.checkAuth();
     } catch (error: any) {
-     alert('Login failed: ' + error.error);
-      return false;
+      return { success: false, error: handleHttpError(error).message };
     }
-    return true;
+    return { success: true };
   }
 
   /**
@@ -57,9 +61,9 @@ export class AuthService {
    * @returns A Promise that resolves when the sign-up process is complete.
    * @throws Error if registration fails or an invalid avatar file type is provided.
    */
-  async signUp(data_form: AuthFormData, avatarFile?: File): Promise<void> {
+  async signUp(data_form: AuthFormData, avatarFile?: File): Promise<ServiceResponse> {
     const formData = new FormData();
-    const file : File | Blob | null = avatarFile || null;
+    const file: File | Blob | null = avatarFile || null;
     // Créer l'objet JSON pour les données utilisateur
     const userData = {
       email: data_form.email,
@@ -72,19 +76,18 @@ export class AuthService {
     formData.append('data', new Blob([JSON.stringify(userData)], {
       type: 'application/json'
     }));
-  // Vérification plus stricte du fichier
-  if (avatarFile) {
-    if (avatarFile instanceof File) {
-      console.log('Valid avatar file:', avatarFile.name, avatarFile.type);
-      formData.append('avatar', avatarFile);
-    } else if (file instanceof Blob) {
-      console.log('Avatar is a Blob, converting...');
-      formData.append('avatar', file, 'avatar.jpg');
-    } else {
-     alert('Invalid avatar file type: ' + typeof avatarFile + ', ' + avatarFile);
-      throw new Error('Invalid avatar file');
+    // Vérification plus stricte du fichier
+    if (avatarFile) {
+      if (avatarFile instanceof File) {
+        console.log('Valid avatar file:', avatarFile.name, avatarFile.type);
+        formData.append('avatar', avatarFile);
+      } else if (file instanceof Blob) {
+        console.log('Avatar is a Blob, converting...');
+        formData.append('avatar', file, 'avatar.jpg');
+      } else {
+        throw new Error('Invalid avatar file');
+      }
     }
-  }
 
     console.log('Sending form data:', userData);
 
@@ -94,35 +97,40 @@ export class AuthService {
     }
 
     try {
-      let res = await fetch(this.apiUrlService.REGISTER, {
+      let res: any = await fetch(this.apiUrlService.REGISTER, {
         method: 'POST',
         body: formData
         // Ne pas définir Content-Type, le navigateur le fera automatiquement
       });
 
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
 
       const result = await res.json();
       console.log('Registration success:', result);
-      return result;
+
+      if (!result.role) {
+        console.error('Registration error:', handleHttpError(result));
+        return { success: false, error: handleHttpError(result).message };
+      }
+
+
+      return { success: true, data: result };
 
     } catch (error: any) {
-     alert('Registration failed: ' + error);
-      throw new Error(error.error || 'Registration failed');
+      console.error('Registration error:', error);
+      return { success: false, error: handleHttpError(error).message };
     }
   }
 
   /**
    * Signs out the current user by clearing local storage and resetting authentication states.
    */
-  signOut(): void {
+  signOut(): ServiceResponse {
     localStorage.removeItem('currentUser');
     localStorage
       .removeItem('token');
     this._isSignIn.set(false);
     localStorage.clear();
+    return { success: true };
   }
 
   /**
@@ -148,21 +156,21 @@ export class AuthService {
         this._isSignIn.set(true);
         return true;
       }
-    } catch (error : any) {
-     alert('Auth check failed: ' + error.error);
+    } catch (error: any) {
+      alert('Auth check failed: ' + error.message);
     }
 
     this._isSignIn.set(false);
     return false;
   }
 
-  /**
-   * Synchronously checks if an authentication token exists in local storage.
-   * This method is primarily used by route guards for immediate authentication checks.
-   * @returns `true` if a token is found, `false` otherwise.
-   */
-  isAuthenticatedSync(): boolean {
-    return !!localStorage.getItem('token');
-  }
+  // /**
+  //  * Synchronously checks if an authentication token exists in local storage.
+  //  * This method is primarily used by route guards for immediate authentication checks.
+  //  * @returns `true` if a token is found, `false` otherwise.
+  //  */
+  // isAuthenticatedSync(): boolean {
+  //   return !!localStorage.getItem('token');
+  // }
 
 }

@@ -49,7 +49,7 @@ export class Profile implements OnInit {
       },
       error: (error) => {
         console.error('Error loading user profile:', error);
-        alert('Failed to load user profile: ' + error.message);
+        this.errorMessage.set(error.message);
       }
     });
     console.log('Profile component initialized');
