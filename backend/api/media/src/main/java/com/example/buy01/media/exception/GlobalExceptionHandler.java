@@ -31,14 +31,14 @@ public class GlobalExceptionHandler {
                                 .stream()
                                 .map(e -> e.getField() + ": " + e.getDefaultMessage())
                                 .collect(Collectors.joining("; "));
-                return ResponseEntity.badRequest().body(buildError(request, HttpStatus.BAD_REQUEST, msg));
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(buildError(request, HttpStatus.BAD_REQUEST, msg));
         }
 
         // Gère les exceptions de type IllegalArgumentException
         @ExceptionHandler(IllegalArgumentException.class)
         public ResponseEntity<ApiErrorResponse> handleIllegalArgument(IllegalArgumentException ex,
                         HttpServletRequest request) {
-                return ResponseEntity.badRequest().body(buildError(request, HttpStatus.BAD_REQUEST, ex.getMessage()));
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(buildError(request, HttpStatus.BAD_REQUEST, ex.getMessage()));
         }
 
         // Gère les exceptions d'authentification

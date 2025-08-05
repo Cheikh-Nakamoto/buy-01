@@ -494,14 +494,7 @@ server.ssl.key-store-password=changeit
 server.ssl.key-store-type=PKCS12
 server.ssl.key-alias=springboot
 
+
 ------ TAF
 
-Traitement de chaque services pour un bon fonctionnement :
-
-kafka implementation for user to product
-
-https ssl to encrypt data in transit
-
-Global Readme file to explain how to run the project with dockerfile
-
-Adresse de mise à jour de l'ip publique pour le domaine buy01us.ydns.eu = curl -s "https://ydns.io/hosts/update/T2eHKRgkfRLUkqtQgokJYk5y"
+Tests unitaires

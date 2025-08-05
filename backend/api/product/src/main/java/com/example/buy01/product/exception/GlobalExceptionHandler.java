@@ -28,13 +28,13 @@ public class GlobalExceptionHandler {
                 String msg = ex.getBindingResult().getFieldErrors().stream()
                                 .map(e -> e.getField() + ": " + e.getDefaultMessage())
                                 .collect(Collectors.joining("; "));
-                return ResponseEntity.badRequest().body(buildError(request, HttpStatus.BAD_REQUEST, msg));
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(buildError(request, HttpStatus.BAD_REQUEST, msg));
         }
 
         @ExceptionHandler(IllegalArgumentException.class)
         public ResponseEntity<ApiErrorResponse> handleIllegalArgument(IllegalArgumentException ex,
                         HttpServletRequest request) {
-                return ResponseEntity.badRequest().body(buildError(request, HttpStatus.BAD_REQUEST, ex.getMessage()));
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(buildError(request, HttpStatus.BAD_REQUEST, ex.getMessage()));
         }
 
         @ExceptionHandler({ UsernameNotFoundException.class, BadCredentialsException.class })
@@ -46,13 +46,13 @@ public class GlobalExceptionHandler {
         @ExceptionHandler(AccessDeniedException.class)
         public ResponseEntity<ApiErrorResponse> handleAccessDenied(Exception ex, HttpServletRequest request) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                                .body(buildError(request, HttpStatus.FORBIDDEN, "Access denied"));
+                                .body(buildError(request, HttpStatus.FORBIDDEN, ex.getMessage()));
         }
 
         @ExceptionHandler(NoHandlerFoundException.class)
         public ResponseEntity<ApiErrorResponse> handle404(NoHandlerFoundException ex, HttpServletRequest request) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                                .body(buildError(request, HttpStatus.NOT_FOUND, "Route not found"));
+                                .body(buildError(request, HttpStatus.NOT_FOUND, ex.getMessage()));
         }
 
         @ExceptionHandler(ResourceNotFoundException.class)

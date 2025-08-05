@@ -26,14 +26,15 @@ public class GlobalExceptionHandler {
         }
 
         // Gère les exceptions de validation des arguments
-        @ExceptionHandler({MethodArgumentNotValidException.class, BindException.class})
+        @ExceptionHandler({ MethodArgumentNotValidException.class, BindException.class })
         public ResponseEntity<ApiErrorResponse> handleValidation(MethodArgumentNotValidException ex,
                         HttpServletRequest request) {
                 String msg = ex.getBindingResult().getFieldErrors()
                                 .stream()
                                 .map(e -> e.getField() + ": " + e.getDefaultMessage())
                                 .collect(Collectors.joining("; "));
-                return ResponseEntity.badRequest().body(buildError(request, HttpStatus.BAD_REQUEST, msg));
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                .body(buildError(request, HttpStatus.BAD_REQUEST, msg));
         }
 
         // Gère les exceptions d'authentification
@@ -47,14 +48,14 @@ public class GlobalExceptionHandler {
         @ExceptionHandler(AccessDeniedException.class)
         public ResponseEntity<ApiErrorResponse> handleAccessDenied(Exception ex, HttpServletRequest request) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                                .body(buildError(request, HttpStatus.FORBIDDEN, "Access denied"));
+                                .body(buildError(request, HttpStatus.FORBIDDEN, ex.getMessage()));
         }
 
         // Gère les exceptions de ressource non trouvée
         @ExceptionHandler(NoHandlerFoundException.class)
         public ResponseEntity<ApiErrorResponse> handle404(NoHandlerFoundException ex, HttpServletRequest request) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                                .body(buildError(request, HttpStatus.NOT_FOUND, "Route not found"));
+                                .body(buildError(request, HttpStatus.NOT_FOUND, ex.getMessage()));
         }
 
         // Gère les exceptions de conflit, par exemple pour les doublons
@@ -62,7 +63,7 @@ public class GlobalExceptionHandler {
         public ResponseEntity<ApiErrorResponse> handleEmailAlreadyUsed(EmailAlreadyUsedException ex,
                         HttpServletRequest request) {
                 return ResponseEntity.status(HttpStatus.CONFLICT)
-                                .body(buildError(request, HttpStatus.CONFLICT, "Email already used"));
+                                .body(buildError(request, HttpStatus.CONFLICT, ex.getMessage()));
         }
 
         // Gère les exceptions générales non détectés
@@ -77,7 +78,7 @@ public class GlobalExceptionHandler {
                         HttpServletRequest request) {
                 return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
                                 .body(buildError(request, HttpStatus.PAYLOAD_TOO_LARGE,
-                                                "Fichier trop volumineux. Taille maximale autorisée : 2 Mo."));
+                                                ex.getMessage()));
         }
 
         // Gère les exceptions spécifiques pour les mots de passe trop faibles
