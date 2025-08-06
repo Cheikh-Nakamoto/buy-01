@@ -127,7 +127,7 @@ export class ProductList implements OnInit {
             if (products) {
               this.products.set(products.reverse());
               this.filteredProducts.set(products); // Initialiser les produits filtrés
-              this.extractCategories(); // Ext}raire les catégories après chargement des produits
+              this.extractCategories(); // Extraire les catégories après chargement des produits
             }
           },
           error: (error: any) => {

@@ -8,19 +8,22 @@ import { HttpClient } from '@angular/common/http';
 import { handleHttpError } from '../utils/utils';
 import { computed } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [MatDialogModule, MatIconModule],
+  imports: [
+    CommonModule,
+    MatDialogModule, 
+    MatIconModule,
+    MatButtonModule
+  ],
   providers: [HttpClient],
   templateUrl: './profile.html',
-  styleUrl: './profile.css'
+  styleUrls: ['./profile.css']
 })
-/**
- * Component for displaying and managing the user's profile.
- * Allows users to view their details, update their profile information, and change their avatar.
- */
 export class Profile implements OnInit {
   user = signal<User | null>(null);
   isLoading = signal(false);
@@ -63,7 +66,8 @@ export class Profile implements OnInit {
     if (this.user()?.avatar) {
       return `url(${this.user()!.avatar})`;
     }
-    return ''; // Utilisera le gradient CSS par défaut
+    // Retourne une image de fond par défaut
+    return 'url(https://images.unsplash.com/photo-1499336315816-097655dcfbda?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80)';
   }
 
   /**
@@ -130,16 +134,6 @@ export class Profile implements OnInit {
   }
 
   /**
-   * Handles the action to edit the user's profile.
-   * Currently logs a message to the console.
-   */
-  onEditProfile(): void {
-    console.log('Édition du profil');
-    // Implémenter la navigation vers la page d'édition
-    // this.router.navigate(['/profile/edit']);
-  }
-
-  /**
    * Opens the dialog for updating the user's profile and avatar.
    * Subscribes to the dialog's `afterClosed` event to handle the result.
    */
@@ -156,6 +150,7 @@ export class Profile implements OnInit {
       }
     });
   }
+
   /**
    * Handles the saving of updated user data, including avatar and profile information.
    * Orchestrates the update process, manages loading states, and handles success/error messages.
@@ -318,37 +313,6 @@ export class Profile implements OnInit {
 
     return String(value);
   }
-
-  // /**
-  //  * Met à jour l'avatar
-  //  */
-  // private async updateAvatar(file: File): Promise<void> {
-  //   console.log('🖼️ Mise à jour de l\'avatar...');
-  //   try {
-  //     await this.userService.updateAvatar(file)
-  //   } catch (error: any) {
-  //     console.error('❌ Erreur avatar:', error);
-  //     handleHttpError(error)
-  //   }
-  // }
-
-  // /**
-  //  * Met à jour le profil utilisateur
-  //  */
-  // private async updateProfile(changes: Partial<User>): void {
-  //   console.log('📝 Mise à jour du profil avec les changements:', changes);
-  //   try {
-  //     let response = await this.userService.updateProfile(changes)
-  //     this.user.set(response);
-  //     console.log('✅ Profil mis à jour avec succès', response);
-  //     // Message de succès avec détails
-  //     const updatedFields = Object.keys(changes).join(', ');
-  //   } catch (error) {
-  //     console.error('❌ Erreur profil:', error);
-
-  //   }
-
-  // }
 
   /**
    * Handles the cancellation of an operation, typically from a dialog.

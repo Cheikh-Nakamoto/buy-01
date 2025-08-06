@@ -29,7 +29,7 @@ public class ValidateMethods {
 
         if (MONGO_KEY_PATTERN.matcher(value).find()) {
             throw new IllegalArgumentException(
-                    fieldName + " contient des caractères non autorisés pour MongoDB ($ ou .)");
+                    fieldName + " contient des caractères non autorisés ($ ou .)");
         }
 
         if (SCRIPT_PATTERN.matcher(value).find()) {

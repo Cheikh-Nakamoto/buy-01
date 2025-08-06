@@ -55,12 +55,12 @@ public class UserService {
     // Vérification de l'unicité de l'email
     public UserDTO createUser(UserCreateDTO dto, MultipartFile avatar) throws IOException {
         if (userRepository.existsByEmail(dto.getEmail())) {
-            throw new EmailAlreadyUsedException("Email already used");
+            throw new EmailAlreadyUsedException("Ce email est déjà utilisé.");
         }
 
         // Vérification de la force du mot de passe
-        if (dto.getPassword().length() < 8) {
-            throw new PasswordTooWeakException("Password must be at least 8 characters long");
+        if (dto.getPassword().length() < 6) {
+            throw new PasswordTooWeakException("Le mot de passe doit contenir au moins 6 caractères.");
         }
 
         User user = new User();
@@ -101,14 +101,14 @@ public class UserService {
         validateMethods.validateObjectId(id);
         return userRepository.findById(id)
                 .map(this::toDTO)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
+                .orElseThrow(() -> new UsernameNotFoundException("L'utilisateur n'a pas été trouvé avec cet ID: " + id));
     }
 
     // Récupération d'un utilisateur par email
     public User getUserByEmail(String email) {
         User user = userRepository.findByEmail(email);
         if (user == null) {
-            throw new UsernameNotFoundException("User not found with email: " + email);
+            throw new UsernameNotFoundException("L'utilisateur n'a pas été trouvé avec cet email : " + email);
         }
 
         return user;
@@ -120,7 +120,7 @@ public class UserService {
     public UserDTO updateUser(String id, UserUpdateDTO dto) {
         validateMethods.validateObjectId(id);
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
+                .orElseThrow(() -> new UsernameNotFoundException("L'utilisateur n'a pas été trouvé avec cet ID: " + id));
 
         if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
             user.setPassword(passwordEncoder.encode(dto.getPassword()));
@@ -139,7 +139,7 @@ public class UserService {
     public void deleteUser(String id) {
         validateMethods.validateObjectId(id);
         if (!userRepository.existsById(id)) {
-            throw new ResourceNotFoundException("User not found");
+            throw new ResourceNotFoundException("L'utilisateur n'a pas été trouvé");
         }
 
         // Suppression de l'utilisateur

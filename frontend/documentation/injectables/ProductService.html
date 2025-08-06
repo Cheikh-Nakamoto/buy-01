@@ -1084,7 +1084,7 @@ export class ProductService {
   private getHeaderToken(): string {
     const token &#x3D; localStorage.getItem(&#x27;token&#x27;);
     if (!token) {
-      throw new Error(&#x27;No authentication token found. Please log in again.&#x27;);
+      throw new Error(&#x27;No authentication token found. Please log in again with correct email and password.&#x27;);
     }
     return &#x60;Bearer ${token}&#x60;;
   }

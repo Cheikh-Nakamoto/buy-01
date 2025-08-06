@@ -52,14 +52,14 @@ public class GlobalExceptionHandler {
         @ExceptionHandler(AccessDeniedException.class)
         public ResponseEntity<ApiErrorResponse> handleAccessDenied(Exception ex, HttpServletRequest request) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                                .body(buildError(request, HttpStatus.FORBIDDEN, "Access denied"));
+                                .body(buildError(request, HttpStatus.FORBIDDEN, ex.getMessage()));
         }
 
         // Gère les exceptions de ressource non trouvée
         @ExceptionHandler(NoHandlerFoundException.class)
         public ResponseEntity<ApiErrorResponse> handle404(NoHandlerFoundException ex, HttpServletRequest request) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                                .body(buildError(request, HttpStatus.NOT_FOUND, "Route not found"));
+                                .body(buildError(request, HttpStatus.NOT_FOUND, ex.getMessage()));
         }
 
         // Gère les exceptions générales non détectés

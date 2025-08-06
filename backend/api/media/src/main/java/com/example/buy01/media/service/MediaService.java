@@ -38,7 +38,7 @@ public class MediaService {
             throws IOException {
 
         if (!whichMake(productId, token, email, role)) {
-            throw new AccessDeniedException("Access denied for this operation.");
+            throw new AccessDeniedException("Accès refusé pour cette opération.");
         }
 
         // get medias by productId
@@ -73,10 +73,10 @@ public class MediaService {
     public void deleteMedia(String mediaId, String internalToken, String email, String role) {
 
         Media media = mediaRepository.findById(mediaId)
-                .orElseThrow(() -> new ResourceNotFoundException("Media not found with ID: " + mediaId));
+                .orElseThrow(() -> new ResourceNotFoundException("Le media n'a pas été trouvé: " + mediaId));
 
         if (!whichMake(media.getProductId(), internalToken, email, role)) {
-            throw new AccessDeniedException("Access denied for this operation.");
+            throw new AccessDeniedException("Accès refusé pour cette opération.");
         }
 
         File file = new File(UPLOAD_DIR + media.getImagePath());
@@ -91,10 +91,10 @@ public class MediaService {
             String role) {
 
         Media media = mediaRepository.findById(mediaId)
-                .orElseThrow(() -> new ResourceNotFoundException("Media not found with ID: " + mediaId));
+                .orElseThrow(() -> new ResourceNotFoundException("Le media n'a pas été trouvé: " + mediaId));
 
         if (!whichMake(media.getProductId(), internalToken, email, role)) {
-            throw new AccessDeniedException("Access denied for this operation.");
+            throw new AccessDeniedException("Accès refusé pour cette opération.");
         }
 
         try {
@@ -111,9 +111,9 @@ public class MediaService {
             return media;
 
         } catch (IOException e) {
-            throw new IllegalStateException("Error uploading file: " + e.getMessage());
+            throw new IllegalStateException("Erreur du chargement du fichier: " + e.getMessage());
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid file: " + e.getMessage());
+            throw new IllegalArgumentException("Fichier invalide: " + e.getMessage());
         }
     }
 

@@ -17,34 +17,34 @@ export function handleHttpError(error: HttpErrorResponse): Error {
         console.log("status received :", status , serverMessage);
         switch (status) {
             case 400:
-                errorMessage = `Bad request. Please check your data.${serverMessage}`;
+                errorMessage = `Please check your input and try again.${serverMessage}`;
                 break;
             case 401:
-                errorMessage = `Unauthorized. Please log in again.${serverMessage}`;
+                errorMessage = `The password you’ve entered is incorrect. Please try again.`;
                 break;
             case 403:
-                errorMessage = `Forbidden. You don't have permission to perform this action.${serverMessage}`;
+                errorMessage = `You don't have permission to perform this action.`;
                 break;
             case 404:
-                errorMessage = `Resource not found.${serverMessage}`;
+                errorMessage = `Resource not found.`;
                 break;
             case 409:
-                errorMessage = `Conflict. The resource already exists.${serverMessage}`;
+                errorMessage = `Your Email is already registered. Please try logging in or use a different email address.`;
                 break;
             case 413:
-                errorMessage = `File too large. Please select smaller files.${serverMessage}`;
+                errorMessage = `File too large. Please select smaller files under 2MB.`;
                 break;
             case 422:
-                errorMessage = `Invalid data format. Please check your inputs.${serverMessage}`;
+                errorMessage = `Invalid data format. Please check your input.`;
                 break;
             case 500:
-                errorMessage = `Server error. Please try again later.${serverMessage}`;
+                errorMessage = `Server error. Please try again later.`;
                 break;
             case 0:
-                errorMessage = `Network error. Please check your connection.${serverMessage}`;
+                errorMessage = `Network error. Please check your connection.`;
                 break;
             default:
-                errorMessage = error.error?.message || `Server error (${error.status})${serverMessage}`;
+                errorMessage = error.error?.message || `Server error (${error.status}): ${error.message}`;
         }
     }
 

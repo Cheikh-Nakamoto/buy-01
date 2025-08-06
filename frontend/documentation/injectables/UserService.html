@@ -1386,7 +1386,7 @@ export class UserService {
   private getAuthHeaders(): HttpHeaders {
     const token &#x3D; this.getToken();
     if (!token) {
-      throw new Error(&#x27;No authentication token found. Please log in again.&#x27;);
+      throw new Error(&#x27;No authentication token found. Please .&#x27;);
     }
     
     return new HttpHeaders({

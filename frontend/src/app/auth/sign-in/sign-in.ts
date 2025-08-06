@@ -68,8 +68,8 @@ export class SignIn implements OnInit {
       console.log('Avatar input changed:', file);
 
       // Validation
-      if (file.size > 5 * 1024 * 1024) { // 5MB max
-        this.errorMessage.set('File too large. Maximum size is 5MB.');
+      if (file.size > 10 * 1024 * 1024) { // 10MB max
+        this.errorMessage.set('File too large. Maximum size is 10MB.');
         this.clearMessages(3000);
         return;
       }

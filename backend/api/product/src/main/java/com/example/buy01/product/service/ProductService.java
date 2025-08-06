@@ -53,7 +53,7 @@ public class ProductService {
         }
 
         if (newProduct.getUserId() == null) {
-            throw new IllegalArgumentException("User ID cannot be null");
+            throw new IllegalArgumentException("L'Id de l'utilisateur ne peut pas être null");
         }
 
         

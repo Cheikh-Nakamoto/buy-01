@@ -82,20 +82,38 @@ Buy01 est une plateforme e-commerce complète construite avec une architecture m
 
 ## 🚀 Installation et Démarrage
 
-### Option 1 : Démarrage avec Docker (Recommandé)
 
-1. **Cloner le repository**
+ **Cloner le repository**
 ```bash
-git clone <votre-repo>
+git clone https://learn.zone01dakar.sn/git/preydedy/buy-01.git
 cd buy01
 ```
 
-2. **Construire et démarrer tous les services**
+### Option 1 : Démarrage avec Docker via script sh (Rapide)
+
+1. **Modifier les droits d'exécutions des fichiers scripts**
+```bash
+chmod +x commit.sh run_microservice.sh start-project.sh stop-project.sh toggle-config.sh
+```
+
+2. **Pour lancer le projet**
+```bash
+./start-project.sh
+```
+
+3. **Pour arrêter le projet**
+```bash
+./stop-project.sh
+```
+
+### Option 2 : Démarrage avec Docker manuel (Recommandé)
+
+1. **Construire et démarrer tous les services**
 ```bash
 docker-compose up --build
 ```
 
-3. **Vérifier le démarrage des services**
+2. **Vérifier le démarrage des services**
 ```bash
 # Eureka Dashboard
 http://localhost:8761
@@ -107,7 +125,15 @@ https://localhost:8443
 https://localhost:8443/swagger-ui.html
 ```
 
-### Option 2 : Démarrage manuel (Développement)
+3. **Démarrer le frontend Angular**
+```bash
+cd frontend
+npm install
+compodoc -s
+ng serve -o --proxy-config proxy.conf.json
+```
+
+### Option 3 : Démarrage manuel (Développement)
 
 1. **Démarrer l'infrastructure**
 ```bash
@@ -143,7 +169,7 @@ cd backend/api/gateway-service
 cd frontend
 npm install
 compodoc -s
-ng serve
+ng serve -o --proxy-config proxy.conf.json
 ```
 
 ## ⚙️ Configuration
@@ -264,7 +290,7 @@ DELETE /api/media/{id}        # Supprimer image (propriétaire uniquement)
 - **Password Hashing** : Spring Security avec BCrypt
 - **File Validation** : 
   - Types autorisés : `image/jpeg`, `image/png`, `image/webp`
-  - Taille max : 2MB par fichier, 7MB par requête
+  - Taille max : 2MB par fichier, 10MB par requête
 - **Rate Limiting** : Protection sur `/api/auth/**`
 - **CORS Configuration** : Headers sécurisés
 
@@ -520,7 +546,8 @@ Assurez-vous d'avoir Node.js, npm et Angular CLI installés (voir [Prérequis](#
 └── productsImages/           # Media Service - Images produits
 ```
 
-**Auteur** : Dedy Pangou  
+**Auteur** : [preydedy](https://learn.zone01dakar.sn/git/preydedy/) et [cheikhmodiouf](https://learn.zone01dakar.sn/git/cheikhmodiouf/)
+
 **Version** : 1.0.0  
 **Spring Boot** : 3.5.3  
 **Spring Cloud** : 2025.0.0  

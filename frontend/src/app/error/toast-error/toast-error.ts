@@ -63,8 +63,8 @@ export class ToastError implements OnInit {
   });
 
   ngOnInit(): void {
-    if(this.hasMessage()){
-    this.visible.set(true);
+    if (this.hasMessage()) {
+      this.visible.set(true);
 
     }
   }

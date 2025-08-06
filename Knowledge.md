@@ -494,7 +494,4 @@ server.ssl.key-store-password=changeit
 server.ssl.key-store-type=PKCS12
 server.ssl.key-alias=springboot
 
-
 ------ TAF
-
-commande pour ajouter les droits d'exécutions au scripts: chmod +x commit.sh run_microservice.sh start-project.sh stop-project.sh toggle-config.sh

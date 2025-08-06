@@ -251,7 +251,7 @@ export class ProductService {
           console.log(`Image ${file.name} uploaded successfully`);
 
         } catch (error: any) {
-          const errorMsg = `Failed to upload ${file.name}: ${error.message}`;
+          const errorMsg = `${error.message}`;
           errors.push(errorMsg);
           console.error(errorMsg);
         }
@@ -278,7 +278,7 @@ export class ProductService {
       } else {
         return {
           success: false,
-          error: `Failed to upload all images: ${errors.join(', ')}`
+          error: `Failed to upload images: ${errors[0]}`,
         };
       }
 
