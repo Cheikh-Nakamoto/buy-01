@@ -50,3 +50,22 @@ export function handleHttpError(error: HttpErrorResponse): Error {
 
     return new Error(errorMessage);
 }
+
+
+/**
+ * Inverse un tableau en utilisant une double boucle.
+ * @param list Le tableau à inverser.
+ * @returns Un nouveau tableau inversé.
+ */
+export function reverseListDoubleLoop<T>(list: T[]): T[] {
+  const reversed: T[] = [];
+  for (let i = 0; i < list.length; i++) {
+    // Deuxième boucle pour trouver la position inverse
+    for (let j = 0; j < list.length; j++) {
+      if (j === list.length - 1 - i) {
+        reversed.push(list[j]);
+      }
+    }
+  }
+  return reversed;
+}

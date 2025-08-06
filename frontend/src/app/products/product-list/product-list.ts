@@ -7,7 +7,7 @@ import { ProductCard } from "../product-card/product-card";
 import { OnInit, signal } from '@angular/core';
 import { computed } from '@angular/core';
 import { effect } from '@angular/core';
-import { handleHttpError } from '../../utils/utils';
+import { handleHttpError, reverseListDoubleLoop } from '../../utils/utils';
 import { ToastError } from "../../error/toast-error/toast-error";
 
 @Component({
@@ -67,6 +67,9 @@ export class ProductList implements OnInit {
 
   private messageLoggerEffect = effect(() => {
     console.log('DEBUG - Nouveau statut des messages :', this.messageStatus());
+    let elem = this.products();
+    console.log('Products loaded:', this.products(), reverseListDoubleLoop(elem));
+
     // Ici, vous pourriez intégrer une logique de logging externe,
     // ou envoyer ces messages à un service de toasts/notifications
   });
@@ -75,14 +78,14 @@ export class ProductList implements OnInit {
   async ngOnInit() {
     //this.loadProducts();
 
-    this.extractCategories();
-    this.applyFilters();
+    // this.extractCategories();
+    // this.applyFilters();
     console.log('ProductList component initialized');
     if (location.pathname != "/products/myproduct") {
       this.productService.getProducts().subscribe({
         next: (products) => {
-          this.products.set(products);
-          this.filteredProducts.set(products); // Initialiser les produits filtrés
+          this.products.set(reverseListDoubleLoop(products));
+          this.filteredProducts.set(reverseListDoubleLoop(products)); // Initialiser les produits filtrés
           this.extractCategories(); // Extraire les catégories après chargement des produits
         },
         error: (error: any) => {
@@ -93,9 +96,9 @@ export class ProductList implements OnInit {
       this.productService.getMyProduct().subscribe({
         next: (products) => {
           if (products) {
-            this.products.set(products);
-            this.filteredProducts.set(products); // Initialiser les produits filtrés
-            this.extractCategories(); // Ext}raire les catégories après chargement des produits
+            this.products.set(reverseListDoubleLoop(products));
+            this.filteredProducts.set(reverseListDoubleLoop(products)); // Initialiser les produits filtrés
+            this.extractCategories(); // Extraire les catégories après chargement des produits
           }
         },
         error: (error: any) => {
@@ -122,7 +125,7 @@ export class ProductList implements OnInit {
         this.productService.getMyProduct().subscribe({
           next: (products) => {
             if (products) {
-              this.products.set(products);
+              this.products.set(products.reverse());
               this.filteredProducts.set(products); // Initialiser les produits filtrés
               this.extractCategories(); // Ext}raire les catégories après chargement des produits
             }
@@ -247,6 +250,7 @@ export class ProductList implements OnInit {
    */
   applyFilters() {
     let filtered = [...this.products()];
+
 
     // Filtrage par catégorie
     if (this.selectedCategory !== 'all') {
@@ -403,7 +407,7 @@ export class ProductList implements OnInit {
    * @returns The total count of products.
    */
   get totalProducts(): number {
-    return this.products.length;
+    return this.products().length;
   }
 
   /**
