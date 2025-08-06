@@ -110,10 +110,10 @@ export class SignIn implements OnInit {
     });
   }
 
-   /**
-   * Réinitialise complètement le formulaire d'authentification,
-   * nettoie l'avatar et efface les messages.
-   */
+  /**
+  * Réinitialise complètement le formulaire d'authentification,
+  * nettoie l'avatar et efface les messages.
+  */
   resetForm(role?: string): void {
     this.authForm.reset({
       name: '',
@@ -219,13 +219,14 @@ export class SignIn implements OnInit {
 
       if (this.isSignUp()) {
         // Inscription
-       let err: ServiceResponse =  await this.authService.signUp(formData, this.selectedAvatarFile);
+        let err: ServiceResponse = await this.authService.signUp(formData, this.selectedAvatarFile);
         if (!err.success) {
           this.errorMessage.set(err.error || 'An error occurred during sign-up.');
           this.loading.set(false);
           return;
         }
-        
+
+        this.successMessage.set('Sign up successful! You can now sign in.');
         // Petit délai pour que l'utilisateur voie le message de succès
         setTimeout(() => {
           this.toggleMode();
@@ -234,17 +235,17 @@ export class SignIn implements OnInit {
 
       } else {
         // Connexion
-       const res = await this.authService.signIn(formData);
+        const res = await this.authService.signIn(formData);
         if (!res.success) {
           this.errorMessage.set(res.error || 'An error occurred during sign-in.');
           this.loading.set(false);
           this.resetForm();
           return;
         }
-        
+
         // Si on arrive ici, c'est que la connexion a réussi
         this.successMessage.set('Sign in successful! Redirecting...');
-        
+
         // Petit délai pour que l'utilisateur voie le message de succès
         setTimeout(() => {
           this.router.navigate(['/']);
@@ -252,7 +253,7 @@ export class SignIn implements OnInit {
       }
     } catch (error: any) {
       console.error('Authentication error:', error);
-      
+
       // Gestion spécifique des erreurs d'authentification
       this.errorMessage.set(error?.error || error?.message || 'An unexpected error occurred. Please try again.');
 
@@ -287,4 +288,6 @@ export class SignIn implements OnInit {
       }, delay);
     }
   }
+
+  
 }

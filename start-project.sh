@@ -20,5 +20,7 @@ fi
 # Aller dans le dossier du frontend (modifie cette ligne si besoin)
 cd frontend || { echo "❌ Dossier 'frontend' introuvable."; exit 1; }
 
+npm install
+
 echo -e "${GREEN}🌐 Lancement du frontend Angular avec proxy...${NC}"
 ng serve --proxy-config proxy.conf.json

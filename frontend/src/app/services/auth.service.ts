@@ -105,7 +105,7 @@ export class AuthService {
 
 
       const result = await res.json();
-      console.log('Registration success:', result);
+      console.log('Registration success:', !result.role);
 
       if (!result.role) {
         console.error('Registration error:', handleHttpError(result));
