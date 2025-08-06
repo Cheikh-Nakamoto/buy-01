@@ -24,4 +24,4 @@ cd frontend || { echo "❌ Dossier 'frontend' introuvable."; exit 1; }
 npm install
 
 echo -e "${GREEN}🌐 Lancement du frontend Angular avec proxy...${NC}"
-ng serve --proxy-config proxy.conf.json
+ng serve -o --proxy-config proxy.conf.json
