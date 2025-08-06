@@ -82,13 +82,7 @@ export class UserService {
   async updateProfile(user: Partial<User>, userId?: string): Promise<ServiceResponse<User>> {
     try {
       const id = userId || this.getCurrentUserId();
-      
-      if (!id) {
-        return {
-          success: false,
-          error: 'User ID not found. Please log in again.'
-        };
-      }
+
 
       const updatedUser :any = await firstValueFrom(
         this.http.put<User>(this.apiUrl.UPDATE_USER(userId!), user, {

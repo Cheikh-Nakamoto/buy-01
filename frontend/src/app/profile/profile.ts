@@ -174,6 +174,7 @@ export class Profile implements OnInit {
         this.processAvatarUpdate(updatedData),
         this.processProfileUpdate(updatedData, currentUser)
       ]);
+      console.log('Profile update result:', profileResult);
 
       this.handleUpdateResults(avatarResult, profileResult);
     } catch (error) {
