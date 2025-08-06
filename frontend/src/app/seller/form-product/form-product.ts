@@ -21,7 +21,7 @@ import { handleHttpError } from '../../utils/utils';
  * Handles form submission, image management, and interaction with the product service.
  */
 export class FormProduct implements OnInit, OnDestroy {
-  images: Array<{ preview: string, id: string }> = [];
+  images: Array<{ preview: string, isNew: boolean, id: string }> = [];
   private imageFiles: File[] = [];
   private imageDelete: string[] = [];
   currentProduct: Product | null = null;
@@ -31,12 +31,6 @@ export class FormProduct implements OnInit, OnDestroy {
   field_management = signal<boolean>(false);
   action_button = signal<boolean>(false);
 
-  // Nouvelles propriétés pour la gestion d'état
-  isLoading = signal<boolean>(false);
-  errorMessage = signal<string>('');
-  successMessage = signal<string>('');
-
-
   // Souscription pour éviter les fuites mémoire
   private subscription!: Subscription;
 
@@ -45,20 +39,21 @@ export class FormProduct implements OnInit, OnDestroy {
   visibleSlides = 3;
   slideWidth = 216;
   currentTranslate = 0;
+  isLoading = signal<boolean>(false);
+  // Nouvelles propriétés pour la gestion d'état
+  errorMessage = signal<string>('');
+  successMessage = signal<string>('');
   messageStatus = computed(() => ({
     error: this.errorMessage(),
     success: this.successMessage()
   }));
 
   private messageLoggerEffect = effect(() => {
-     console.log('DEBUG - Nouveau statut des messages :', this.messageStatus());
-    // Ici, vous pourriez intégrer une logique de logging externe,
-    // ou envoyer ces messages à un service de toasts/notifications
+    console.log('DEBUG - Nouveau statut des messages :', this.messageStatus());
   });
 
 
   constructor(private productService: ProductService, private dataSharedProduct: DataService, private router: Router) {
-    // Un computed qui génère un objet avec le contenu des messages
 
     // Initialisation du formulaire
     this.productForm = new FormGroup({
@@ -135,7 +130,7 @@ export class FormProduct implements OnInit, OnDestroy {
 
     // Si le produit a des images, les charger aussi
     if (product.imageUrls && product.imageUrls.length > 0) {
-      this.loadExistingImages(product.imageUrls);
+      this.loadExistingImages(product.imageUrls, false);
     }
   }
 
@@ -143,9 +138,10 @@ export class FormProduct implements OnInit, OnDestroy {
    * Loads existing product images into the component's `images` array for display.
    * @param imageUrls An array of `productImage` objects containing image paths and IDs.
    */
-  private loadExistingImages(imageUrls: productImage[]): void {
+  private loadExistingImages(imageUrls: productImage[], isNew?: boolean): void {
     this.images = imageUrls.map((url, index) => ({
       preview: url.imagePath,
+      isNew: isNew != undefined ? isNew : true, // Indique si l'image est nouvelle ou existante
       id: url.id
     }));
   }
@@ -158,7 +154,7 @@ export class FormProduct implements OnInit, OnDestroy {
    */
   onFileSelected(event: Event) {
     if (this.imageFiles.length + this.images.length > 5) {
-      alert("🚨Vous avez depassez le seuil d'image requis !!!🚨")
+      this.errorMessage.set("🚨Vous avez depassez le seuil d'image requis !!!🚨")
       return;
     }
     const input = event.target as HTMLInputElement;
@@ -169,6 +165,7 @@ export class FormProduct implements OnInit, OnDestroy {
         reader.onload = (e) => {
           this.images.push({
             preview: e.target?.result as string,
+            isNew: true, // Indique que c'est une nouvelle image
             id: this.images.length.toString(),
           });
         };
@@ -189,13 +186,13 @@ export class FormProduct implements OnInit, OnDestroy {
     const index = this.images.findIndex(img => img.id === id);
     const idnumber = parseInt(id);
     if (index !== -1) {
-      this.images.splice(index, 1);
+      const elem: any = this.images.splice(index, 1);
       if (this.imageFiles[idnumber] != undefined) {
         this.imageFiles.splice(index, 1);
-      } else {
+      } else if (elem[0].isNew === false) {
         this.imageDelete.push(id);
       }
-      console.log('Image supprimée avec succès', this.images.length, this.imageFiles.length);
+      console.log('Image supprimée avec succès', elem);
 
       // Ajuster la position du carrousel
       if (this.currentIndex > 0 && this.currentIndex >= this.images.length - this.visibleSlides) {
@@ -241,7 +238,7 @@ export class FormProduct implements OnInit, OnDestroy {
 
     } catch (error: any) {
       // Gestion spécifique des erreurs
-     this.errorMessage.set(handleHttpError(error).message)
+      this.errorMessage.set(handleHttpError(error).message)
     } finally {
       this.isLoading.set(false);
     }
@@ -337,7 +334,7 @@ export class FormProduct implements OnInit, OnDestroy {
       console.error('Error in executeFormActions:', error);
       return {
         success: false,
-        error:  handleHttpError(error).message || 'An error occurred while processing your request.'
+        error: handleHttpError(error).message || 'An error occurred while processing your request.'
       };
     }
   }
@@ -381,11 +378,11 @@ export class FormProduct implements OnInit, OnDestroy {
       return { success: true };
 
     } catch (error: any) {
-      if (error.status == 200){
-         return {
-        success: true,
-        error: handleHttpError(error).message || 'Image delete successfuly.'
-      };
+      if (error.status == 200) {
+        return {
+          success: true,
+          error: handleHttpError(error).message || 'Image delete successfuly.'
+        };
       }
       return {
         success: false,

@@ -82,8 +82,6 @@ export class UserService {
   async updateProfile(user: Partial<User>, userId?: string): Promise<ServiceResponse<User>> {
     try {
       const id = userId || this.getCurrentUserId();
-
-
       const updatedUser :any = await firstValueFrom(
         this.http.put<User>(this.apiUrl.UPDATE_USER(userId!), user, {
           headers: this.getAuthHeaders()

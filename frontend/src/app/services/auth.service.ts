@@ -4,6 +4,7 @@ import { delay, map } from 'rxjs/operators';
 import { User, AuthFormData, AuthResponse, ServiceResponse } from '../models/interfaces';
 import { ApiUrlService } from './api-url-service';
 import { handleHttpError } from '../utils/utils';
+import { DataService } from './data-service';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +19,7 @@ export class AuthService {
   private _isSignIn = signal<boolean>(false);
   public isSignIn$ = this._isSignIn.asReadonly();
 
-  constructor(private apiUrlService: ApiUrlService) {
+  constructor(private apiUrlService: ApiUrlService, private sharedData: DataService) {
     // Check for stored user
     this.checkAuth();
   }
@@ -157,7 +158,7 @@ export class AuthService {
         return true;
       }
     } catch (error: any) {
-      alert('Auth check failed: ' + error.message);
+      this.sharedData.updateData({ error: 'Auth check failed: ' + error.message , success: false });
     }
 
     this._isSignIn.set(false);
