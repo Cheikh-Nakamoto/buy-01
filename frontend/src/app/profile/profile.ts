@@ -282,7 +282,7 @@ export class Profile implements OnInit {
     // Champs à comparer (ajustez selon votre interface User)
     const fieldsToCompare: (keyof User)[] = [
       'name', 'email',
-      'role'
+      'role', 'password'
     ];
 
     fieldsToCompare.forEach(field => {

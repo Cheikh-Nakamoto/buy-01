@@ -114,6 +114,7 @@ export class ProductList implements OnInit {
       console.log("arrivage du event ", $event);
       let respons: any = await this.productService.deleteProduct($event);
       if (respons.success) {
+        console.log("Product deleted successfully:", respons);
         this.successMessage.set(respons.message)
         this.filteredProducts.set([]);
         // Délai anti-spam

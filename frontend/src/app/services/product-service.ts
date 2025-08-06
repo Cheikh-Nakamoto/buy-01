@@ -316,10 +316,9 @@ export class ProductService {
               return {
                 success: true,
                 data: httpResponse.body,
-                message: 'Image deleted successfully!'
+                message: 'Product deleted successfully!'
               };
             }
-            console.log("effac")
             // Si le statut n'est pas dans la plage 200-299
             return {
               success: false,
@@ -333,7 +332,7 @@ export class ProductService {
               return of({
                 success: true,
                 data: null,
-                message: 'Image deleted successfully (handled)'
+                message: 'Product deleted successfully (handled)'
               });
             }
             return throwError(() => handleHttpError(error));
@@ -341,11 +340,11 @@ export class ProductService {
         )
       );
 
-      console.log('Image deleted successfully:', response);
+      console.log('Product deleted successfully:', response);
       return {
         success: true,
         data: response,
-        message: 'Image deleted successfully!'
+        message: 'Product deleted successfully!'
       };
 
     } catch (error: any) {

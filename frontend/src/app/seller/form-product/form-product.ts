@@ -153,7 +153,7 @@ export class FormProduct implements OnInit, OnDestroy {
    * @param event The DOM event triggered by the file input change.
    */
   onFileSelected(event: Event) {
-    if (this.imageFiles.length + this.images.length > 5) {
+    if (this.images.length > 5) {
       this.errorMessage.set("🚨Vous avez depassez le seuil d'image requis !!!🚨")
       return;
     }
