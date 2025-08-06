@@ -5,6 +5,7 @@ GREEN='\033[0;32m'
 NC='\033[0m' # No Color
 
 echo -e "${GREEN}📦 Lancement du backend avec Docker Compose...${NC}"
+./toggle-config.sh --inside
 docker-compose up --build -d
 
 # Attendre quelques secondes pour laisser le backend démarrer correctement

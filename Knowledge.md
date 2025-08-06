@@ -497,4 +497,4 @@ server.ssl.key-alias=springboot
 
 ------ TAF
 
-Tests unitaires
+commande pour ajouter les droits d'exécutions au scripts: chmod +x start-project.sh stop-project.sh
