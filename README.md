@@ -93,7 +93,7 @@ cd buy01
 
 1. **Modifier les droits d'exécutions des fichiers scripts**
 ```bash
-chmod +x commit.sh run_microservice.sh start-project.sh stop-project.sh toggle-config.sh
+chmod +x commit.sh run_microservice.sh start-project.sh stop-project.sh toggle-config.sh run-all-tests.sh
 ```
 
 2. **Pour lancer le projet**
