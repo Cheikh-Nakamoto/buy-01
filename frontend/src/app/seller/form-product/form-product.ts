@@ -147,34 +147,59 @@ export class FormProduct implements OnInit, OnDestroy {
   }
 
   /**
-   * Handles the selection of new image files from the input.
-   * Adds selected files to the `imageFiles` array and creates previews.
-   * Enforces a maximum of 5 images.
-   * @param event The DOM event triggered by the file input change.
-   */
+  * Handles the selection of new image files from the input.
+  * Adds selected files to the `imageFiles` array and creates previews.
+  * Enforces a maximum of 5 images.
+  * @param event The DOM event triggered by the file input change.
+  */
   onFileSelected(event: Event) {
-    if (this.images.length > 5) {
-      this.errorMessage.set("🚨Vous avez depassez le seuil d'image requis !!!🚨")
+    const input = event.target as HTMLInputElement;
+
+    if (!input.files || input.files.length === 0) {
       return;
     }
-    const input = event.target as HTMLInputElement;
-    if (input.files) {
-      for (const file of input.files) {
-        // Créer la preview
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          this.images.push({
-            preview: e.target?.result as string,
-            isNew: true, // Indique que c'est une nouvelle image
-            id: this.images.length.toString(),
-          });
-        };
-        // Ajouter le fichier à la liste
-        this.imageFiles.push(file);
-        // Lire le fichier pour la prévisualisation
-        reader.readAsDataURL(file);
-      }
+
+    // Calculer le nombre d'images actuelles (nouvelles + existantes)
+    const oldImagesCount = this.images.filter(img => !img.isNew).length;
+    const currentTotalImages = oldImagesCount + this.imageFiles.length;
+
+    // Vérifier si l'ajout des nouveaux fichiers dépasse la limite
+    if (currentTotalImages + input.files.length > 5) {
+      this.errorMessage.set("🚨Vous avez dépassé le seuil d'image requis, max 5 images par produit!!!🚨");
+      return;
     }
+
+    // Traiter chaque fichier sélectionné
+    Array.from(input.files).forEach((file) => {
+      // Ajouter d'abord le fichier à la liste pour obtenir son index final
+      this.imageFiles.push(file);
+
+      // L'ID correspond maintenant à l'index du fichier dans imageFiles
+      const fileIndex = this.imageFiles.length - 1;
+
+      console.log("<==============================>");
+      console.log('ID Fichier sélectionné (index dans imageFiles):', fileIndex.toString());
+      console.log('Nom du fichier:', file.name);
+      console.log('Position dans imageFiles:', fileIndex);
+      console.log("<==============================>");
+
+      // Créer la preview
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        this.images.push({
+          preview: e.target?.result as string,
+          isNew: true, // Indique que c'est une nouvelle image
+          id: fileIndex.toString(), // ID = index dans imageFiles
+        });
+      };
+
+      // Lire le fichier pour la prévisualisation
+      reader.readAsDataURL(file);
+    });
+
+    // Optionnel : Réinitialiser l'input pour permettre de sélectionner les mêmes fichiers
+    input.value = '';
   }
 
   /**
@@ -187,6 +212,7 @@ export class FormProduct implements OnInit, OnDestroy {
     const idnumber = parseInt(id);
     if (index !== -1) {
       const elem: any = this.images.splice(index, 1);
+      console.log('Image supprimée de la liste sur la liste', elem.id, 'parse:', this.imageFiles[idnumber]);
       if (this.imageFiles[idnumber] != undefined) {
         this.imageFiles.splice(index, 1);
       } else if (elem[0].isNew === false) {
@@ -207,6 +233,9 @@ export class FormProduct implements OnInit, OnDestroy {
    * Validates the form, prepares data, executes API calls, and manages UI messages and navigation.
    */
   async onSubmit() {
+    this.isLoading.set(true);
+    this.errorMessage.set('');
+    this.successMessage.set('');
     // Validation du formulaire
     if (this.productForm.invalid) {
       this.markAllFieldsAsTouched();
@@ -214,9 +243,12 @@ export class FormProduct implements OnInit, OnDestroy {
       return;
     }
 
-    this.isLoading.set(true);
-    this.errorMessage.set('');
-    this.successMessage.set('');
+    if ((this.images.filter(img => !img.isNew).length + this.imageFiles.length) > 5) {
+      console.log("🚨Vous avez depassez le seuil d'image requis , max 5 image par produit!!!🚨", this.images.filter(img => img.isNew), "image file length :", this.imageFiles.length)
+      this.errorMessage.set("🚨Vous avez depassez le seuil d'image requis !!!🚨")
+      return;
+    }
+
 
     try {
       // Préparation des données
@@ -227,11 +259,10 @@ export class FormProduct implements OnInit, OnDestroy {
 
       if (result.success) {
         this.successMessage.set(result.message || 'Operation completed successfully!');
-
         // Petit délai pour que l'utilisateur voie le message de succès
         setTimeout(() => {
           this.router.navigate(['/products/myproduct']);
-        }, 1500);
+        }, 1000);
       } else {
         this.errorMessage.set(result.error || 'Operation failed. Please try again.');
       }

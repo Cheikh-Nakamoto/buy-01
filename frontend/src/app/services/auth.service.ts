@@ -158,7 +158,7 @@ export class AuthService {
         return true;
       }
     } catch (error: any) {
-      this.sharedData.updateData({ error: 'Auth check failed: ' + error.message , success: false });
+      this.sharedData.updateData({ error: 'Auth check failed: wait a moment and will retry', success: false });
     }
 
     this._isSignIn.set(false);

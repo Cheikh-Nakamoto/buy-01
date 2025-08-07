@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guide Complet : Jasmine pour les Tests Angular</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 5px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 12px 20px;
+            text-align: center;
+            border: none;
+            background: transparent;
+            color: white;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-tab.active {
+            background: rgba(255,255,255,0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .nav-tab:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .content-section {
+            display: none;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+
+        .content-section.active {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .comment { color: #6a9955; }
+        .function { color: #dcdcaa; }
+        .variable { color: #9cdcfe; }
+        .operator { color: #d4d4d4; }
+
+        .concept-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .concept-card h3 {
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+
+        .example-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .example-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .example-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
+        }
+
+        .example-card h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #ff6b6b;
+            margin: 15px 0;
+        }
+
+        .tip {
+            background: linear-gradient(120deg, #a8edea 0%, #fed6e3 100%);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #4ecdc4;
+            margin: 15px 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4ecdc4, #44a08d);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 3px;
+        }
+
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+
+        .checklist li {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .checklist li:before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #4ecdc4;
+            font-weight: bold;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .section-title:after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 2px;
+        }
+
+        .interactive-demo {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 2px dashed #dee2e6;
+        }
+
+        .run-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: transform 0.2s ease;
+        }
+
+        .run-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .level-indicator {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .level-basic { background: #e3f2fd; color: #1976d2; }
+        .level-intermediate { background: #fff3e0; color: #f57c00; }
+        .level-advanced { background: #fce4ec; color: #c2185b; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 Guide Complet : Jasmine pour Angular</h1>
+            <p>De zéro à expert - Tests unitaires, intégration et bonnes pratiques</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showSection('basics')">Bases de Jasmine</button>
+            <button class="nav-tab" onclick="showSection('components')">Tests de Composants</button>
+            <button class="nav-tab" onclick="showSection('services')">Services & HTTP</button>
+            <button class="nav-tab" onclick="showSection('advanced')">Techniques Avancées</button>
+            <button class="nav-tab" onclick="showSection('best-practices')">Bonnes Pratiques</button>
+        </div>
+
+        <!-- Section 1: Bases de Jasmine -->
+        <div id="basics" class="content-section active">
+            <h2 class="section-title">🚀 Bases de Jasmine</h2>
+            
+            <div class="concept-card">
+                <h3>Qu'est-ce que Jasmine ?</h3>
+                <p>Jasmine est un framework de test JavaScript "behavior-driven development" (BDD). Il fournit une syntaxe claire et expressive pour écrire des tests.</p>
+            </div>
+
+            <div class="example-grid">
+                <div class="example-card">
+                    <span class="level-indicator level-basic">BASIQUE</span>
+                    <h4>Structure d'un test Jasmine</h4>
+                    <div class="code-block">
+<span class="keyword">describe</span>(<span class="string">'Nom du composant'</span>, () => {
+  <span class="keyword">beforeEach</span>(() => {
+    <span class="comment">// Configuration avant chaque test</span>
+  });
+
+  <span class="keyword">it</span>(<span class="string">'devrait faire quelque chose'</span>, () => {
+    <span class="comment">// Le test lui-même</span>
+    <span class="keyword">expect</span>(result).<span class="function">toBe</span>(<span class="string">'expected'</span>);
+  });
+});
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <span class="level-indicator level-basic">BASIQUE</span>
+                    <h4>Matchers principaux</h4>
+                    <div class="code-block">
+<span class="comment">// Égalité</span>
+<span class="keyword">expect</span>(value).<span class="function">toBe</span>(expected);
+<span class="keyword">expect</span>(value).<span class="function">toEqual</span>(expected);
+
+<span class="comment">// Booléens</span>
+<span class="keyword">expect</span>(value).<span class="function">toBeTruthy</span>();
+<span class="keyword">expect</span>(value).<span class="function">toBeFalsy</span>();
+
+<span class="comment">// Nullité</span>
+<span class="keyword">expect</span>(value).<span class="function">toBeNull</span>();
+<span class="keyword">expect</span>(value).<span class="function">toBeUndefined</span>();
+
+<span class="comment">// Tableaux/Objets</span>
+<span class="keyword">expect</span>(array).<span class="function">toContain</span>(item);
+<span class="keyword">expect</span>(obj).<span class="function">toHaveProperty</span>(<span class="string">'prop'</span>);
+                    </div>
+                </div>
+            </div>
+
+            <div class="highlight">
+                <strong>💡 Point clé :</strong> La différence entre <code>toBe()</code> (référence) et <code>toEqual()</code> (valeur) est cruciale pour les objets !
+            </div>
+
+            <div class="interactive-demo">
+                <h4>🔬 Démo Interactive - Testez vos matchers</h4>
+                <p>Cliquez pour voir différents matchers en action :</p>
+                <button class="run-button" onclick="runMatcherDemo()">Lancer la démo</button>
+                <div id="matcherResult" style="margin-top: 15px; padding: 15px; background: white; border-radius: 8px; display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Section 2: Tests de Composants -->
+        <div id="components" class="content-section">
+            <h2 class="section-title">⚛️ Tests de Composants Angular</h2>
+
+            <div class="concept-card">
+                <h3>TestBed - Votre environnement de test</h3>
+                <p>TestBed configure un module Angular pour les tests, simulant l'environnement d'exécution de vos composants.</p>
+            </div>
+
+            <div class="example-grid">
+                <div class="example-card">
+                    <span class="level-indicator level-basic">BASIQUE</span>
+                    <h4>Configuration de base</h4>
+                    <div class="code-block">
+<span class="keyword">import</span> { <span class="variable">ComponentFixture</span>, <span class="variable">TestBed</span> } <span class="keyword">from</span> <span class="string">'@angular/core/testing'</span>;
+<span class="keyword">import</span> { <span class="variable">UserComponent</span> } <span class="keyword">from</span> <span class="string">'./user.component'</span>;
+
+<span class="keyword">describe</span>(<span class="string">'UserComponent'</span>, () => {
+  <span class="keyword">let</span> <span class="variable">component</span>: <span class="variable">UserComponent</span>;
+  <span class="keyword">let</span> <span class="variable">fixture</span>: <span class="variable">ComponentFixture</span>&lt;<span class="variable">UserComponent</span>&gt;;
+
+  <span class="keyword">beforeEach</span>(<span class="keyword">async</span> () => {
+    <span class="keyword">await</span> <span class="variable">TestBed</span>.<span class="function">configureTestingModule</span>({
+      <span class="variable">declarations</span>: [<span class="variable">UserComponent</span>]
+    }).<span class="function">compileComponents</span>();
+
+    <span class="variable">fixture</span> = <span class="variable">TestBed</span>.<span class="function">createComponent</span>(<span class="variable">UserComponent</span>);
+    <span class="variable">component</span> = <span class="variable">fixture</span>.<span class="variable">componentInstance</span>;
+    <span class="variable">fixture</span>.<span class="function">detectChanges</span>();
+  });
+});
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <span class="level-indicator level-intermediate">INTERMÉDIAIRE</span>
+                    <h4>Test des propriétés et méthodes</h4>
+                    <div class="code-block">
+<span class="keyword">it</span>(<span class="string">'devrait initialiser avec les bonnes valeurs'</span>, () => {
+  <span class="keyword">expect</span>(<span class="variable">component</span>.<span class="variable">name</span>).<span class="function">toBe</span>(<span class="string">''</span>);
+  <span class="keyword">expect</span>(<span class="variable">component</span>.<span class="variable">isActive</span>).<span class="function">toBeFalsy</span>();
+});
+
+<span class="keyword">it</span>(<span class="string">'devrait mettre à jour le nom'</span>, () => {
+  <span class="variable">component</span>.<span class="function">updateName</span>(<span class="string">'John'</span>);
+  <span class="keyword">expect</span>(<span class="variable">component</span>.<span class="variable">name</span>).<span class="function">toBe</span>(<span class="string">'John'</span>);
+});
+
+<span class="keyword">it</span>(<span class="string">'devrait émettre un événement'</span>, () => {
+  <span class="keyword">spyOn</span>(<span class="variable">component</span>.<span class="variable">nameChanged</span>, <span class="string">'emit'</span>);
+  <span class="variable">component</span>.<span class="function">updateName</span>(<span class="string">'Jane'</span>);
+  <span class="keyword">expect</span>(<span class="variable">component</span>.<span class="variable">nameChanged</span>.<span class="variable">emit</span>)
+    .<span class="function">toHaveBeenCalledWith</span>(<span class="string">'Jane'</span>);
+});
+                    </div>
+                </div>
+            </div>
+
+            <div class="example-card">
+                <span class="level-indicator level-intermediate">INTERMÉDIAIRE</span>
+                <h4>Test du DOM et des interactions</h4>
+                <div class="code-block">
+<span class="keyword">it</span>(<span class="string">'devrait afficher le nom dans le template'</span>, () => {
+  <span class="variable">component</span>.<span class="variable">name</span> = <span class="string">'Alice'</span>;
+  <span class="variable">fixture</span>.<span class="function">detectChanges</span>(); <span class="comment">// Force la mise à jour du DOM</span>
+  
+  <span class="keyword">const</span> <span class="variable">nameElement</span> = <span class="variable">fixture</span>.<span class="variable">nativeElement</span>.<span class="function">querySelector</span>(<span class="string">'.user-name'</span>);
+  <span class="keyword">expect</span>(<span class="variable">nameElement</span>.<span class="variable">textContent</span>).<span class="function">toContain</span>(<span class="string">'Alice'</span>);
+});
+
+<span class="keyword">it</span>(<span class="string">'devrait réagir au clic sur le bouton'</span>, () => {
+  <span class="keyword">spyOn</span>(<span class="variable">component</span>, <span class="string">'onClick'</span>);
+  
+  <span class="keyword">const</span> <span class="variable">button</span> = <span class="variable">fixture</span>.<span class="variable">nativeElement</span>.<span class="function">querySelector</span>(<span class="string">'button'</span>);
+  <span class="variable">button</span>.<span class="function">click</span>();
+  
+  <span class="keyword">expect</span>(<span class="variable">component</span>.<span class="variable">onClick</span>).<span class="function">toHaveBeenCalled</span>();
+});
+                </div>
+            </div>
+
+            <div class="tip">
+                <strong>🎯 Astuce :</strong> Toujours appeler <code>fixture.detectChanges()</code> après avoir modifié des propriétés du composant pour déclencher la détection de changements Angular !
+            </div>
+        </div>
+
+        <!-- Section 3: Services & HTTP -->
+        <div id="services" class="content-section">
+            <h2 class="section-title">🔗 Tests de Services & HTTP</h2>
+
+            <div class="concept-card">
+                <h3>Injection de dépendances dans les tests</h3>
+                <p>Angular utilise un système d'injection de dépendances. Dans les tests, on peut facilement mocker ces dépendances.</p>
+            </div>
+
+            <div class="example-grid">
+                <div class="example-card">
+                    <span class="level-indicator level-intermediate">INTERMÉDIAIRE</span>
+                    <h4>Test d'un service simple</h4>
+                    <div class="code-block">
+<span class="keyword">import</span> { <span class="variable">TestBed</span> } <span class="keyword">from</span> <span class="string">'@angular/core/testing'</span>;
+<span class="keyword">import</span> { <span class="variable">UserService</span> } <span class="keyword">from</span> <span class="string">'./user.service'</span>;
+
+<span class="keyword">describe</span>(<span class="string">'UserService'</span>, () => {
+  <span class="keyword">let</span> <span class="variable">service</span>: <span class="variable">UserService</span>;
+
+  <span class="keyword">beforeEach</span>(() => {
+    <span class="variable">TestBed</span>.<span class="function">configureTestingModule</span>({});
+    <span class="variable">service</span> = <span class="variable">TestBed</span>.<span class="function">inject</span>(<span class="variable">UserService</span>);
+  });
+
+  <span class="keyword">it</span>(<span class="string">'devrait calculer l\'âge correctement'</span>, () => {
+    <span class="keyword">const</span> <span class="variable">age</span> = <span class="variable">service</span>.<span class="function">calculateAge</span>(<span class="keyword">new</span> <span class="function">Date</span>(<span class="string">'1990-01-01'</span>));
+    <span class="keyword">expect</span>(<span class="variable">age</span>).<span class="function">toBeGreaterThan</span>(<span class="number">30</span>);
+  });
+});
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <span class="level-indicator level-advanced">AVANCÉ</span>
+                    <h4>Mock des appels HTTP</h4>
+                    <div class="code-block">
+<span class="keyword">import</span> { <span class="variable">HttpClientTestingModule</span>, <span class="variable">HttpTestingController</span> } 
+  <span class="keyword">from</span> <span class="string">'@angular/common/http/testing'</span>;
+
+<span class="keyword">describe</span>(<span class="string">'UserService HTTP'</span>, () => {
+  <span class="keyword">let</span> <span class="variable">service</span>: <span class="variable">UserService</span>;
+  <span class="keyword">let</span> <span class="variable">httpMock</span>: <span class="variable">HttpTestingController</span>;
+
+  <span class="keyword">beforeEach</span>(() => {
+    <span class="variable">TestBed</span>.<span class="function">configureTestingModule</span>({
+      <span class="variable">imports</span>: [<span class="variable">HttpClientTestingModule</span>],
+      <span class="variable">providers</span>: [<span class="variable">UserService</span>]
+    });
+
+    <span class="variable">service</span> = <span class="variable">TestBed</span>.<span class="function">inject</span>(<span class="variable">UserService</span>);
+    <span class="variable">httpMock</span> = <span class="variable">TestBed</span>.<span class="function">inject</span>(<span class="variable">HttpTestingController</span>);
+  });
+
+  <span class="keyword">it</span>(<span class="string">'devrait récupérer les utilisateurs'</span>, () => {
+    <span class="keyword">const</span> <span class="variable">mockUsers</span> = [
+      { <span class="variable">id</span>: <span class="number">1</span>, <span class="variable">name</span>: <span class="string">'John'</span> },
+      { <span class="variable">id</span>: <span class="number">2</span>, <span class="variable">name</span>: <span class="string">'Jane'</span> }
+    ];
+
+    <span class="variable">service</span>.<span class="function">getUsers</span>().<span class="function">subscribe</span>(<span class="variable">users</span> => {
+      <span class="keyword">expect</span>(<span class="variable">users</span>.<span class="variable">length</span>).<span class="function">toBe</span>(<span class="number">2</span>);
+      <span class="keyword">expect</span>(<span class="variable">users</span>).<span class="function">toEqual</span>(<span class="variable">mockUsers</span>);
+    });
+
+    <span class="keyword">const</span> <span class="variable">req</span> = <span class="variable">httpMock</span>.<span class="function">expectOne</span>(<span class="string">'/api/users'</span>);
+    <span class="keyword">expect</span>(<span class="variable">req</span>.<span class="variable">request</span>.<span class="variable">method</span>).<span class="function">toBe</span>(<span class="string">'GET'</span>);
+    <span class="variable">req</span>.<span class="function">flush</span>(<span class="variable">mockUsers</span>);
+  });
+});
+                    </div>
+                </div>
+            </div>
+
+            <div class="example-card">
+                <span class="level-indicator level-advanced">AVANCÉ</span>
+                <h4>Test avec composant + service</h4>
+                <div class="code-block">
+<span class="keyword">describe</span>(<span class="string">'UserListComponent avec service'</span>, () => {
+  <span class="keyword">let</span> <span class="variable">component</span>: <span class="variable">UserListComponent</span>;
+  <span class="keyword">let</span> <span class="variable">fixture</span>: <span class="variable">ComponentFixture</span>&lt;<span class="variable">UserListComponent</span>&gt;;
+  <span class="keyword">let</span> <span class="variable">userService</span>: <span class="variable">jasmine.SpyObj</span>&lt;<span class="variable">UserService</span>&gt;;
+
+  <span class="keyword">beforeEach</span>(() => {
+    <span class="keyword">const</span> <span class="variable">spy</span> = <span class="function">jasmine.createSpyObj</span>(<span class="string">'UserService'</span>, [<span class="string">'getUsers'</span>]);
+
+    <span class="variable">TestBed</span>.<span class="function">configureTestingModule</span>({
+      <span class="variable">declarations</span>: [<span class="variable">UserListComponent</span>],
+      <span class="variable">providers</span>: [
+        { <span class="variable">provide</span>: <span class="variable">UserService</span>, <span class="variable">useValue</span>: <span class="variable">spy</span> }
+      ]
+    });
+
+    <span class="variable">fixture</span> = <span class="variable">TestBed</span>.<span class="function">createComponent</span>(<span class="variable">UserListComponent</span>);
+    <span class="variable">component</span> = <span class="variable">fixture</span>.<span class="variable">componentInstance</span>;
+    <span class="variable">userService</span> = <span class="variable">TestBed</span>.<span class="function">inject</span>(<span class="variable">UserService</span>) <span class="keyword">as</span> <span class="variable">jasmine.SpyObj</span>&lt;<span class="variable">UserService</span>&gt;;
+  });
+
+  <span class="keyword">it</span>(<span class="string">'devrait charger les utilisateurs au démarrage'</span>, () => {
+    <span class="keyword">const</span> <span class="variable">mockUsers</span> = [{ <span class="variable">id</span>: <span class="number">1</span>, <span class="variable">name</span>: <span class="string">'Test'</span> }];
+    <span class="variable">userService</span>.<span class="variable">getUsers</span>.<span class="function">and</span>.<span class="function">returnValue</span>(<span class="function">of</span>(<span class="variable">mockUsers</span>));
+
+    <span class="variable">component</span>.<span class="function">ngOnInit</span>();
+
+    <span class="keyword">expect</span>(<span class="variable">userService</span>.<span class="variable">getUsers</span>).<span class="function">toHaveBeenCalled</span>();
+    <span class="keyword">expect</span>(<span class="variable">component</span>.<span class="variable">users</span>).<span class="function">toEqual</span>(<span class="variable">mockUsers</span>);
+  });
+});
+                </div>
+            </div>
+
+            <div class="highlight">
+                <strong>⚡ Point important :</strong> Utilisez <code>jasmine.createSpyObj()</code> pour créer des mocks propres et testables de vos services !
+            </div>
+        </div>
+
+        <!-- Section 4: Techniques Avancées -->
+        <div id="advanced" class="content-section">
+            <h2 class="section-title">🚀 Techniques Avancées</h2>
+
+            <div class="concept-card">
+                <h3>Spies, Mocks et Testing Avancé</h3>
+                <p>Maîtrisez les techniques avancées pour tester des scénarios complexes : async/await, observables, timers, etc.</p>
+            </div>
+
+            <div class="example-grid">
+                <div class="example-card">
+                    <span class="level-indicator level-advanced">AVANCÉ</span>
+                    <h4>Tests asynchrones avec fakeAsync</h4>
+                    <div class="code-block">
+<span class="keyword">import</span> { <span class="variable">fakeAsync</span>, <span class="variable">tick</span>, <span class="variable">flush</span> } <span class="keyword">from</span> <span class="string">'@angular/core/testing'</span>;
+
+<span class="keyword">it</span>(<span class="string">'devrait gérer les délais avec fakeAsync'</span>, <span class="function">fakeAsync</span>(() => {
+  <span class="keyword">let</span> <span class="variable">result</span> = <span class="string">''</span>;
+  
+  <span class="variable">component</span>.<span class="function">delayedAction</span>().<span class="function">then</span>(<span class="variable">value</span> => <span class="variable">result</span> = <span class="variable">value</span>);
+  
+  <span class="comment">// Avance le temps de 1000ms</span>
+  <span class="function">tick</span>(<span class="number">1000</span>);
+  
+  <span class="keyword">expect</span>(<span class="variable">result</span>).<span class="function">toBe</span>(<span class="string">'completed'</span>);
+}));
+
+<span class="keyword">it</span>(<span class="string">'devrait tester les intervalles'</span>, <span class="function">fakeAsync</span>(() => {
+  <span class="variable">component</span>.<span class="function">startTimer</span>();
+  
+  <span class="function">tick</span>(<span class="number">5000</span>); <span class="comment">// 5 secondes</span>
+  
+  <span class="keyword">expect</span>(<span class="variable">component</span>.<span class="variable">counter</span>).<span class="function">toBe</span>(<span class="number">5</span>);
+  
+  <span class="comment">// Nettoie tous les timers restants</span>
+  <span class="function">flush</span>();
+}));
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <span class="level-indicator level-advanced">AVANCÉ</span>
+                    <h4>Tests d'Observables complexes</h4>
+                    <div class="code-block">
+<span class="keyword">import</span> { <span class="variable">cold</span>, <span class="variable">hot</span> } <span class="keyword">from</span> <span class="string">'jasmine-marbles'</span>;
+
+<span class="keyword">it</span>(<span class="string">'devrait filtrer et mapper les données'</span>, () => {
+  <span class="keyword">const</span> <span class="variable">source$</span> = <span class="function">cold</span>(<span class="string">'a-b-c-d|'</span>, {
+    <span class="variable">a</span>: <span class="number">1</span>, <span class="variable">b</span>: <span class="number">2</span>, <span class="variable">c</span>: <span class="number">3</span>, <span class="variable">d</span>: <span class="number">4</span>
+  });
+  
+  <span class="keyword">const</span> <span class="variable">expected$</span> = <span class="function">cold</span>(<span class="string">'--b---d|'</span>, {
+    <span class="variable">b</span>: <span class="number">4</span>, <span class="variable">d</span>: <span class="number">8</span>
+  });
+  
+  <span class="keyword">const</span> <span class="variable">result$</span> = <span class="variable">source$</span>.<span class="function">pipe</span>(
+    <span class="function">filter</span>(<span class="variable">x</span> => <span class="variable">x</span> % <span class="number">2</span> === <span class="number">0</span>),
+    <span class="function">map</span>(<span class="variable">x</span> => <span class="variable">x</span> * <span class="number">2</span>)
+  );
+  
+  <span class="keyword">expect</span>(<span class="variable">result$</span>).<span class="function">toBeObservable</span>(<span class="variable">expected$</span>);
+});
+
+<span class="keyword">it</span>(<span class="string">'devrait gérer les erreurs'</span>, () => {
+  <span class="keyword">const</span> <span class="variable">source$</span> = <span class="function">cold</span>(<span class="string">'a-b-#'</span>, {
+    <span class="variable">a</span>: <span class="number">1</span>, <span class="variable">b</span>: <span class="number">2</span>
+  }, <span class="keyword">new</span> <span class="function">Error</span>(<span class="string">'Test error'</span>));
+  
+  <span class="keyword">const</span> <span class="variable">expected$</span> = <span class="function">cold</span>(<span class="string">'a-b-(c|)'</span>, {
+    <span class="variable">a</span>: <span class="number">1</span>, <span class="variable">b</span>: <span class="number">2</span>, <span class="variable">c</span>: <span class="string">'fallback'</span>
+  });
+  
+  <span class="keyword">const</span> <span class="variable">result$</span> = <span class="variable">source$</span>.<span class="function">pipe</span>(
+    <span class="function">catchError</span>(() => <span class="function">of</span>(<span class="string">'fallback'</span>))
+  );
+  
+  <span class="keyword">expect</span>(<span class="variable">result$</span>).<span class="function">toBeObservable</span>(<span class="variable">expected$</span>);
+});
+                    </div>
+                </div>
+            </div>
+
+            <div class="example-card">
+                <span class="level-indicator level-advanced">AVANCÉ</span>
+                <h4>Custom Matchers</h4>
+                <div class="code-block">
+<span class="comment">// Créer un matcher personnalisé</span>
+<span class="keyword">beforeEach</span>(() => {
+  <span class="variable">jasmine</span>.<span class="function">addMatchers</span>({
+    <span class="function">toBeValidEmail</span>(): <span class="variable">jasmine</span>.<span class="variable">CustomMatcher</span> {
+      <span class="keyword">return</span> {
+        <span class="function">compare</span>(<span class="variable">actual</span>: <span class="keyword">string</span>) {
+          <span class="keyword">const</span> <span class="variable">emailRegex</span> = <span class="string">/^[^\s@]+@[^\s@]+\.[^\s@]+$/</span>;
+          <span class="keyword">const</span> <span class="variable">pass</span> = <span class="variable">emailRegex</span>.<span class="function">test</span>(<span class="variable">actual</span>);
+          
+          <span class="keyword">return</span> {
+            <span class="variable">pass</span>,
+            <span class="variable">message</span>: <span class="variable">pass</span> 
+              ? <span class="string">'Expected not to be a valid email'</span>
+              : <span class="string">`Expected '${actual}' to be a valid email`</span>
+          };
+        }
+      };
+    }
+  });
+});
+
+<span class="keyword">it</span>(<span class="string">'devrait valider les emails'</span>, () => {
+  <span class="keyword">expect</span>(<span class="string">'test@example.com'</span>).<span class="function">toBeValidEmail</span>();
+  <span class="keyword">expect</span>(<span class="string">'invalid-email'</span>).<span class="operator">not</span>.<span class="function">toBeValidEmail</span>();
+});
+                </div>
+            </div>
+
+            <div class="tip">
+                <strong>🔥 Pro tip :</strong> Utilisez <code>jasmine-marbles</code> pour tester facilement les Observables complexes avec une syntaxe visuelle !
+            </div>
+        </div>
+
+        <!-- Section 5: Bonnes Pratiques -->
+        <div id="best-practices" class="content-section">
+            <h2 class="section-title">✨ Bonnes Pratiques</h2>
+
+            <div class="concept-card">
+                <h3>Les règles d'or du testing Angular</h3>
+                <p>Adoptez ces pratiques pour des tests maintenables, lisibles et efficaces.</p>
+            </div>
+
+            <div class="example-grid">
+                <div class="example-card">
+                    <h4>📋 Checklist des bonnes pratiques</h4>
+                    <ul class="checklist">
+                        <li>Un seul concept testé par test (it)</li>
+                        <li>Noms de tests descriptifs et clairs</li>
+                        <li>Arrange, Act, Assert (AAA pattern)</li>
+                        <li>Isolation complète entre les tests</li>
+                        <li>Mock des dépendances externes</li>
+                        <li>Tests rapides (< 100ms par test)</li>
+                        <li>Couverture de code > 80%</li>
+                        <li>Tests des cas d'erreur</li>
+                    </ul>
+                </div>
+
+                <div class="example-card">
+                    <h4>🏗️ Structure recommandée</h4>
+                    <div class="code-block">
+<span class="comment">// ✅ BON : Test clair et focalisé</span>
+<span class="keyword">describe</span>(<span class="string">'UserComponent'</span>, () => {
+  <span class="keyword">describe</span>(<span class="string">'quand l\'utilisateur est connecté'</span>, () => {
+    <span class="keyword">beforeEach</span>(() => {
+      <span class="comment">// Arrange : Configuration spécifique</span>
+      <span class="variable">component</span>.<span class="variable">user</span> = <span class="variable">mockUser</span>;
+      <span class="variable">component</span>.<span class="variable">isLoggedIn</span> = <span class="keyword">true</span>;
+    });
+
+    <span class="keyword">it</span>(<span class="string">'devrait afficher le menu utilisateur'</span>, () => {
+      <span class="comment">// Act</span>
+      <span class="variable">fixture</span>.<span class="function">detectChanges</span>();
+      
+      <span class="comment">// Assert</span>
+      <span class="keyword">const</span> <span class="variable">menu</span> = <span class="variable">fixture</span>.<span class="variable">nativeElement</span>
+        .<span class="function">querySelector</span>(<span class="string">'.user-menu'</span>);
+      <span class="keyword">expect</span>(<span class="variable">menu</span>).<span class="function">toBeTruthy</span>();
+    });
+  });
+});
+                    </div>
+                </div>
+            </div>
+
+            <div class="example-card">
+                <h4>🎯 Tests de Page Objects</h4>
+                <div class="code-block">
+<span class="comment">// Page Object pour réutilisation</span>
+<span class="keyword">class</span> <span class="variable">UserComponentPageObject</span> {
+  <span class="keyword">constructor</span>(<span class="keyword">private</span> <span class="variable">fixture</span>: <span class="variable">ComponentFixture</span>&lt;<span class="variable">UserComponent</span>&gt;) {}
+
+  <span class="keyword">get</span> <span class="function">nameInput</span>() {
+    <span class="keyword">return</span> <span class="keyword">this</span>.<span class="variable">fixture</span>.<span class="variable">nativeElement</span>
+      .<span class="function">querySelector</span>(<span class="string">'input[name="name"]'</span>);
+  }
+
+  <span class="keyword">get</span> <span class="function">submitButton</span>() {
+    <span class="keyword">return</span> <span class="keyword">this</span>.<span class="variable">fixture</span>.<span class="variable">nativeElement</span>
+      .<span class="function">querySelector</span>(<span class="string">'button[type="submit"]'</span>);
+  }
+
+  <span class="function">fillName</span>(<span class="variable">name</span>: <span class="keyword">string</span>) {
+    <span class="keyword">this</span>.<span class="variable">nameInput</span>.<span class="variable">value</span> = <span class="variable">name</span>;
+    <span class="keyword">this</span>.<span class="variable">nameInput</span>.<span class="function">dispatchEvent</span>(<span class="keyword">new</span> <span class="function">Event</span>(<span class="string">'input'</span>));
+    <span class="keyword">this</span>.<span class="variable">fixture</span>.<span class="function">detectChanges</span>();
+  }
+
+  <span class="function">clickSubmit</span>() {
+    <span class="keyword">this</span>.<span class="variable">submitButton</span>.<span class="function">click</span>();
+    <span class="keyword">this</span>.<span class="variable">fixture</span>.<span class="function">detectChanges</span>();
+  }
+}
+
+<span class="comment">// Utilisation dans les tests</span>
+<span class="keyword">describe</span>(<span class="string">'UserComponent'</span>, () => {
+  <span class="keyword">let</span> <span class="variable">pageObject</span>: <span class="variable">UserComponentPageObject</span>;
+
+  <span class="keyword">beforeEach</span>(() => {
+    <span class="variable">pageObject</span> = <span class="keyword">new</span> <span class="variable">UserComponentPageObject</span>(<span class="variable">fixture</span>);
+  });
+
+  <span class="keyword">it</span>(<span class="string">'devrait soumettre le formulaire'</span>, () => {
+    <span class="variable">pageObject</span>.<span class="function">fillName</span>(<span class="string">'John Doe'</span>);
+    <span class="variable">pageObject</span>.<span class="function">clickSubmit</span>();
+    
+    <span class="keyword">expect</span>(<span class="variable">component</span>.<span class="variable">submittedName</span>).<span class="function">toBe</span>(<span class="string">'John Doe'</span>);
+  });
+});
+                </div>
+            </div>
+
+            <div class="highlight">
+                <strong>💎 Conseil d'expert :</strong> Créez des Page Objects pour vos composants complexes. Cela rend vos tests plus lisibles et maintenables !
+            </div>
+
+            <div class="example-card">
+                <h4>⚡ Configuration optimisée pour les performances</h4>
+                <div class="code-block">
+<span class="comment">// karma.conf.js - Configuration optimisée</span>
+<span class="variable">module</span>.<span class="variable">exports</span> = <span class="keyword">function</span>(<span class="variable">config</span>) {
+  <span class="variable">config</span>.<span class="function">set</span>({
+    <span class="comment">// Tests en parallèle</span>
+    <span class="variable">browsers</span>: [<span class="string">'ChromeHeadless'</span>],
+    <span class="variable">singleRun</span>: <span class="keyword">true</span>,
+    
+    <span class="comment">// Cache des modules</span>
+    <span class="variable">webpack</span>: {
+      <span class="variable">cache</span>: <span class="keyword">true</span>
+    },
+    
+    <span class="comment">// Surveillance des fichiers optimisée</span>
+    <span class="variable">autoWatch</span>: <span class="keyword">true</span>,
+    <span class="variable">restartOnFileChange</span>: <span class="keyword">true</span>
+  });
+};
+
+<span class="comment">// angular.json - Tests optimisés</span>
+<span class="string">"test"</span>: {
+  <span class="string">"builder"</span>: <span class="string">"@angular-devkit/build-angular:karma"</span>,
+  <span class="string">"options"</span>: {
+    <span class="string">"codeCoverage"</span>: <span class="keyword">true</span>,
+    <span class="string">"watch"</span>: <span class="keyword">false</span>,
+    <span class="string">"browsers"</span>: <span class="string">"ChromeHeadless"</span>
+  }
+}
+                </div>
+            </div>
+
+            <div class="interactive-demo">
+                <h4>🎮 Quiz Final - Testez vos connaissances !</h4>
+                <p>Répondez à ces questions pour valider votre compréhension :</p>
+                <div id="quiz-container">
+                    <div class="quiz-question" id="question1">
+                        <p><strong>Question 1:</strong> Quelle est la différence entre <code>toBe()</code> et <code>toEqual()</code> ?</p>
+                        <button onclick="showAnswer(1, 'toBe() compare les références, toEqual() compare les valeurs')">Répondre</button>
+                    </div>
+                    <div class="quiz-question" id="question2" style="margin-top: 15px;">
+                        <p><strong>Question 2:</strong> Quand utilise-t-on <code>fakeAsync()</code> et <code>tick()</code> ?</p>
+                        <button onclick="showAnswer(2, 'Pour tester du code asynchrone en contrôlant le temps')">Répondre</button>
+                    </div>
+                </div>
+                <div id="quiz-results" style="margin-top: 20px; display: none;">
+                    <h4 style="color: green;">🎉 Félicitations ! Tu maîtrises les bases de Jasmine avec Angular !</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSection = 'basics';
+        let progress = 0;
+
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+            
+            currentSection = sectionId;
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const sections = ['basics', 'components', 'services', 'advanced', 'best-practices'];
+            const currentIndex = sections.indexOf(currentSection);
+            const progressPercent = ((currentIndex + 1) / sections.length) * 100;
+            
+            document.getElementById('progressBar').style.width = progressPercent + '%';
+        }
+
+        function runMatcherDemo() {
+            const resultDiv = document.getElementById('matcherResult');
+            resultDiv.style.display = 'block';
+            
+            const examples = [
+                'expect("hello").toBe("hello") ✅',
+                'expect({a: 1}).toEqual({a: 1}) ✅',
+                'expect({a: 1}).toBe({a: 1}) ❌ (différentes références)',
+                'expect([1,2,3]).toContain(2) ✅',
+                'expect(true).toBeTruthy() ✅'
+            ];
+            
+            resultDiv.innerHTML = '<h5>Exemples de matchers :</h5>' + 
+                examples.map(ex => '<div style="padding: 5px; font-family: monospace;">' + ex + '</div>').join('');
+        }
+
+        let answeredQuestions = 0;
+
+        function showAnswer(questionNum, answer) {
+            const questionDiv = document.getElementById('question' + questionNum);
+            questionDiv.innerHTML += '<div style="background: #e8f5e8; padding: 10px; margin-top: 10px; border-radius: 5px; border-left: 3px solid #4caf50;"><strong>Réponse:</strong> ' + answer + '</div>';
+            
+            answeredQuestions++;
+            if (answeredQuestions >= 2) {
+                document.getElementById('quiz-results').style.display = 'block';
+            }
+        }
+
+        // Initialize progress
+        updateProgress();
+    </script>
+</body>
+</html>

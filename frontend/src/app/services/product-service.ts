@@ -54,16 +54,37 @@ export class ProductService {
   }
 
   /**
-   * Retrieves a product by its ID.
-   * @param id The ID of the product to retrieve.
-   * @returns A string representing the product (TODO: Implement actual logic to return Product object).
-   */
-  getProductById(id: number): string {
-    // TODO: Implémenter la vraie logique
-    return `Product ${id}`;
+ * Récupère un produit par son ID depuis le backend.
+ * @param id L'ID du produit à récupérer.
+ * @returns Une Promise qui résout avec le produit ou une erreur.
+ */
+  async getProductById(id: string): Promise<ServiceResponse> {
+    try {
+      const response = await firstValueFrom(
+        this.http.get<Product>(this.apiUrl.GET_PRODUCT_BY_ID(id), {
+          headers: {
+            'Authorization': this.getHeaderToken()
+          }
+        }).pipe(
+          catchError((error: HttpErrorResponse) => {
+            console.error('Error fetching product by ID:', error);
+            return throwError(() => handleHttpError(error));
+          })
+        )
+      );
+      return {
+        success: true,
+        data: response
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: handleHttpError(error).message
+      };
+    }
   }
 
-  /**
+ /**
    * Retrieves the authentication token from local storage and formats it for HTTP headers.
    * @returns The formatted authorization header string.
    * @throws Error if no authentication token is found.
@@ -226,7 +247,6 @@ export class ProductService {
 
       const results: any[] = [];
       const errors: string[] = [];
-
       // Traitement séquentiel des fichiers
       for (let index = 0; index < formdata.length; index++) {
         const file = formdata[index];

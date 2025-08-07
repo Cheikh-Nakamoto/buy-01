@@ -56,7 +56,7 @@ export class ApiUrlService {
    * API endpoint to get a product by ID.
    * @param id The ID of the product to retrieve.
    */
-  readonly GET_PRODUCT_BY_ID = (id: number) => `${this.baseUrl}/api/products/${id}`;
+  readonly GET_PRODUCT_BY_ID = (id: string) => `${this.baseUrl}/api/products/${id}`;
   /**
    * API endpoint to update a product by ID.
    * @param id The ID of the product to update.
