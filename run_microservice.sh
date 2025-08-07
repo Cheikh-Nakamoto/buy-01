@@ -5,9 +5,9 @@
 
 # Configuration
 BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-MICROSERVICES_DIR="${BASE_DIR}/backend/api"  # Chemin relatif depuis l'emplacement du script
-START_COMMAND="mvn spring-boot:run"         # Commande pour démarrer chaque service
-DELAY_BETWEEN_STARTS=1                      # Délai entre les lancements en secondes
+MICROSERVICES_DIR="${BASE_DIR}/backend/api"
+DEFAULT_START_COMMAND="mvn spring-boot:run"
+DELAY_BETWEEN_STARTS=1
 
 # Couleurs pour l'affichage
 RED='\033[0;31m'
@@ -22,18 +22,9 @@ error_exit() {
     exit 1
 }
 
-# Vérification initiale
-echo -e "${GREEN}🚀 Préparation du lancement des microservices...${NC}"
-
-# Vérifier que le répertoire des microservices existe
-if [ ! -d "$MICROSERVICES_DIR" ]; then
-    error_exit "Le répertoire des microservices n'existe pas: $MICROSERVICES_DIR"
-fi
-
-# Vérifier que Maven est installé
-if ! command -v mvn &> /dev/null; then
-    error_exit "Maven (mvn) n'est pas installé ou n'est pas dans le PATH"
-fi
+# Appliquer la config outside avant de lancer les services
+echo -e "${BLUE}🔧 Application de la configuration '--outside' avec toggle-config.sh...${NC}"
+"${BASE_DIR}/toggle-config.sh" --outside || error_exit "Échec de la configuration avec toggle-config.sh"
 
 # Détection du terminal
 detect_terminal() {
@@ -65,69 +56,100 @@ detect_terminal() {
     esac
 }
 
-# Lancement d'un microservice
+# Lancer un microservice
 launch_microservice() {
     local service_dir="$1"
     local service_name="$(basename "$service_dir")"
     local terminal_type=$(detect_terminal)
-    
+    local start_cmd="$DEFAULT_START_COMMAND"
+
     echo -e "${BLUE}📦 Traitement du service: ${YELLOW}${service_name}${NC}"
     echo -e "   📁 Répertoire: ${service_dir}"
 
     if [ ! -f "${service_dir}/pom.xml" ] && [ ! -f "${service_dir}/build.gradle" ]; then
-        echo -e "${YELLOW}   ⚠️  Avertissement: Aucun fichier de build détecté, ignoré${NC}"
+        echo -e "${YELLOW}   ⚠️ Aucun projet Maven/Gradle détecté. Ignoré.${NC}"
         return 1
+    fi
+
+    # Choix du gestionnaire de build
+    if [ -f "${service_dir}/pom.xml" ]; then
+        start_cmd="mvn spring-boot:run"
+    elif [ -f "${service_dir}/build.gradle" ]; then
+        start_cmd="./gradlew bootRun"
     fi
 
     case $terminal_type in
         "gnome-terminal")
             gnome-terminal --tab --title="$service_name" --working-directory="$service_dir" \
-                -- bash -c "echo -e '${GREEN}Démarrage de $service_name...${NC}'; ${START_COMMAND}; \
+                -- bash -c "echo -e '${GREEN}Démarrage de $service_name...${NC}'; ${start_cmd}; \
                 echo -e '\n${RED}Service $service_name terminé. Appuyez sur Entrée pour fermer...${NC}'; read" &
             ;;
         "xterm")
-            xterm -T "$service_name" -hold -e "cd '$service_dir' && \
-                echo -e '${GREEN}Démarrage de $service_name...${NC}' && ${START_COMMAND}" &
+            xterm -T "$service_name" -hold -e "cd '$service_dir' && echo -e '${GREEN}Démarrage de $service_name...${NC}' && ${start_cmd}" &
             ;;
         "konsole")
             konsole --new-tab --workdir "$service_dir" -p "TabTitle=$service_name" \
-                -e bash -c "echo -e '${GREEN}Démarrage de $service_name...${NC}' && ${START_COMMAND}" &
+                -e bash -c "echo -e '${GREEN}Démarrage de $service_name...${NC}' && ${start_cmd}" &
             ;;
         "osascript")
-            osascript -e "tell application \"Terminal\" to do script \"cd '$service_dir' && \
-                echo -e '\\\\\\e[32mDémarrage de $service_name...\\\\\\e[0m' && ${START_COMMAND}\"" &
+            osascript -e "tell application \"Terminal\" to do script \"cd '$service_dir' && echo -e '\\\\\\e[32mDémarrage de $service_name...\\\\\\e[0m' && ${start_cmd}\"" &
             ;;
         "cmd")
-            cmd.exe /c start cmd.exe /k "cd \"$(wslpath -w "$service_dir")\" && \
-                echo Démarrage de $service_name... && ${START_COMMAND}" &
+            cmd.exe /c start cmd.exe /k "cd \"$(wslpath -w "$service_dir")\" && echo Démarrage de $service_name... && ${start_cmd}" &
             ;;
         *)
-            echo -e "${YELLOW}   ⚠️  Terminal non supporté. Lancement en arrière-plan dans le répertoire...${NC}"
-            (cd "$service_dir" && ${START_COMMAND} &)
+            echo -e "${YELLOW}   ⚠️ Terminal non supporté. Lancement en arrière-plan...${NC}"
+            (cd "$service_dir" && ${start_cmd} &) || return 1
             ;;
     esac
 
     return 0
 }
 
-# Main execution
-echo -e "${GREEN}🔍 Recherche des microservices dans: ${MICROSERVICES_DIR}${NC}"
+# Vérification initiale
+echo -e "${GREEN}🚀 Préparation du lancement des microservices...${NC}"
 
+if [ ! -d "$MICROSERVICES_DIR" ]; then
+    error_exit "Le répertoire des microservices est introuvable : $MICROSERVICES_DIR"
+fi
+
+if ! command -v mvn &> /dev/null && ! command -v ./mvnw &> /dev/null; then
+    error_exit "Maven n'est pas installé ou non accessible dans le PATH"
+fi
+
+# Gestion des arguments : services spécifiques
+TARGET_SERVICES=()
+
+if [ "$#" -gt 0 ]; then
+    for arg in "$@"; do
+        TARGET_SERVICES+=("$arg")
+    done
+else
+    for service_path in "${MICROSERVICES_DIR}"/*; do
+        [ -d "$service_path" ] && TARGET_SERVICES+=("$(basename "$service_path")")
+    done
+fi
+
+# Lancer les services
 services_launched=0
-for service_dir in "${MICROSERVICES_DIR}"/*; do
-    if [ -d "$service_dir" ]; then
-        launch_microservice "$service_dir" && ((services_launched++))
-        sleep "$DELAY_BETWEEN_STARTS"  # Petit délai entre les lancements
+
+for service_name in "${TARGET_SERVICES[@]}"; do
+    service_path="${MICROSERVICES_DIR}/${service_name}"
+    if [ -d "$service_path" ]; then
+        launch_microservice "$service_path" && ((services_launched++))
+        sleep "$DELAY_BETWEEN_STARTS"
+    else
+        echo -e "${YELLOW}⚠️  Répertoire du service introuvable : $service_name${NC}"
     fi
 done
 
 # Résumé
 if [ "$services_launched" -gt 0 ]; then
-    echo -e "\n${GREEN}✅ ${services_launched} microservice(s) lancé(s) avec succès!${NC}"
+    echo -e "\n${GREEN}✅ ${services_launched} microservice(s) lancé(s) avec succès !${NC}"
 else
-    echo -e "\n${RED}❌ Aucun microservice valide trouvé à lancer${NC}"
+    echo -e "\n${RED}❌ Aucun microservice valide n'a pu être lancé.${NC}"
     exit 1
 fi
 
-echo -e "\n${GREEN}🎉 Tous les services ont été démarrés${NC}"
-echo -e "${BLUE}ℹ️  Vérifiez les terminaux ouverts pour voir les sorties des services${NC}"
+echo -e "\n${GREEN}🎉 Tous les services demandés ont été démarrés${NC}"
+echo -e "${BLUE}ℹ️  Consulte les terminaux ouverts pour voir la sortie des services.${NC}"
