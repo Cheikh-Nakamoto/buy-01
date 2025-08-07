@@ -249,7 +249,7 @@ export class ProductList implements OnInit {
    * Updates the `filteredProducts` signal with the results.
    */
   applyFilters() {
-    let filtered = [...this.products()]; // Créer une copie inversée des produits
+    let filtered = [...reverseListDoubleLoop(this.products())]; // Créer une copie inversée des produits
 
 
     // Filtrage par catégorie
