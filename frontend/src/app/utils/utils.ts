@@ -40,6 +40,9 @@ export function handleHttpError(error: HttpErrorResponse): Error {
             case 500:
                 errorMessage = `Server error. Please try again later.`;
                 break;
+            case 503:
+                errorMessage = `Server error. Please try again later.`;
+                break;    
             case 0:
                 errorMessage = `Network error. Please check your connection.`;
                 break;
