@@ -1,10 +1,13 @@
 <nav class="navbar">
-  <app-toast-error [currentNotification]="messageStatus"></app-toast-error>
+    <app-toast-error [currentNotification]="messageStatus"></app-toast-error>
     <div class="navbar-container">
         <!-- Logo et nom du site -->
         <div class="navbar-brand">
+
             <div class="logo">
-                <img src="/logo.png" alt="">
+                <a href="" (click)="navigateAndSetActive('/', $event)">
+                    <img src="/logo.png" alt="">
+                </a>
             </div>
         </div>
 
@@ -23,9 +26,9 @@
         <!-- Actions utilisateur -->
         <div class="navbar-actions">
             <!-- Favoris -->
-            <button class="action-btn favorites-btn">
+            <!--button class="action-btn favorites-btn">
                 <span class="icon">♡</span>
-            </button>
+            </!--button-->
 
             <!-- Panier -->
             <button class="action-btn cart-btn">

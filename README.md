@@ -129,47 +129,16 @@ https://localhost:8443/swagger-ui.html
 ```bash
 cd frontend
 npm install
-compodoc -s
-ng serve -o --proxy-config proxy.conf.json
+npm run compodoc:serve
+npm start
 ```
 
 ### Option 3 : Démarrage manuel (Développement)
 
-1. **Démarrer l'infrastructure**
+**Démarrer les services Spring Boot via le Script**
+
 ```bash
-# MongoDB, Kafka, Zookeeper uniquement
-docker-compose up user-mongodb product-mongodb media-mongodb zookeeper kafka
-```
-
-2. **Démarrer les services Spring Boot (dans l'ordre)**
-```bash
-# 1. Discovery Server
-cd backend/api/discovery-server
-./mvnw spring-boot:run
-
-# 2. User Service
-cd backend/api/user
-./mvnw spring-boot:run
-
-# 3. Product Service  
-cd backend/api/product
-./mvnw spring-boot:run
-
-# 4. Media Service
-cd backend/api/media
-./mvnw spring-boot:run
-
-# 5. Gateway Service
-cd backend/api/gateway-service
-./mvnw spring-boot:run
-```
-
-3. **Démarrer le frontend Angular**
-```bash
-cd frontend
-npm install
-compodoc -s
-ng serve -o --proxy-config proxy.conf.json
+./run_microservice.sh
 ```
 
 ## ⚙️ Configuration
@@ -227,7 +196,7 @@ Chaque service a sa propre base de données :
   - `product-service-group` 
   - `media-service-group`
 
-## 📚 Documentation API
+## 📚 Documentation API & Frontend(Angular)
 
 ### Swagger UI Centralisé
 - **Gateway Swagger** : https://localhost:8443/swagger-ui.html
@@ -237,6 +206,18 @@ Chaque service a sa propre base de données :
 - **User Service** : http://localhost:8081/swagger-ui.html
 - **Product Service** : http://localhost:8082/swagger-ui.html  
 - **Media Service** : http://localhost:8083/swagger-ui.html
+
+### Generate and serve frontend documentation  with hot-reload:
+```bash
+cd frontend
+npm install
+npm run compodoc:serve
+```
+#### After it, You'll able to see frontend doc on this link:
+
+
+[http://localhost:8080/](http://localhost:8080/)
+
 
 ### Routes Gateway principales
 

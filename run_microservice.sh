@@ -7,7 +7,7 @@
 BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MICROSERVICES_DIR="${BASE_DIR}/backend/api"
 DEFAULT_START_COMMAND="mvn spring-boot:run"
-DELAY_BETWEEN_STARTS=1
+DELAY_BETWEEN_STARTS=10
 
 # Couleurs pour l'affichage
 RED='\033[0;31m'
@@ -21,6 +21,107 @@ error_exit() {
     echo -e "${RED}❌ Erreur: $1${NC}" >&2
     exit 1
 }
+
+launch_in_terminal() {
+    local title="$1"
+    local dir="$2"
+    local command="$3"
+    local terminal_type=$(detect_terminal)
+
+    case $terminal_type in
+        "gnome-terminal")
+            gnome-terminal --tab --title="$title" --working-directory="$dir" \
+                -- bash -c "echo -e '\033[0;32m${title}...\033[0m'; ${command}; \
+                echo -e '\n\033[0;31mProcess terminé. Appuie sur Entrée pour fermer...\033[0m'; read" &
+            ;;
+        "xterm")
+            xterm -T "$title" -hold -e "cd '$dir' && echo -e '\033[0;32m${title}...\033[0m' && ${command}" &
+            ;;
+        "konsole")
+            konsole --new-tab --workdir "$dir" -p "TabTitle=$title" \
+                -e bash -c "echo -e '\033[0;32m${title}...\033[0m' && ${command}" &
+            ;;
+        "osascript")
+            osascript -e "tell application \"Terminal\" to do script \"cd '$dir' && echo -e '\\\\\\e[32m${title}...\\\\\\e[0m' && ${command}\"" &
+            ;;
+        "cmd")
+            cmd.exe /c start cmd.exe /k "cd \"$(wslpath -w "$dir")\" && echo ${title}... && ${command}" &
+            ;;
+        *)
+            echo -e "${YELLOW}⚠️ Terminal non supporté. Lancement en arrière-plan...${NC}"
+            (cd "$dir" && ${command} &) || return 1
+            ;;
+    esac
+}
+
+
+# 🔧 Crée le réseau buy-network s’il n’existe pas
+ensure_docker_network() {
+    local network_name="$1"
+    if ! docker network ls --format '{{.Name}}' | grep -q "^${network_name}$"; then
+        echo -e "${YELLOW}🔌 Réseau ${network_name} absent. Création en cours...${NC}"
+        docker network create "$network_name" > /dev/null
+        echo -e "${GREEN}✅ Réseau ${network_name} créé avec succès${NC}"
+    else
+        echo -e "${GREEN}🔗 Réseau ${network_name} déjà présent${NC}"
+    fi
+}
+
+# Lancer Mongo si nécessaire
+start_mongo_container() {
+    local name="$1"
+    local db_name="$2"
+    local port="$3"
+    local volume="$4"
+    local image="mongo:latest"
+
+    echo -e "${BLUE}🛢️  Vérification du conteneur MongoDB: ${YELLOW}${name}${NC}"
+
+    ensure_docker_image "$image"
+
+    if docker ps -a --format '{{.Names}}' | grep -q "^${name}$"; then
+        if docker ps --format '{{.Names}}' | grep -q "^${name}$"; then
+            echo -e "${GREEN}✅ ${name} est déjà en cours d'exécution${NC}"
+        else
+            echo -e "${YELLOW}⏳ ${name} existe mais n'est pas en cours... Démarrage...${NC}"
+            docker start "$name" > /dev/null
+            echo -e "${GREEN}✅ ${name} démarré avec succès${NC}"
+        fi
+    else
+        echo -e "${YELLOW}🚀 ${name} n'existe pas encore. Création et lancement...${NC}"
+
+        # Crée le volume s'il n'existe pas (optionnel)
+        if ! docker volume ls --format '{{.Name}}' | grep -q "^${volume}$"; then
+            docker volume create "$volume" > /dev/null
+            echo -e "${GREEN}📁 Volume ${volume} créé${NC}"
+        fi
+
+        docker run -d \
+            --name "$name" \
+            -e MONGO_INITDB_DATABASE="$db_name" \
+            -e MONGO_INITDB_ROOT_USERNAME=root \
+            -e MONGO_INITDB_ROOT_PASSWORD=secret \
+            -p "$port:27017" \
+            -v "${volume}:/data/db" \
+            --network buy-network \
+            "$image" > /dev/null
+
+        if [ $? -eq 0 ]; then
+            echo -e "${GREEN}✅ ${name} lancé avec succès sur le port ${port}${NC}"
+        else
+            error_exit "❌ Échec du lancement de ${name}"
+        fi
+    fi
+}
+
+echo -e "${GREEN}🧩 Initialisation des bases MongoDB nécessaires...${NC}"
+
+ensure_docker_network "buy-network"
+
+start_mongo_container "user-mongodb" "user_db" 27017 "user_mongo_data"
+start_mongo_container "product-mongodb" "product_db" 27018 "product_mongo_data"
+start_mongo_container "media-mongodb" "media_db" 27019 "media_mongo_data"
+
 
 # Appliquer la config outside avant de lancer les services
 echo -e "${BLUE}🔧 Application de la configuration '--outside' avec toggle-config.sh...${NC}"
@@ -153,3 +254,16 @@ fi
 
 echo -e "\n${GREEN}🎉 Tous les services demandés ont été démarrés${NC}"
 echo -e "${BLUE}ℹ️  Consulte les terminaux ouverts pour voir la sortie des services.${NC}"
+
+sleep 30 # Pause pour laisser le temps au backend de démarrer
+
+# Aller dans le dossier du frontend (modifie cette ligne si besoin)
+cd frontend || { echo "❌ Dossier 'frontend' introuvable."; exit 1; }
+
+echo -e "${GREEN}🌐 Lancement du frontend Angular avec proxy...${NC}"
+npm install
+# 💡 Lancer compodoc dans un terminal séparé
+launch_in_terminal "📘 Compodoc" "$PWD" "npm run compodoc:serve"
+
+# 💡 Lancer Angular dans le terminal courant
+npm start

@@ -1,0 +1,893 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>e-comerce documentation</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="icon" type="image/x-icon" href="../images/favicon.ico">
+	   <link rel="stylesheet" href="../styles/style.css">
+        <link rel="stylesheet" href="../styles/dark.css">
+    </head>
+    <body>
+          <script>
+               // Blocking script to avoid flickering dark mode
+               // Dark mode toggle button
+               var useDark = window.matchMedia('(prefers-color-scheme: dark)');
+               var darkModeState = useDark.matches;
+               var $darkModeToggleSwitchers = document.querySelectorAll('.dark-mode-switch input');
+               var $darkModeToggles = document.querySelectorAll('.dark-mode-switch');
+               var darkModeStateLocal = localStorage.getItem('compodoc_darkmode-state');
+
+               function checkToggle(check) {
+                    for (var i = 0; i < $darkModeToggleSwitchers.length; i++) {
+                         $darkModeToggleSwitchers[i].checked = check;
+                    }
+               }
+
+               function toggleDarkMode(state) {
+                    if (window.localStorage) {
+                         localStorage.setItem('compodoc_darkmode-state', state);
+                    }
+
+                    checkToggle(state);
+
+                    const hasClass = document.body.classList.contains('dark');
+
+                    if (state) {
+                         for (var i = 0; i < $darkModeToggles.length; i++) {
+                              $darkModeToggles[i].classList.add('dark');
+                         }
+                         if (!hasClass) {
+                              document.body.classList.add('dark');
+                         }
+                    } else {
+                         for (var i = 0; i < $darkModeToggles.length; i++) {
+                              $darkModeToggles[i].classList.remove('dark');
+                         }
+                         if (hasClass) {
+                              document.body.classList.remove('dark');
+                         }
+                    }
+               }
+
+               useDark.addEventListener('change', function (evt) {
+                    toggleDarkMode(evt.matches);
+               });
+               if (darkModeStateLocal) {
+                    darkModeState = darkModeStateLocal === 'true';
+               }
+               toggleDarkMode(darkModeState);
+          </script>
+
+        <div class="navbar navbar-default navbar-fixed-top d-md-none p-0">
+               <div class="d-flex">
+                    <a href="../" class="navbar-brand">e-comerce documentation</a>
+                    <button type="button" class="btn btn-default btn-menu ion-ios-menu" id="btn-menu"></button>
+               </div>
+        </div>
+
+        <div class="xs-menu menu" id="mobile-menu">
+                <div id="book-search-input" role="search"><input type="text" placeholder="Type to search"></div>            <compodoc-menu></compodoc-menu>
+        </div>
+
+        <div class="container-fluid main">
+           <div class="row main">
+               <div class="d-none d-md-block menu">
+                   <compodoc-menu mode="normal"></compodoc-menu>
+               </div>
+               <!-- START CONTENT -->
+               <div class="content injectable">
+                   <div class="content-data">
+
+
+
+
+
+
+
+
+<ol class="breadcrumb">
+  <li class="breadcrumb-item">Injectables</li>
+  <li class="breadcrumb-item" >AuthService</li>
+</ol>
+
+<ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item">
+            <a href="#info" 
+                class="nav-link"
+                class="nav-link active"
+                role="tab" id="info-tab" data-bs-toggle="tab" data-link="info">Info</a>
+        </li>
+        <li class="nav-item">
+            <a href="#source" 
+                class="nav-link"
+                
+                role="tab" id="source-tab" data-bs-toggle="tab" data-link="source">Source</a>
+        </li>
+</ul>
+
+<div class="tab-content">
+    <div class="tab-pane fade active in" id="info">
+        <p class="comment">
+            <h3>File</h3>
+        </p>
+        <p class="comment">
+            <code>src/app/services/auth.service.ts</code>
+        </p>
+
+
+
+
+
+            <section data-compodoc="block-index">
+    <h3 id="index">Index</h3>
+    <table class="table table-sm table-bordered index-table">
+        <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <h6><b>Properties</b></h6>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <ul class="index-list">
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#_isSignIn" >_isSignIn</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#currentUser$" >currentUser$</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#currentUserSubject" >currentUserSubject</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#isSignIn$" >isSignIn$</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <h6><b>Methods</b></h6>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <ul class="index-list">
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#checkAuth" >checkAuth</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#signIn" >signIn</a>
+                            </li>
+                            <li>
+                                <a href="#signOut" >signOut</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#signUp" >signUp</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+
+
+
+
+
+        </tbody>
+    </table>
+</section>
+
+            <section data-compodoc="block-constructor">
+    <h3 id="constructor">Constructor</h3>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+<code>constructor(apiUrlService: <a href="../injectables/ApiUrlService.html" target="_self">ApiUrlService</a>, sharedData: <a href="../injectables/DataService.html" target="_self">DataService</a>)</code>
+                    </td>
+                </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="20" class="link-to-prism">src/app/services/auth.service.ts:20</a></div>
+                            </td>
+                        </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                            <div>
+                                    <b>Parameters :</b>
+                                    <table class="params">
+                                        <thead>
+                                            <tr>
+                                                <td>Name</td>
+                                                    <td>Type</td>
+                                                <td>Optional</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                                <tr>
+                                                        <td>apiUrlService</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../injectables/ApiUrlService.html" target="_self" >ApiUrlService</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>sharedData</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../injectables/DataService.html" target="_self" >DataService</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                        </tbody>
+                                    </table>
+                            </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+</section>
+
+            <section data-compodoc="block-methods">
+    
+    <h3 id="methods">
+        Methods
+    </h3>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="checkAuth"></a>
+                    <span class="name">
+                            <span class="modifier">Async</span>
+                        <span ><b>checkAuth</b></span>
+                        <a href="#checkAuth"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                        <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>checkAuth()</code>
+                </td>
+            </tr>
+
+
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="142"
+                                    class="link-to-prism">src/app/services/auth.service.ts:142</a></div>
+                        </td>
+                    </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                        <div class="io-description"><p>Checks the current authentication status by verifying the stored token with the backend.
+Updates the <code>currentUserSubject</code> and <code>_isSignIn</code> signals based on the token&#39;s validity.</p>
+</div>
+
+                        <div class="io-description">
+                            <b>Returns : </b>    <code>Promise&lt;boolean&gt;</code>
+
+                        </div>
+                            <div class="io-description">
+                                <p>A Promise that resolves to <code>true</code> if the user is authenticated, <code>false</code> otherwise.</p>
+
+                            </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="signIn"></a>
+                    <span class="name">
+                            <span class="modifier">Async</span>
+                        <span ><b>signIn</b></span>
+                        <a href="#signIn"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                        <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>signIn(data_form: <a href="../interfaces/AuthFormData.html" target="_self">AuthFormData</a>)</code>
+                </td>
+            </tr>
+
+
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="33"
+                                    class="link-to-prism">src/app/services/auth.service.ts:33</a></div>
+                        </td>
+                    </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                        <div class="io-description"><p>Authenticates a user by sending their credentials to the login API.
+On successful login, stores the authentication token and updates the user&#39;s sign-in status.</p>
+</div>
+
+                            <div class="io-description">
+                                <b>Parameters :</b>
+                                
+                                <table class="params">
+                                    <thead>
+                                        <tr>
+                                            <td>Name</td>
+                                                <td>Type</td>
+                                            <td>Optional</td>
+                                                <td>Description</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                                <td>data_form</td>
+                                            <td>
+                                                            <code><a href="../interfaces/AuthFormData.html" target="_self" >AuthFormData</a></code>
+                                            </td>
+
+                                            <td>
+                                                    No
+                                            </td>
+
+
+                                            <td>
+                                                    <p>The authentication form data containing email and password.</p>
+
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <div class="io-description">
+                            <b>Returns : </b>        <code><a href="../interfaces/ServiceResponse.html" target="_self" >Promise&lt;ServiceResponse&gt;</a></code>
+
+                        </div>
+                            <div class="io-description">
+                                <p>A Promise that resolves to <code>true</code> if sign-in is successful, <code>false</code> otherwise.</p>
+
+                            </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="signOut"></a>
+                    <span class="name">
+                        <span ><b>signOut</b></span>
+                        <a href="#signOut"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>signOut()</code>
+                </td>
+            </tr>
+
+
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="128"
+                                    class="link-to-prism">src/app/services/auth.service.ts:128</a></div>
+                        </td>
+                    </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                        <div class="io-description"><p>Signs out the current user by clearing local storage and resetting authentication states.</p>
+</div>
+
+                        <div class="io-description">
+                            <b>Returns : </b>        <code><a href="../interfaces/ServiceResponse.html" target="_self" >ServiceResponse</a></code>
+
+                        </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="signUp"></a>
+                    <span class="name">
+                            <span class="modifier">Async</span>
+                        <span ><b>signUp</b></span>
+                        <a href="#signUp"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                        <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>signUp(data_form: <a href="../interfaces/AuthFormData.html" target="_self">AuthFormData</a>, avatarFile?: File)</code>
+                </td>
+            </tr>
+
+
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="65"
+                                    class="link-to-prism">src/app/services/auth.service.ts:65</a></div>
+                        </td>
+                    </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                        <div class="io-description"><p>Registers a new user by sending their registration data and an optional avatar file to the sign-up API.</p>
+</div>
+
+                            <div class="io-description">
+                                <b>Parameters :</b>
+                                
+                                <table class="params">
+                                    <thead>
+                                        <tr>
+                                            <td>Name</td>
+                                                <td>Type</td>
+                                            <td>Optional</td>
+                                                <td>Description</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                                <td>data_form</td>
+                                            <td>
+                                                            <code><a href="../interfaces/AuthFormData.html" target="_self" >AuthFormData</a></code>
+                                            </td>
+
+                                            <td>
+                                                    No
+                                            </td>
+
+
+                                            <td>
+                                                    <p>The registration form data containing user details.</p>
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                                <td>avatarFile</td>
+                                            <td>
+                                                        <code>File</code>
+                                            </td>
+
+                                            <td>
+                                                    Yes
+                                            </td>
+
+
+                                            <td>
+                                                    <p>Optional. The avatar image file to upload for the new user.</p>
+
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <div class="io-description">
+                            <b>Returns : </b>        <code><a href="../interfaces/ServiceResponse.html" target="_self" >Promise&lt;ServiceResponse&gt;</a></code>
+
+                        </div>
+                            <div class="io-description">
+                                <p>A Promise that resolves when the sign-up process is complete.</p>
+
+                            </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+            <section data-compodoc="block-properties">
+    
+    <h3 id="inputs">
+        Properties
+    </h3>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="_isSignIn"></a>
+                    <span class="name">
+                            <span class="modifier">Private</span>
+                        <span ><b>_isSignIn</b></span>
+                        <a href="#_isSignIn"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Default value : </i><code>signal&lt;boolean&gt;(false)</code>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="19" class="link-to-prism">src/app/services/auth.service.ts:19</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="currentUser$"></a>
+                    <span class="name">
+                            <span class="modifier">Public</span>
+                        <span ><b>currentUser$</b></span>
+                        <a href="#currentUser$"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Default value : </i><code>this.currentUserSubject.asReadonly()</code>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="18" class="link-to-prism">src/app/services/auth.service.ts:18</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="currentUserSubject"></a>
+                    <span class="name">
+                            <span class="modifier">Private</span>
+                        <span ><b>currentUserSubject</b></span>
+                        <a href="#currentUserSubject"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Default value : </i><code>signal&lt;User | null&gt;(null)</code>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="17" class="link-to-prism">src/app/services/auth.service.ts:17</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="isSignIn$"></a>
+                    <span class="name">
+                            <span class="modifier">Public</span>
+                        <span ><b>isSignIn$</b></span>
+                        <a href="#isSignIn$"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Default value : </i><code>this._isSignIn.asReadonly()</code>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="20" class="link-to-prism">src/app/services/auth.service.ts:20</a></div>
+                        </td>
+                    </tr>
+
+
+        </tbody>
+    </table>
+</section>
+
+    </div>
+
+
+    <div class="tab-pane fade  tab-source-code" id="source">
+        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { Injectable, signal } from &#x27;@angular/core&#x27;;
+import { BehaviorSubject, Observable, of } from &#x27;rxjs&#x27;;
+import { delay, map } from &#x27;rxjs/operators&#x27;;
+import { User, AuthFormData, AuthResponse, ServiceResponse } from &#x27;../models/interfaces&#x27;;
+import { ApiUrlService } from &#x27;./api-url-service&#x27;;
+import { handleHttpError } from &#x27;../utils/utils&#x27;;
+import { DataService } from &#x27;./data-service&#x27;;
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+/**
+ * Service for handling user authentication, including sign-in, sign-up, and session management.
+ * Manages the current user&#x27;s authentication state and provides methods for interacting with the authentication API.
+ */
+export class AuthService {
+  private currentUserSubject &#x3D; signal&lt;User | null&gt;(null);
+  public currentUser$ &#x3D; this.currentUserSubject.asReadonly();
+  private _isSignIn &#x3D; signal&lt;boolean&gt;(false);
+  public isSignIn$ &#x3D; this._isSignIn.asReadonly();
+
+  constructor(private apiUrlService: ApiUrlService, private sharedData: DataService) {
+    // Check for stored user
+    this.checkAuth();
+  }
+
+  /**
+   * Authenticates a user by sending their credentials to the login API.
+   * On successful login, stores the authentication token and updates the user&#x27;s sign-in status.
+   * @param data_form The authentication form data containing email and password.
+   * @returns A Promise that resolves to &#x60;true&#x60; if sign-in is successful, &#x60;false&#x60; otherwise.
+   */
+  async signIn(data_form: AuthFormData): Promise&lt;ServiceResponse&gt; {
+    // Mock authentication - simulate API call
+    console.log(&#x27;Signing in with data:&#x27;, data_form);
+    try {
+      let res &#x3D; await fetch(this.apiUrlService.LOGIN, {
+        method: &#x27;POST&#x27;,
+        headers: {
+          &#x27;Content-Type&#x27;: &#x27;application/json&#x27;
+        },
+        body: JSON.stringify(data_form)
+      }).then((res) &#x3D;&gt; res.json());
+      console.log(&#x27;Login response:&#x27;, res);
+      if (!res.token) {
+        console.log(&#x27;Login error:&#x27;, handleHttpError(res).message);
+        return { success: false, error: handleHttpError(res).message };
+      }
+      this._isSignIn.set(true);
+      localStorage.setItem(&#x27;token&#x27;, res.token);
+      await this.checkAuth();
+    } catch (error: any) {
+      return { success: false, error: handleHttpError(error).message };
+    }
+    return { success: true };
+  }
+
+  /**
+   * Registers a new user by sending their registration data and an optional avatar file to the sign-up API.
+   * @param data_form The registration form data containing user details.
+   * @param avatarFile Optional. The avatar image file to upload for the new user.
+   * @returns A Promise that resolves when the sign-up process is complete.
+   * @throws Error if registration fails or an invalid avatar file type is provided.
+   */
+  async signUp(data_form: AuthFormData, avatarFile?: File): Promise&lt;ServiceResponse&gt; {
+    const formData &#x3D; new FormData();
+    const file: File | Blob | null &#x3D; avatarFile || null;
+    // Créer l&#x27;objet JSON pour les données utilisateur
+    const userData &#x3D; {
+      email: data_form.email,
+      password: data_form.password,
+      name: data_form.name,
+      role: data_form.role
+    };
+
+    // Ajouter les données JSON comme Blob avec le bon Content-Type
+    formData.append(&#x27;data&#x27;, new Blob([JSON.stringify(userData)], {
+      type: &#x27;application/json&#x27;
+    }));
+    // Vérification plus stricte du fichier
+    if (avatarFile) {
+      if (avatarFile instanceof File) {
+        console.log(&#x27;Valid avatar file:&#x27;, avatarFile.name, avatarFile.type);
+        formData.append(&#x27;avatar&#x27;, avatarFile);
+      } else if (file instanceof Blob) {
+        console.log(&#x27;Avatar is a Blob, converting...&#x27;);
+        formData.append(&#x27;avatar&#x27;, file, &#x27;avatar.jpg&#x27;);
+      } else {
+        throw new Error(&#x27;Invalid avatar file&#x27;);
+      }
+    }
+
+    console.log(&#x27;Sending form data:&#x27;, userData);
+
+    // Debug: voir le contenu du FormData
+    for (let [key, value] of formData.entries()) {
+      console.log(&#x60;${key}:&#x60;, value);
+    }
+
+    try {
+      let res: any &#x3D; await fetch(this.apiUrlService.REGISTER, {
+        method: &#x27;POST&#x27;,
+        body: formData
+        // Ne pas définir Content-Type, le navigateur le fera automatiquement
+      });
+
+
+      const result &#x3D; await res.json();
+      console.log(&#x27;Registration success:&#x27;, !result.role);
+
+      if (!result.role) {
+        console.error(&#x27;Registration error:&#x27;, handleHttpError(result));
+        return { success: false, error: handleHttpError(result).message };
+      }
+
+
+      return { success: true, data: result };
+
+    } catch (error: any) {
+      console.error(&#x27;Registration error:&#x27;, error);
+      return { success: false, error: handleHttpError(error).message };
+    }
+  }
+
+  /**
+   * Signs out the current user by clearing local storage and resetting authentication states.
+   */
+  signOut(): ServiceResponse {
+    localStorage.removeItem(&#x27;currentUser&#x27;);
+    localStorage
+      .removeItem(&#x27;token&#x27;);
+    this._isSignIn.set(false);
+    localStorage.clear();
+    return { success: true };
+  }
+
+  /**
+   * Checks the current authentication status by verifying the stored token with the backend.
+   * Updates the &#x60;currentUserSubject&#x60; and &#x60;_isSignIn&#x60; signals based on the token&#x27;s validity.
+   * @returns A Promise that resolves to &#x60;true&#x60; if the user is authenticated, &#x60;false&#x60; otherwise.
+   */
+  async checkAuth(): Promise&lt;boolean&gt; {
+    const token &#x3D; localStorage.getItem(&#x27;token&#x27;);
+    if (!token || token &#x3D;&#x3D; undefined) {
+      this._isSignIn.set(false);
+      return false;
+    }
+
+    try {
+      const response &#x3D; await fetch(this.apiUrlService.GET_CURRENT_USER, {
+        headers: { &#x27;Authorization&#x27;: &#x60;Bearer ${token}&#x60; }
+      });
+
+      if (response.ok) {
+        const user &#x3D; await response.json();
+        this.currentUserSubject.set(user);
+        this._isSignIn.set(true);
+        return true;
+      }
+    } catch (error: any) {
+      this.sharedData.updateData({ error: &#x27;Auth check failed: wait a moment and will retry&#x27;, success: false });
+    }
+
+    this._isSignIn.set(false);
+    return false;
+  }
+
+  // /**
+  //  * Synchronously checks if an authentication token exists in local storage.
+  //  * This method is primarily used by route guards for immediate authentication checks.
+  //  * @returns &#x60;true&#x60; if a token is found, &#x60;false&#x60; otherwise.
+  //  */
+  // isAuthenticatedSync(): boolean {
+  //   return !!localStorage.getItem(&#x27;token&#x27;);
+  // }
+
+}</code></pre>
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+                   </div><div class="search-results">
+    <div class="has-results">
+        <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+        <ul class="search-results-list"></ul>
+    </div>
+    <div class="no-results">
+        <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+    </div>
+</div>
+</div>
+               <!-- END CONTENT -->
+           </div>
+       </div>
+
+          <label class="dark-mode-switch">
+               <input type="checkbox">
+               <span class="slider">
+                    <svg class="slider-icon" viewBox="0 0 24 24" fill="none" height="20" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" width="20" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
+                    </svg>
+               </span>
+          </label>
+
+       <script>
+            var COMPODOC_CURRENT_PAGE_DEPTH = 1;
+            var COMPODOC_CURRENT_PAGE_CONTEXT = 'injectable';
+            var COMPODOC_CURRENT_PAGE_URL = 'AuthService.html';
+            var MAX_SEARCH_RESULTS = 15;
+       </script>
+
+       <script>
+               $darkModeToggleSwitchers = document.querySelectorAll('.dark-mode-switch input');
+               checkToggle(darkModeState);
+               if ($darkModeToggleSwitchers.length > 0) {
+                    for (var i = 0; i < $darkModeToggleSwitchers.length; i++) {
+                         $darkModeToggleSwitchers[i].addEventListener('change', function (event) {
+                              darkModeState = !darkModeState;
+                              toggleDarkMode(darkModeState);
+                         });
+                    }
+               }
+          </script>
+
+       <script src="../js/libs/custom-elements.min.js"></script>
+       <script src="../js/libs/lit-html.js"></script>
+
+       <script src="../js/menu-wc.js" defer></script>
+       <script nomodule src="../js/menu-wc_es5.js" defer></script>
+
+       <script src="../js/libs/bootstrap-native.js"></script>
+
+       <script src="../js/libs/es6-shim.min.js"></script>
+       <script src="../js/libs/EventDispatcher.js"></script>
+       <script src="../js/libs/promise.min.js"></script>
+
+       <script src="../js/compodoc.js"></script>
+
+       <script src="../js/tabs.js"></script>
+       <script src="../js/menu.js"></script>
+       <script src="../js/libs/clipboard.min.js"></script>
+       <script src="../js/libs/prism.js"></script>
+       <script src="../js/sourceCode.js"></script>
+          <script src="../js/search/search.js"></script>
+          <script src="../js/search/lunr.min.js"></script>
+          <script src="../js/search/search-lunr.js"></script>
+          <script src="../js/search/search_index.js"></script>
+       <script src="../js/lazy-load-graphs.js"></script>
+
+
+    </body>
+</html>
