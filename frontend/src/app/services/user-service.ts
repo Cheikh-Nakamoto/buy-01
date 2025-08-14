@@ -332,19 +332,5 @@ export class UserService {
     throw lastError;
   }
 
-  /**
-   * Méthode utilitaire pour vérifier la connexion réseau
-   * @returns Promise<boolean>
-   */
-  async checkNetworkConnection(): Promise<boolean> {
-    try {
-      const response = await fetch('/api/health', { 
-        method: 'HEAD',
-        cache: 'no-cache'
-      });
-      return response.ok;
-    } catch {
-      return false;
-    }
-  }
+  
 }

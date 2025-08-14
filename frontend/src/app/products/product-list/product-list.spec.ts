@@ -10,7 +10,7 @@ describe('ProductList', () => {
     await TestBed.configureTestingModule({
       imports: [ProductList]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(ProductList);
     component = fixture.componentInstance;
@@ -19,5 +19,14 @@ describe('ProductList', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should display title', () => {
+    const compiled = fixture.nativeElement;
+    expect(compiled.querySelector('h1').textContent).toContain(component.title);
+  });
+
+  it('should emit event on click', () => {
+
   });
 });

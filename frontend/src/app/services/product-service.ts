@@ -84,11 +84,11 @@ export class ProductService {
     }
   }
 
- /**
-   * Retrieves the authentication token from local storage and formats it for HTTP headers.
-   * @returns The formatted authorization header string.
-   * @throws Error if no authentication token is found.
-   */
+  /**
+    * Retrieves the authentication token from local storage and formats it for HTTP headers.
+    * @returns The formatted authorization header string.
+    * @throws Error if no authentication token is found.
+    */
   private getHeaderToken(): string {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -234,12 +234,34 @@ export class ProductService {
   }
 
   /**
+   * Uploads a single image to a product.
+   * @param id The ID of the product.
+   * @param file The image file to upload.
+   * @returns A Promise resolving to the upload result or throwing an error.
+   */
+  private async uploadSingleImage(id: string, file: File): Promise<any> {
+    const formulaire = new FormData();
+    formulaire.append("file", file);
+
+    return await firstValueFrom(
+      this.http.post(this.apiUrl.ADD_IMG_BY_PRODUCT_ID(id), formulaire, {
+        headers: {
+          'Authorization': this.getHeaderToken()
+        }
+      }).pipe(
+        catchError((error: HttpErrorResponse) => {
+          console.error(`Error uploading file ${file.name}:`, error);
+          return throwError(() => handleHttpError(error));
+        })
+      )
+    );
+  }
+
+  /**
    * Adds one or more images to an existing product on the backend.
-   * Processes files sequentially and reports individual and overall success/failure.
    * @param id The ID of the product to add images to.
    * @param formdata An array of File objects representing the images to upload.
-   * @returns A Promise that resolves to a ServiceResponse indicating success or failure,
-   *          including details about uploaded and failed images.
+   * @returns A Promise that resolves to a ServiceResponse.
    */
   async addImageInProduct(id: string, formdata: File[]): Promise<ServiceResponse> {
     try {
@@ -247,36 +269,22 @@ export class ProductService {
 
       const results: any[] = [];
       const errors: string[] = [];
-      // Traitement séquentiel des fichiers
+
       for (let index = 0; index < formdata.length; index++) {
         const file = formdata[index];
-        const formulaire = new FormData();
-        formulaire.append("file", file);
-
+        console.log('Uploading image:', file.name);
         try {
-          const response = await firstValueFrom(
-            this.http.post(this.apiUrl.ADD_IMG_BY_PRODUCT_ID(id), formulaire, {
-              headers: {
-                'Authorization': this.getHeaderToken()
-              }
-            }).pipe(
-              catchError((error: HttpErrorResponse) => {
-                console.error(`Error uploading file ${file.name}:`, error);
-                return throwError(() => handleHttpError(error));
-              })
-            )
-          );
-
+          const response = await this.uploadSingleImage(id, file);
+          console.log(response);
           results.push({ file: file.name, response });
           console.log(`Image ${file.name} uploaded successfully`);
-
         } catch (error: any) {
           const errorMsg = `${error.message}`;
           errors.push(errorMsg);
           console.error(errorMsg);
         }
 
-        // Délai anti-spam
+        // Anti-spam delay
         if (index < formdata.length - 1) {
           await new Promise(resolve => setTimeout(resolve, 100));
         }
@@ -310,7 +318,6 @@ export class ProductService {
       };
     }
   }
-
 
 
 
@@ -376,41 +383,39 @@ export class ProductService {
     }
   }
 
+  // /**
+  //  * Utility method to retry an asynchronous operation with exponential backoff.
+  //  * @template T The return type of the operation.
+  //  * @param operation The asynchronous function to retry.
+  //  * @param maxRetries The maximum number of retry attempts. Defaults to 3.
+  //  * @param baseDelay The base delay in milliseconds before the first retry. Defaults to 1000ms.
+  //  * @returns A Promise that resolves with the result of the operation if successful,
+  //  *          or rejects with the last error after all retries are exhausted.
+  //  */
+  // async retryOperation<T>(
+  //   operation: () => Promise<T>,
+  //   maxRetries: number = 3,
+  //   baseDelay: number = 1000
+  // ): Promise<T> {
+  //   let lastError: any;
 
+  //   for (let attempt = 1; attempt <= maxRetries; attempt++) {
+  //     try {
+  //       return await operation();
+  //     } catch (error) {
+  //       lastError = error;
 
-  /**
-   * Utility method to retry an asynchronous operation with exponential backoff.
-   * @template T The return type of the operation.
-   * @param operation The asynchronous function to retry.
-   * @param maxRetries The maximum number of retry attempts. Defaults to 3.
-   * @param baseDelay The base delay in milliseconds before the first retry. Defaults to 1000ms.
-   * @returns A Promise that resolves with the result of the operation if successful,
-   *          or rejects with the last error after all retries are exhausted.
-   */
-  async retryOperation<T>(
-    operation: () => Promise<T>,
-    maxRetries: number = 3,
-    baseDelay: number = 1000
-  ): Promise<T> {
-    let lastError: any;
+  //       if (attempt === maxRetries) {
+  //         break;
+  //       }
 
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        return await operation();
-      } catch (error) {
-        lastError = error;
+  //       // Backoff exponentiel
+  //       const delay = baseDelay * Math.pow(2, attempt - 1);
+  //       console.log(`Attempt ${attempt} failed, retrying in ${delay}ms...`);
+  //       await new Promise(resolve => setTimeout(resolve, delay));
+  //     }
+  //   }
 
-        if (attempt === maxRetries) {
-          break;
-        }
-
-        // Backoff exponentiel
-        const delay = baseDelay * Math.pow(2, attempt - 1);
-        console.log(`Attempt ${attempt} failed, retrying in ${delay}ms...`);
-        await new Promise(resolve => setTimeout(resolve, delay));
-      }
-    }
-
-    throw lastError;
-  }
+  //   throw lastError;
+  // }
 }

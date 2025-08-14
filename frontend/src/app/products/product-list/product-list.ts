@@ -21,6 +21,10 @@ import { ToastError } from "../../error/toast-error/toast-error";
  * Handles product filtering, sorting, and interaction with the product service.
  */
 export class ProductList implements OnInit {
+  title(title: any) {
+    throw new Error('Method not implemented.');
+  }
+ 
 
   /**
    * TrackBy function for optimizing Angular's change detection when rendering product lists.
@@ -249,7 +253,7 @@ export class ProductList implements OnInit {
    * Updates the `filteredProducts` signal with the results.
    */
   applyFilters() {
-    let filtered = [...reverseListDoubleLoop(this.products())]; // Créer une copie inversée des produits
+    let filtered =this.products(); // Créer une copie inversée des produits
 
 
     // Filtrage par catégorie
@@ -306,6 +310,7 @@ export class ProductList implements OnInit {
    */
   onCategoryChange(category: string) {
     this.selectedCategory = category;
+    console.log('Selected category:', this.selectedCategory);
     this.applyFilters();
   }
 
