@@ -129,7 +129,7 @@ https://localhost:8443/swagger-ui.html
 ```bash
 cd frontend
 npm install
-npm run compodoc:serve
+npm run serve-docs
 npm start
 ```
 
@@ -211,12 +211,12 @@ Chaque service a sa propre base de données :
 ```bash
 cd frontend
 npm install
-npm run compodoc:serve
+npm run serve-docs
 ```
 #### After it, You'll able to see frontend doc on this link:
 
 
-[http://localhost:8080/](http://localhost:8080/)
+[http://localhost:4212/](http://localhost:4212/)
 
 
 ### Routes Gateway principales

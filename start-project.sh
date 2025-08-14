@@ -57,8 +57,8 @@ cd frontend || { echo "❌ Dossier 'frontend' introuvable."; exit 1; }
 
 echo -e "${GREEN}🌐 Lancement du frontend Angular avec proxy...${NC}"
 npm install
-# 💡 Lancer compodoc dans un terminal séparé
-launch_in_terminal "📘 Compodoc" "$PWD" "npm run compodoc:serve"
+# 💡 Lancer typedoc dans un terminal séparé
+launch_in_terminal "📘 Typedoc" "$PWD" "npm run serve-docs"
 
 # 💡 Lancer Angular dans le terminal courant
 npm start
