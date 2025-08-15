@@ -24,7 +24,7 @@ export class GuardService {
   canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
-  ): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+  ): Promise<boolean | UrlTree> | boolean | UrlTree {
     return this.authService.checkAuth().then(authenticated => {
       if (!authenticated) {
         return this.router.createUrlTree(['/auth'], {
