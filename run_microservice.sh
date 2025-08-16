@@ -114,6 +114,57 @@ start_mongo_container() {
     fi
 }
 
+# Lancer Kafka et Zookeeper si nécessaire
+start_kafka_stack() {
+    local zk_name="zookeeper"
+    local kafka_name="kafka"
+    local zk_image="confluentinc/cp-zookeeper:latest"
+    local kafka_image="confluentinc/cp-kafka:7.5.3"
+
+    echo -e "${GREEN}🧩 Initialisation de Kafka et Zookeeper...${NC}"
+
+    ensure_docker_image "$zk_image"
+    ensure_docker_image "$kafka_image"
+
+    # Zookeeper
+    echo -e "${BLUE}🛢️  Vérification du conteneur Zookeeper: ${YELLOW}${zk_name}${NC}"
+    if ! docker ps -a --format '{{.Names}}' | grep -q "^${zk_name}$"; then
+        echo -e "${YELLOW}🚀 Création et lancement de ${zk_name}...${NC}"
+        docker run -d \
+            --name "$zk_name" \
+            -p 2181:2181 \
+            -e ZOOKEEPER_CLIENT_PORT=2181 \
+            -e ZOOKEEPER_TICK_TIME=2000 \
+            --network buy-network \
+            "$zk_image" > /dev/null
+        echo -e "${GREEN}✅ ${zk_name} lancé avec succès${NC}"
+    else
+        docker start "$zk_name" > /dev/null
+        echo -e "${GREEN}✅ ${zk_name} déjà existant et démarré${NC}"
+    fi
+
+    sleep 5 # On attend un peu que Zookeeper soit prêt
+
+    # Kafka
+    echo -e "${BLUE}🛢️  Vérification du conteneur Kafka: ${YELLOW}${kafka_name}${NC}"
+    if ! docker ps -a --format '{{.Names}}' | grep -q "^${kafka_name}$"; then
+        echo -e "${YELLOW}🚀 Création et lancement de ${kafka_name}...${NC}"
+        docker run -d \
+            --name "$kafka_name" \
+            -p 9092:9092 \
+            -e KAFKA_BROKER_ID=1 \
+            -e KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181 \
+            -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092 \
+            -e KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1 \
+            --network buy-network \
+            "$kafka_image" > /dev/null
+        echo -e "${GREEN}✅ ${kafka_name} lancé avec succès${NC}"
+    else
+        docker start "$kafka_name" > /dev/null
+        echo -e "${GREEN}✅ ${kafka_name} déjà existant et démarré${NC}"
+    fi
+}
+
 echo -e "${GREEN}🧩 Initialisation des bases MongoDB nécessaires...${NC}"
 
 ensure_docker_network "buy-network"
@@ -122,6 +173,7 @@ start_mongo_container "user-mongodb" "user_db" 27017 "user_mongo_data"
 start_mongo_container "product-mongodb" "product_db" 27018 "product_mongo_data"
 start_mongo_container "media-mongodb" "media_db" 27019 "media_mongo_data"
 
+start_kafka_stack
 
 # Appliquer la config outside avant de lancer les services
 echo -e "${BLUE}🔧 Application de la configuration '--outside' avec toggle-config.sh...${NC}"
