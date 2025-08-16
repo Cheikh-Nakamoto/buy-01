@@ -1,10 +1,10 @@
 import { Injectable, signal } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { delay, map } from 'rxjs/operators';
 import { User, AuthFormData, AuthResponse, ServiceResponse } from '../models/interfaces';
 import { ApiUrlService } from './api-url-service';
 import { handleHttpError } from '../utils/utils';
 import { DataService } from './data-service';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +19,7 @@ export class AuthService {
   private _isSignIn = signal<boolean>(false);
   public isSignIn$ = this._isSignIn.asReadonly();
 
-  constructor(private apiUrlService: ApiUrlService, private sharedData: DataService) {
+  constructor(private apiUrlService: ApiUrlService, private sharedData: DataService, private http: HttpClient) {
     // Check for stored user
     this.checkAuth();
   }
@@ -31,21 +31,20 @@ export class AuthService {
    * @returns A Promise that resolves to `true` if sign-in is successful, `false` otherwise.
    */
   async signIn(data_form: AuthFormData): Promise<ServiceResponse> {
-    // Mock authentication - simulate API call
     console.log('Signing in with data:', data_form);
     try {
-      let res = await fetch(this.apiUrlService.LOGIN, {
-        method: 'POST',
+      const res = await firstValueFrom(this.http.post<any>(this.apiUrlService.LOGIN, data_form,{
         headers: {
           'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data_form)
-      }).then((res) => res.json());
+        }
+      }));
+
       console.log('Login response:', res);
-      if (!res.token) {
+      if (!res?.token) {
         console.log('Login error:', handleHttpError(res).message);
         return { success: false, error: handleHttpError(res).message };
       }
+
       this._isSignIn.set(true);
       localStorage.setItem('token', res.token);
       await this.checkAuth();
@@ -98,23 +97,22 @@ export class AuthService {
     }
 
     try {
-      let res: any = await fetch(this.apiUrlService.REGISTER, {
-        method: 'POST',
-        body: formData
-        // Ne pas définir Content-Type, le navigateur le fera automatiquement
-      });
+      let res = await firstValueFrom(this.http.post<any>(this.apiUrlService.REGISTER, formData, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }));
 
+      console.log('Registration response:', res);
+      console.log('Registration success:', !res.role);
 
-      const result = await res.json();
-      console.log('Registration success:', !result.role);
-
-      if (!result.role) {
-        console.error('Registration error:', handleHttpError(result));
-        return { success: false, error: handleHttpError(result).message };
+      if (!res.role) {
+        console.error('Registration error:', handleHttpError(res));
+        return { success: false, error: handleHttpError(res).message };
       }
 
 
-      return { success: true, data: result };
+      return { success: true, data: res };
 
     } catch (error: any) {
       console.error('Registration error:', error);
@@ -141,15 +139,17 @@ export class AuthService {
    */
   async checkAuth(): Promise<boolean> {
     const token = localStorage.getItem('token');
+    console.log('Checking auth with token:', token);
     if (!token || token == undefined) {
       this._isSignIn.set(false);
       return false;
     }
 
     try {
-      const response = await fetch(this.apiUrlService.GET_CURRENT_USER, {
+   
+      const response = await firstValueFrom(this.http.get<any>(this.apiUrlService.GET_CURRENT_USER, {
         headers: { 'Authorization': `Bearer ${token}` }
-      });
+      }));
 
       if (response.ok) {
         const user = await response.json();
@@ -164,14 +164,5 @@ export class AuthService {
     this._isSignIn.set(false);
     return false;
   }
-
-  // /**
-  //  * Synchronously checks if an authentication token exists in local storage.
-  //  * This method is primarily used by route guards for immediate authentication checks.
-  //  * @returns `true` if a token is found, `false` otherwise.
-  //  */
-  // isAuthenticatedSync(): boolean {
-  //   return !!localStorage.getItem('token');
-  // }
 
 }
