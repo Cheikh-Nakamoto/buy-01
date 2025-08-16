@@ -147,12 +147,11 @@ export class AuthService {
 
     try {
    
-      const response = await firstValueFrom(this.http.get<any>(this.apiUrlService.GET_CURRENT_USER, {
+      const user = await firstValueFrom(this.http.get<any>(this.apiUrlService.GET_CURRENT_USER, {
         headers: { 'Authorization': `Bearer ${token}` }
       }));
 
-      if (response.ok) {
-        const user = await response.json();
+      if (user.email) {
         this.currentUserSubject.set(user);
         this._isSignIn.set(true);
         return true;
