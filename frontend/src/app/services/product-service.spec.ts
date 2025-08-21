@@ -17,6 +17,7 @@ describe('ProductService', () => {
 
   beforeEach(() => {
     // Mock ApiUrlService
+    TestBed.resetTestEnvironment();
     const apiUrlSpy = jasmine.createSpyObj('ApiUrlService', [], {
       GET_ALL_PRODUCTS: '/api/products',
       GET_MY_ALL_PRODUCT: '/api/products/my',
@@ -87,6 +88,7 @@ describe('ProductService', () => {
   afterEach(() => {
     httpMock.verify();
     mockLocalStorage = {};
+    TestBed.resetTestEnvironment() // Reset the test environment after each test
   });
 
   describe('Service Creation', () => {

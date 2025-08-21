@@ -70,7 +70,6 @@
         "test": {
           "builder": "@angular/build:karma",
           "options": {
-            "browsers": "Chromium",
             "polyfills": [
               "zone.js",
               "zone.js/testing"

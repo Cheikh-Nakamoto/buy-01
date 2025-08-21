@@ -139,22 +139,20 @@ export class AuthService {
    */
   async checkAuth(): Promise<boolean> {
     const token = localStorage.getItem('token');
-    console.log('Checking auth with token:', token);
     if (!token || token == undefined) {
       this._isSignIn.set(false);
       return false;
     }
 
     try {
-   
       const response = await firstValueFrom(this.http.get<any>(this.apiUrlService.GET_CURRENT_USER, {
         headers: { 'Authorization': `Bearer ${token}` }
       }));
-
-      if (response.ok) {
-        const user = await response.json();
-        this.currentUserSubject.set(user);
+      console.log('Auth check response:', response.email.length > 0);
+      if (response.email.length > 0) {
+        this.currentUserSubject.set(response);
         this._isSignIn.set(true);
+        console.log("true existe")
         return true;
       }
     } catch (error: any) {

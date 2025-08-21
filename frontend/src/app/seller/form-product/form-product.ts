@@ -23,7 +23,7 @@ import { handleHttpError } from '../../utils/utils';
 export class FormProduct implements OnInit, OnDestroy {
   images: Array<{ preview: string, isNew: boolean, id: string }> = [];
   private imageFiles: File[] = [];
-  private imageDelete: string[] = [];
+  imageDelete: string[] = [];
   currentProduct: Product | null = null;
   private updateProductfield: Product | null = null;
   productForm: FormGroup;
@@ -32,7 +32,7 @@ export class FormProduct implements OnInit, OnDestroy {
   action_button = signal<boolean>(false);
 
   // Souscription pour éviter les fuites mémoire
-  private subscription!: Subscription;
+  subscription!: Subscription;
 
   // Propriétés pour le carrousel
   currentIndex = 0;
