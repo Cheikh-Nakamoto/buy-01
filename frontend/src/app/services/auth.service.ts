@@ -97,11 +97,7 @@ export class AuthService {
     }
 
     try {
-      let res = await firstValueFrom(this.http.post<any>(this.apiUrlService.REGISTER, formData, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }));
+      let res = await firstValueFrom(this.http.post<any>(this.apiUrlService.REGISTER, formData));
 
       console.log('Registration response:', res);
       console.log('Registration success:', !res.role);
