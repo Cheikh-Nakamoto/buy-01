@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { ApiUrlService } from './api-url-service';
 import { Product, ServiceResponse } from '../models/interfaces';
 import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
@@ -6,6 +6,7 @@ import { Observable, firstValueFrom, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { handleHttpError } from '../utils/utils';
+import { StorageService } from './service_test/storage.test.service';
 
 
 @Injectable({
@@ -16,7 +17,7 @@ import { handleHttpError } from '../utils/utils';
  * and deleting products and their associated images.
  */
 export class ProductService {
-
+  private storageService = inject(StorageService); // ← Injection du StorageService
   constructor(private apiUrl: ApiUrlService, private http: HttpClient) { }
 
   /**
@@ -90,7 +91,7 @@ export class ProductService {
     * @throws Error if no authentication token is found.
     */
   private getHeaderToken(): string {
-    const token = localStorage.getItem('token');
+    const token = this.storageService.getItem('token'); // ← Utilisez le service injecté
     if (!token) {
       throw new Error('No authentication token found. Please log in again.');
     }

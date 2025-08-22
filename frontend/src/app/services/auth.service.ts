@@ -1,10 +1,11 @@
-import { Injectable, signal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { User, AuthFormData, AuthResponse, ServiceResponse } from '../models/interfaces';
 import { ApiUrlService } from './api-url-service';
 import { handleHttpError } from '../utils/utils';
 import { DataService } from './data-service';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
+import { StorageService } from './service_test/storage.test.service';
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +19,7 @@ export class AuthService {
   public currentUser$ = this.currentUserSubject.asReadonly();
   private _isSignIn = signal<boolean>(false);
   public isSignIn$ = this._isSignIn.asReadonly();
+  private storageService = inject(StorageService); // ← Injection correcte
 
   constructor(private apiUrlService: ApiUrlService, private sharedData: DataService, private http: HttpClient) {
     // Check for stored user
@@ -33,7 +35,7 @@ export class AuthService {
   async signIn(data_form: AuthFormData): Promise<ServiceResponse> {
     console.log('Signing in with data:', data_form);
     try {
-      const res = await firstValueFrom(this.http.post<any>(this.apiUrlService.LOGIN, data_form,{
+      const res = await firstValueFrom(this.http.post<any>(this.apiUrlService.LOGIN, data_form, {
         headers: {
           'Content-Type': 'application/json'
         }
@@ -46,7 +48,7 @@ export class AuthService {
       }
 
       this._isSignIn.set(true);
-      localStorage.setItem('token', res.token);
+      this.storageService.setItem('token', res.token);
       await this.checkAuth();
     } catch (error: any) {
       return { success: false, error: handleHttpError(error).message };
@@ -120,11 +122,11 @@ export class AuthService {
    * Signs out the current user by clearing local storage and resetting authentication states.
    */
   signOut(): ServiceResponse {
-    localStorage.removeItem('currentUser');
-    localStorage
+    this.storageService.removeItem('currentUser');
+    this.storageService
       .removeItem('token');
     this._isSignIn.set(false);
-    localStorage.clear();
+    this.currentUserSubject.set(null); // Reset currentUserSubject
     return { success: true };
   }
 
@@ -134,7 +136,7 @@ export class AuthService {
    * @returns A Promise that resolves to `true` if the user is authenticated, `false` otherwise.
    */
   async checkAuth(): Promise<boolean> {
-    const token = localStorage.getItem('token');
+    const token = this.storageService.getItem('token');
     if (!token || token == undefined) {
       this._isSignIn.set(false);
       return false;

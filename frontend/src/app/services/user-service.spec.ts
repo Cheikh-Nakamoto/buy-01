@@ -1,9 +1,9 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { UserService } from './user-service';
 import { ApiUrlService } from './api-url-service';
-import { User, ServiceResponse } from '../models/interfaces';
-import { HttpErrorResponse, provideHttpClient } from '@angular/common/http';
+import { User } from '../models/interfaces';
+import { provideHttpClient } from '@angular/common/http';
 
 describe('UserService', () => {
   let service: UserService;
@@ -27,7 +27,6 @@ describe('UserService', () => {
     mockLocalStorage = {
       'token': 'eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9TRUxMRVIiLCJzdWIiOiJhemVydHlmZXBwZG91Z291QGdtYWlsLmNvbSIsImlhdCI6MTc1NDk5NjAyOSwiZXhwIjoxNzU1MDMyMDI5fQ.gT7BIqQYbtWfxH3PDAKcjzk0QW8S_fcvVzMySOvmH5A'
     };
-
     spyOn(localStorage, 'getItem').and.callFake((key: string) => mockLocalStorage[key] || null);
     spyOn(localStorage, 'setItem').and.callFake((key: string, value: string) => mockLocalStorage[key] = value);
     spyOn(localStorage, 'removeItem').and.callFake((key: string) => delete mockLocalStorage[key]);

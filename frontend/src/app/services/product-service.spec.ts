@@ -1,14 +1,16 @@
-import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { fakeAsync, inject, TestBed, tick } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ProductService } from './product-service';
 import { ApiUrlService } from './api-url-service';
 import { Product, ServiceResponse } from '../models/interfaces';
 import { HttpErrorResponse, HttpResponse, provideHttpClient } from '@angular/common/http';
+import { MockStorageService, StorageService } from './service_test/storage.test.service';
 
 describe('ProductService', () => {
   let service: ProductService;
   let httpMock: HttpTestingController;
   let apiUrlService: jasmine.SpyObj<ApiUrlService>;
+  let storageService: MockStorageService; // ← Référence directe au mock
   let mockProducts: Product[];
   let mockProduct: Product;
 
@@ -17,7 +19,6 @@ describe('ProductService', () => {
 
   beforeEach(() => {
     // Mock ApiUrlService
-    TestBed.resetTestEnvironment();
     const apiUrlSpy = jasmine.createSpyObj('ApiUrlService', [], {
       GET_ALL_PRODUCTS: '/api/products',
       GET_MY_ALL_PRODUCT: '/api/products/my',
@@ -31,12 +32,10 @@ describe('ProductService', () => {
 
     // Setup mock localStorage
     mockLocalStorage = {
-      'token': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9TRUxMRVIiLCJzdWIiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiaWF0IjoxNjkwMDAwMDAwLCJleHAiOjE2OTAwMzYwMDB9.test'
+      'token': 'eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9TRUxMRVIiLCJzdWIiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiaWF0IjoxNjkwMDAwMDAwLCJleHAiOjE2OTAwMzYwMDB9.test'
     };
 
-    spyOn(localStorage, 'getItem').and.callFake((key: string) => mockLocalStorage[key] || null);
-    spyOn(localStorage, 'setItem').and.callFake((key: string, value: string) => mockLocalStorage[key] = value);
-    spyOn(localStorage, 'removeItem').and.callFake((key: string) => delete mockLocalStorage[key]);
+
 
     TestBed.configureTestingModule({
 
@@ -44,6 +43,7 @@ describe('ProductService', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         ProductService,
+        { provide: StorageService, useClass: MockStorageService }, // ← Injection du mock
         { provide: ApiUrlService, useValue: apiUrlSpy }
       ]
     });
@@ -51,6 +51,12 @@ describe('ProductService', () => {
     service = TestBed.inject(ProductService);
     httpMock = TestBed.inject(HttpTestingController);
     apiUrlService = TestBed.inject(ApiUrlService) as jasmine.SpyObj<ApiUrlService>;
+    storageService = TestBed.inject(StorageService) as MockStorageService; // ← Récupération du mock
+
+
+
+    // Configuration du token dans le service mocké
+    storageService.setItem('token', 'eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9TRUxMRVIiLCJzdWIiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiaWF0IjoxNjkwMDAwMDAwLCJleHAiOjE2OTAwMzYwMDB9.test');
 
     // Mock data
     mockProduct = {
@@ -87,8 +93,7 @@ describe('ProductService', () => {
 
   afterEach(() => {
     httpMock.verify();
-    mockLocalStorage = {};
-    TestBed.resetTestEnvironment() // Reset the test environment after each test
+    storageService.clear(); // ← Nettoyage du mock
   });
 
   describe('Service Creation', () => {
@@ -158,8 +163,7 @@ describe('ProductService', () => {
     });
 
     it('should throw error when no token is available', () => {
-      mockLocalStorage = {}; // Clear token
-
+      storageService.removeItem('token');
       expect(() => {
         service.getMyProduct().subscribe();
       }).toThrowError('No authentication token found. Please log in again.');
@@ -435,8 +439,7 @@ describe('ProductService', () => {
 
   describe('Authentication', () => {
     it('should throw error when token is missing', () => {
-      mockLocalStorage = {}; // Clear token
-
+      storageService.removeItem('token');
       expect(() => {
         (service as any).getHeaderToken();
       }).toThrowError('No authentication token found. Please log in again.');
